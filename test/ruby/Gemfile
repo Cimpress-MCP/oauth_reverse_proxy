@@ -1,0 +1,3 @@
+source 'http://artifactory.vistaprint.net/api/gems/rubygems/'
+
+gem 'oauth', '0.3.6'

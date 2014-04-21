@@ -6,7 +6,7 @@ var oauth = require('oauth').OAuth;
 
 var oa = new oauth('', '', 'super-insecure-test-key', 'super-insecure-secret', '1.0', null, 'HMAC-SHA1');
 
-oa.getProtectedResource("http://localhost:8000/job", "GET", null, null, 
+oa.getProtectedResource("http://localhost:8000/job?do=query&strings=kill&us=or&not=true", "GET", null, null,
   function (error, data, response) {
     util.puts(data);
   }

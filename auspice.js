@@ -7,7 +7,8 @@ var logger = require('./utils/logger.js').getLogger('auspice');
 var proxy = httpProxy.createProxyServer({});
 
 var server = require('http').createServer(function(req, res) {
-  logger.info("Got req:\n%s", util.inspect(req.headers.authorization));
+  logger.info("Got req url:\n%s", util.inspect(req.url));
+  logger.info("Got req auth:\n%s", util.inspect(req.headers.authorization));
   authenticator.authenticateRequest(req, function(err) {
     if (err) {
       res.writeHead(401);

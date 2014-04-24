@@ -15,3 +15,5 @@ SIGNATURE=`echo -n $TO_SIGN | openssl sha1 -hmac "$CONSUMER_SECRET" -binary | ba
 #echo $NONCE
 
 curl -G --data-urlencode "oauth_consumer_key=$CONSUMER_KEY" --data-urlencode "oauth_nonce=$NONCE" --data-urlencode "oauth_signature_method=HMAC-SHA1" --data-urlencode "oauth_signature=$SIGNATURE" --data-urlencode "oauth_version=1.0" --data-urlencode "oauth_timestamp=$TIME" http://localhost:8000/job
+
+#curl --data "happy=sad" http://localhost:8000/job

@@ -12,7 +12,8 @@
   "dependencies": {
     "log4js": "~0.6.13",
     "http-proxy": "~1.1.2",
-    "oauth": "~0.9.11"
+    "connect": "2.14.4",
+    "connect-restreamer": "1.0.0"
   },
   "licenses": [
     {

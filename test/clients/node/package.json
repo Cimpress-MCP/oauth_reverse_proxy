@@ -1,0 +1,20 @@
+{
+  "name": "auspice-client",
+  "description": "Authenticating service proxy test client",
+  "version": "0.0.1",
+  "contributors": [
+    {
+      "name": "Ryan Breen",
+      "email": "rbreen@vistaprint.com",
+      "web": ""
+    }
+  ],
+  "dependencies": {
+    "oauth": "~0.9.11"
+  },
+  "licenses": [
+    {
+      "name": "proprietary"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 #!/bin/bash
-CONSUMER_KEY=super-insecure-client-key
+CONSUMER_KEY=super-insecure-test-key
 CONSUMER_SECRET=super-insecure-secret\&
 
 TIME=$(($(date +'%s * 1000 + %-N / 1000000')))

@@ -1,23 +1,27 @@
 var util = require('util');
-var httpProxy = require('http-proxy');
-var authenticator = require('./lib/authenticator.js');
+
+var proxy_manager = require('./lib/proxy_manager.js');
 
 var logger = require('./utils/logger.js').getLogger('auspice');
 
-var proxy = httpProxy.createProxyServer({});
+// We use string trimming throughout the application, so update the prototype here.
+if (typeof(String.prototype.trim) === "undefined") {
+  // Add a strip command to make input parsing cleaner.
+  String.prototype.trim = function() {
+    return String(this).replace(/^\s+|\s+$/g, '');
+  };
+}
 
-var server = require('http').createServer(function(req, res) {
-  logger.info("Got req url:\n%s", util.inspect(req.url));
-  logger.info("Got req auth:\n%s", util.inspect(req.headers.authorization));
-  authenticator.authenticateRequest(req, function(err) {
-    if (err) {
-      res.writeHead(401);
-      res.write(err);
-      return res.end();
-    }
-    proxy.web(req, res, { target: 'http://localhost:8080/'});
-  });
+try {
+  var config = require('./utils/config_loader.js').getState('config.json');
+} catch(e) {
+  logger.error('Failed to load auspice config due to %s', e);
+  process.exit(1);
+}
 
+process.on('uncaughtException', function(err) {
+  // handle the error safely
+  logger.error(err);
 });
 
-server.listen(8000);
+proxy_manager.init(config.root_dir);

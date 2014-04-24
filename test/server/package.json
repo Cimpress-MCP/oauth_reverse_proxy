@@ -1,0 +1,21 @@
+{
+  "name": "auspice-test-server",
+  "description": "A simple express test server to put behind our authenticating proxy",
+  "version": "0.0.1",
+  "contributors": [
+    {
+      "name": "Ryan Breen",
+      "email": "rbreen@vistaprint.com"
+    }
+  ],
+  "dependencies": {
+    "express": "~4.0.0",
+    "body-parser": "~1.0.2",
+    "method-override": "~1.0.0"
+  },
+  "licenses": [
+    {
+      "name": "proprietary"
+    }
+  ]
+}

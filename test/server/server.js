@@ -6,7 +6,7 @@ app.use(require ('method-override')());
 
 app.get("/job", function(req, res) {
   
-  console.log("Request looks like:\n%s", util.inspect(req));
+  console.log("Request looks like:\n%s", util.inspect(req.headers));
   
   res.send({'status':'ok'});
 });

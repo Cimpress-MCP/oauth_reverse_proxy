@@ -4,6 +4,7 @@ using DotNetOpenAuth.OAuth.ChannelElements;
 using DotNetOpenAuth.OAuth.Messages;
 
 using System;
+using System.Collections.Generic;
 
 namespace AuspiceClient
 {
@@ -59,20 +60,16 @@ namespace AuspiceClient
 
             var zeroLeggedWebConsumer = new DotNetOpenAuth.OAuth.WebConsumer(providerDesc, new ZeroLeggedTokenManager("super-insecure-test-key", "super-insecure-secret"));
 
-            var response = zeroLeggedWebConsumer.PrepareAuthorizedRequestAndSend(
-                new MessageReceivingEndpoint("http://localhost:8000/job",
-                   HttpDeliveryMethods.GetRequest), "DUMMY");
-            using (var reader = new System.IO.StreamReader(response.ResponseStream))
+            var endpoint = new MessageReceivingEndpoint("http://10.95.251.69:8000/job?query=parameters&also=good", HttpDeliveryMethods.AuthorizationHeaderRequest | HttpDeliveryMethods.PostRequest);
+            var httpRequest = zeroLeggedWebConsumer.PrepareAuthorizedRequest(endpoint, "DUMMY", new Dictionary<String, String>()
             {
-                char[] buffer = new char[1024];
-                int read = 0;
-                int i = 0;
-                do
-                {
-                    read = reader.Read(buffer, 0, buffer.Length);
-                    Console.Write("{0}", new String(buffer, 0, read));
-                } while (!reader.EndOfStream);
-            }
+                {"are", "post"},
+                {"parameters", "handled"},
+            });
+
+            var response = httpRequest.GetResponse();
+            var responseContent = new System.IO.StreamReader(response.GetResponseStream()).ReadToEnd();
+            Console.Out.WriteLine(responseContent);
         }
     }
 }

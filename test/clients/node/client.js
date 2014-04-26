@@ -1,12 +1,19 @@
 var util = require('util');
 
-var logger = require('../utils/logger.js').getLogger('test-client');
-
 var oauth = require('oauth').OAuth;
 
 var oa = new oauth('', '', 'super-insecure-test-key', 'super-insecure-secret', '1.0', null, 'HMAC-SHA1');
 
-oa.getProtectedResource("http://localhost:8000/job?do=query&strings=kill&us=or&not=true", "GET", null, null,
+var post_body = {
+  posts:'should',
+  fun: 'kill',
+  beans: 'either',
+  strings: 'cheese'
+//  not: 'true'
+};
+
+oa.post("http://localhost:8000/job?do=query&strings=kill&us=or&not=true", "", "", 
+  post_body, 'application/x-www-form-urlencoded',
   function (error, data, response) {
     util.puts(data);
   }

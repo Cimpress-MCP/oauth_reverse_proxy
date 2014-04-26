@@ -11,6 +11,14 @@ app.get("/job", function(req, res) {
   res.send({'status':'ok'});
 });
 
+app.post("/job", function(req, res) {
+  
+  console.log("Request looks like:\n%s", util.inspect(req.headers));
+  console.log("Body looks like:\n%s", util.inspect(req.body));
+  
+  res.send({'status':'ok'});
+});
+
 var server = app.listen(8888, function() {
   console.log("Listening on port %d", server.address().port);
 });

@@ -2,7 +2,7 @@ require 'oauth'
 require 'net/http'
 
 @consumer=OAuth::Consumer.new(
-  "super-insecure-client-key",
+  "super-insecure-test-key",
 	"super-insecure-secret",
 	:site => "http://localhost:8000/",
   :request_token_path => "",
@@ -12,7 +12,7 @@ require 'net/http'
  
 access_token = OAuth::AccessToken.new @consumer
  
-resp = access_token.get("/job")
+resp = access_token.get("/job?do=query&strings=kill&us=or&not=&not=would&be=good")
  
 puts resp.code + "\r\n"
 puts resp.body

@@ -1,34 +1,50 @@
 package com.vistaprint.auspice;
 
-import com.google.api.client.auth.oauth.OAuthHmacSigner;
-import com.google.api.client.auth.oauth.OAuthParameters;
-import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpResponse;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
+import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+import oauth.signpost.OAuthConsumer;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 
 public class Client {
 	private static final String CONSUMER_KEY = "super-insecure-test-key";
 	private static final String CONSUMER_SECRET = "super-insecure-secret";
 
 	public static void main(String[] args) throws Exception {
-		HttpTransport transport = new NetHttpTransport();
+		
+		OAuthConsumer consumer = new CommonsHttpOAuthConsumer(CONSUMER_KEY, CONSUMER_SECRET);
 
-		OAuthHmacSigner signer = new OAuthHmacSigner();
-		signer.clientSharedSecret = CONSUMER_SECRET;
+		URL url = new URL("http://localhost:8000/job?this=is&fun=right");
+		
+		HttpPost request = new HttpPost(url.toURI());
+		List<NameValuePair> params = new LinkedList<NameValuePair>();
+		// TODO: The below line doesn't work because Java SignPost can't handle query and post
+		// params with the same name.
+		// params.add(new BasicNameValuePair("this", "post"));
+		params.add(new BasicNameValuePair("post", "happy"));
+		params.add(new BasicNameValuePair("wow", "so"));
+		params.add(new BasicNameValuePair("signposty", "a"));
+		params.add(new BasicNameValuePair("signposty", "b"));
+		params.add(new BasicNameValuePair("signposty", "rad"));
+		request.setEntity(new UrlEncodedFormEntity(params));
 
-		OAuthParameters params = new OAuthParameters();
-		params.consumerKey = CONSUMER_KEY;
-		params.signer = signer;
+        // sign the request
+        consumer.sign(request);
 
-		// utilize accessToken to access protected resources
-		HttpRequestFactory factory = transport.createRequestFactory(params);
-		GenericUrl url = new GenericUrl("http://localhost:8000/job");
-		HttpRequest req = factory.buildGetRequest(url);
-		HttpResponse resp = req.execute();
-		System.out.println("Response Status Code: " + resp.getStatusCode());
-		System.out.println("Response body:" + resp.parseAsString());
+        // send the request
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpResponse response = httpClient.execute(request);
+		
+		// Print the result
+		System.out.println("Got response:\n" + response.getStatusLine());
 	}
 }

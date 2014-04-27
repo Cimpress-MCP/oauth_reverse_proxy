@@ -8,8 +8,8 @@ var post_body = {
   posts:'should',
   fun: 'kill',
   beans: 'either',
-  strings: 'cheese'
-//  not: 'true'
+  strings: 'cheese',
+  not: 'true'
 };
 
 oa.post("http://localhost:8000/job?do=query&strings=kill&us=or&not=true", "", "", 

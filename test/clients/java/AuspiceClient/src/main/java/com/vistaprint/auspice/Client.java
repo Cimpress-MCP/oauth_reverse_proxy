@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -16,12 +17,14 @@ import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 
 public class Client {
-	private static final String CONSUMER_KEY = "super-insecure-test-key";
-	private static final String CONSUMER_SECRET = "super-insecure-secret";
+	private static final String CONSUMER_KEY = "java-test-key";
 
 	public static void main(String[] args) throws Exception {
 		
-		OAuthConsumer consumer = new CommonsHttpOAuthConsumer(CONSUMER_KEY, CONSUMER_SECRET);
+		URL consumerKeyUrl = new URL("http://localhost:8787/proxy/8000/key/" + CONSUMER_KEY + "/");
+		String consumerSecret = IOUtils.toString(consumerKeyUrl.openConnection().getInputStream());
+		
+		OAuthConsumer consumer = new CommonsHttpOAuthConsumer(CONSUMER_KEY, consumerSecret);
 
 		URL url = new URL("http://localhost:8000/job?this=is&fun=right");
 		

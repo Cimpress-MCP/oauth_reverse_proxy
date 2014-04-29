@@ -1,6 +1,6 @@
 #!/bin/bash
-CONSUMER_KEY=super-insecure-test-key
-CONSUMER_SECRET=super-insecure-secret\&
+CONSUMER_KEY=bash-test-key
+CONSUMER_SECRET=`curl --silent http://localhost:8787/proxy/8000/key/$CONSUMER_KEY/`\&
 
 TIME=$(($(date +'%s * 1000 + %-N / 1000000')))
 NONCE=$(LC_CTYPE=C tr -dc A-Za-z0-9 < /dev/urandom | head -c 32 | xargs)
@@ -14,6 +14,6 @@ SIGNATURE=`echo -n $TO_SIGN | openssl sha1 -hmac "$CONSUMER_SECRET" -binary | ba
 #echo $SIGNATURE
 #echo $NONCE
 
-curl -G --data-urlencode "oauth_consumer_key=$CONSUMER_KEY" --data-urlencode "oauth_nonce=$NONCE" --data-urlencode "oauth_signature_method=HMAC-SHA1" --data-urlencode "oauth_signature=$SIGNATURE" --data-urlencode "oauth_version=1.0" --data-urlencode "oauth_timestamp=$TIME" http://localhost:8000/job
+curl --silent -G --data-urlencode "oauth_consumer_key=$CONSUMER_KEY" --data-urlencode "oauth_nonce=$NONCE" --data-urlencode "oauth_signature_method=HMAC-SHA1" --data-urlencode "oauth_signature=$SIGNATURE" --data-urlencode "oauth_version=1.0" --data-urlencode "oauth_timestamp=$TIME" http://localhost:8000/job
 
 #curl --data "happy=sad" http://localhost:8000/job

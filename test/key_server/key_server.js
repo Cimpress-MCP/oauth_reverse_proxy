@@ -38,7 +38,7 @@ app.get("/proxy/:from_port/key/:key_id/", function(req, res) {
  */
 app.post('/proxy/:from_port/key/', function(req, res) {
   var keyfile = createPath(req.params.from_port, req.body.key_id);
-  logger.trace("Attempting to write key %s", keyfile);
+  logger.trace("Attempting to create key %s", keyfile);
   fs.writeFile(keyfile, uuid.v4(), function(err) {
     if (err) return res.send(500, err);
     res.sendfile(keyfile);
@@ -50,6 +50,7 @@ app.post('/proxy/:from_port/key/', function(req, res) {
  */
 app.delete("/proxy/:from_port/key/:key_id", function(req, res) {
   var keyfile = createPath(req.params.from_port, req.params.key_id);
+  logger.trace("Deleting key %s", keyfile);
   fs.unlink(keyfile, function (err) {
     if (err) return res.send(500, err);
     res.send('ok');

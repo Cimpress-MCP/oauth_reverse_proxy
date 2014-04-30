@@ -1,12 +1,15 @@
 [Reflection.Assembly]::LoadWithPartialName("System.Security")
 [Reflection.Assembly]::LoadWithPartialName("System.Net")
 
-$oauth_consumer_key = "super-insecure-client-key";
-$oauth_consumer_secret = "super-insecure-secret";
+$oauth_consumer_key = "powershell-test-key";
+
+$client = new-object System.Net.WebClient;
+$oauth_consumer_secret = $client.DownloadString("http://localhost:8787/proxy/8000/key/" + $oauth_consumer_key + "/");
+
 $oauth_token_secret = "";
 $oauth_nonce = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes([System.DateTime]::Now.Ticks.ToString()));
-$ts = [System.DateTime]::UtcNow - [System.DateTime]::ParseExact("01/01/1970", "dd/MM/yyyy", $null).ToUniversalTime();
-$oauth_timestamp = [System.Convert]::ToInt64($ts.TotalSeconds).ToString();
+# TODO: Should we enforce that all clients use GMT epoch time?
+$oauth_timestamp = [int][double]::Parse($(Get-Date -date (Get-Date).ToUniversalTime()-uformat %s));
 
 $signature = "GET&";
 $signature += [System.Uri]::EscapeDataString("http://localhost:8000/job") + "&";

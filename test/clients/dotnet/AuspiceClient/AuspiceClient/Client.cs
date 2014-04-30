@@ -5,6 +5,7 @@ using DotNetOpenAuth.OAuth.Messages;
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace AuspiceClient
 {
@@ -58,9 +59,13 @@ namespace AuspiceClient
                 TamperProtectionElements = new ITamperProtectionChannelBindingElement[] { new HmacSha1SigningBindingElement() }
             };
 
-            var zeroLeggedWebConsumer = new DotNetOpenAuth.OAuth.WebConsumer(providerDesc, new ZeroLeggedTokenManager("super-insecure-test-key", "super-insecure-secret"));
+            var consumerKey = "dotnet-test-key";
+            var client = new WebClient();
+            var consumerSecret = client.DownloadString("http://localhost:8787/proxy/8000/key/" + consumerKey + "/");
 
-            var endpoint = new MessageReceivingEndpoint("http://10.95.251.69:8000/job?query=parameters&also=good", HttpDeliveryMethods.AuthorizationHeaderRequest | HttpDeliveryMethods.PostRequest);
+            var zeroLeggedWebConsumer = new DotNetOpenAuth.OAuth.WebConsumer(providerDesc, new ZeroLeggedTokenManager(consumerKey, consumerSecret));
+
+            var endpoint = new MessageReceivingEndpoint("http://localhost:8000/job?query=parameters&also=good", HttpDeliveryMethods.AuthorizationHeaderRequest | HttpDeliveryMethods.PostRequest);
             var httpRequest = zeroLeggedWebConsumer.PrepareAuthorizedRequest(endpoint, "DUMMY", new Dictionary<String, String>()
             {
                 {"are", "post"},

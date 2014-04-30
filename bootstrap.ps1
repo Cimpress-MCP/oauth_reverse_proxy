@@ -13,6 +13,9 @@ function CreateNewKey {
 # node process, cool.
 Stop-Process -processname node -erroraction 'silentlycontinue'
 
+Start-Process -NoNewWindow -Wait npm install
+Start-Process -NoNewWindow -Wait -WorkingDirectory test\key_server\ npm install
+
 # Fixup path to be node-friendlier.
 $root_dir = $root_dir.Replace("\", "\\")
 "Creating config in $root_dir"
@@ -39,4 +42,5 @@ CreateNewKey "java-test-key"
 CreateNewKey "dotnet-test-key"
 CreateNewKey "node-test-key"
 
+Start-Process -NoNewWindow -Wait -WorkingDirectory test\server\ npm install
 Start-Process -Wait -NoNewWindow -WorkingDirectory test\server\ node job_server.js

@@ -13,6 +13,8 @@ function CreateNewKey {
 # node process, cool.
 Stop-Process -processname node -erroraction 'silentlycontinue'
 
+# Fixup path to be node-friendlier.
+$root_dir = $root_dir.Replace("\", "\\")
 "Creating config in $root_dir"
 
 Set-Content -Value "{ `"root_dir`": `"$root_dir`" }" -Path config.json

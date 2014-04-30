@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "auspice", "auspice.njsproj", "{969CE1FB-96DC-4CC0-B8FD-97B408163D7A}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "key_server", "test\key_server\key_server.njsproj", "{2B2F402B-15CA-42F6-A088-681C06880E58}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "server", "test\server\server.njsproj", "{A12F5A47-8E51-45F0-85D6-F787F9E39960}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{969CE1FB-96DC-4CC0-B8FD-97B408163D7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{969CE1FB-96DC-4CC0-B8FD-97B408163D7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{969CE1FB-96DC-4CC0-B8FD-97B408163D7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{969CE1FB-96DC-4CC0-B8FD-97B408163D7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B2F402B-15CA-42F6-A088-681C06880E58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B2F402B-15CA-42F6-A088-681C06880E58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B2F402B-15CA-42F6-A088-681C06880E58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B2F402B-15CA-42F6-A088-681C06880E58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A12F5A47-8E51-45F0-85D6-F787F9E39960}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A12F5A47-8E51-45F0-85D6-F787F9E39960}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A12F5A47-8E51-45F0-85D6-F787F9E39960}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A12F5A47-8E51-45F0-85D6-F787F9E39960}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

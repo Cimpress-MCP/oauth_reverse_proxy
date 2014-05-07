@@ -4,7 +4,7 @@
 $oauth_consumer_key = "powershell-test-key";
 
 $client = new-object System.Net.WebClient;
-$oauth_consumer_secret = $client.DownloadString("http://localhost:8787/proxy/8000/key/" + $oauth_consumer_key + "/");
+$oauth_consumer_secret = $client.DownloadString("http://localhost:8787/proxy/8000/8888/key/" + $oauth_consumer_key + "/");
 
 $oauth_token_secret = "";
 $oauth_nonce = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes([System.DateTime]::Now.Ticks.ToString()));

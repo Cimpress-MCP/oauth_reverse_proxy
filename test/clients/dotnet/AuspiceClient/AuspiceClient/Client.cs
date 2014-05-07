@@ -61,7 +61,7 @@ namespace AuspiceClient
 
             var consumerKey = "dotnet-test-key";
             var client = new WebClient();
-            var consumerSecret = client.DownloadString("http://localhost:8787/proxy/8000/key/" + consumerKey + "/");
+            var consumerSecret = client.DownloadString("http://localhost:8787/proxy/8000/8888/key/" + consumerKey + "/");
 
             var zeroLeggedWebConsumer = new DotNetOpenAuth.OAuth.WebConsumer(providerDesc, new ZeroLeggedTokenManager(consumerKey, consumerSecret));
 

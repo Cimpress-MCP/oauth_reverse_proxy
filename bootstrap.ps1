@@ -6,7 +6,7 @@ function CreateNewKey {
 	$client = new-object System.Net.WebClient;
 	$post_body = new-object Collections.Specialized.NameValueCollection;
 	$post_body.Add("key_id", $args[0]);
-	$result = $client.UploadValues("http://localhost:8787/proxy/8000/key/", "POST", $post_body);
+	$result = $client.UploadValues("http://localhost:8787/proxy/8000/8888/key/", "POST", $post_body);
 }
 
 # Killall node.js processes because we're mean like that.  If there's no
@@ -22,9 +22,7 @@ $root_dir = $root_dir.Replace("\", "\\")
 
 Set-Content -Value "{ `"root_dir`": `"$root_dir`" }" -Path config.json
 
-New-Item -ItemType directory -Path $root_dir\8000\keys -erroraction 'silentlycontinue'
-
-Set-Content -Value "{ `"to_port`": 8888 }" -Path $root_dir\8000\config.json
+New-Item -ItemType directory -Path $root_dir\8000\8888 -erroraction 'silentlycontinue'
 
 Start-Process -NoNewWindow node auspice.js
 Start-Process -NoNewWindow -WorkingDirectory test\key_server\ node key_server.js

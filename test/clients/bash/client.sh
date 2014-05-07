@@ -1,6 +1,6 @@
 #!/bin/bash
 CONSUMER_KEY=bash-test-key
-CONSUMER_SECRET=`curl --silent http://localhost:8787/proxy/8000/key/$CONSUMER_KEY/`\&
+CONSUMER_SECRET=`curl --silent http://localhost:8787/proxy/8000/8888/key/$CONSUMER_KEY/`\&
 
 TIME=$(($(date +'%s * 1000 + %-N / 1000000')))
 NONCE=$(LC_CTYPE=C tr -dc A-Za-z0-9 < /dev/urandom | head -c 32 | xargs)

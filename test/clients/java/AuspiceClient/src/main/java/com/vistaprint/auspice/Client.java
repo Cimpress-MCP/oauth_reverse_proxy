@@ -21,7 +21,7 @@ public class Client {
 
 	public static void main(String[] args) throws Exception {
 		
-		URL consumerKeyUrl = new URL("http://localhost:8787/proxy/8000/key/" + CONSUMER_KEY + "/");
+		URL consumerKeyUrl = new URL("http://localhost:8787/proxy/8000/8888/key/" + CONSUMER_KEY + "/");
 		String consumerSecret = IOUtils.toString(consumerKeyUrl.openConnection().getInputStream());
 		
 		OAuthConsumer consumer = new CommonsHttpOAuthConsumer(CONSUMER_KEY, consumerSecret);

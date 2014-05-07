@@ -3,7 +3,7 @@ var util = require('util');
 
 var consumer_key = 'node-test-key';
 
-var req = http.get("http://localhost:8787/proxy/8000/key/" + consumer_key + "/", function(res) {
+var req = http.get("http://localhost:8787/proxy/8000/8888/key/" + consumer_key + "/", function(res) {
   
   var consumer_secret = "";
   

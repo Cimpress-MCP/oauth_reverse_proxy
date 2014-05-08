@@ -1,5 +1,10 @@
 var util = require('util');
 
+/**
+ * If we're running as a Windows service, we'll have an environment variable
+ * pointing to the correct working dir for the app.  Update the working dir
+ * before doing anything involving relative paths.
+ */
 if (process.env.AUSPICE_HOME) {
   console.log("Changing home directory to " + process.env.AUSPICE_HOME);
   process.chdir(process.env.AUSPICE_HOME);
@@ -25,8 +30,11 @@ try {
 }
 
 process.on('uncaughtException', function(err) {
-  // handle the error safely
+  // If an exception blew up a function, log it.  We'll want to audit these via
+  // logstash and address the root cause.
   logger.error(err);
 });
 
+// Create a proxy manager at our configured root dir.  All the real work happens
+// in there.
 proxy_manager.init(config.root_dir);

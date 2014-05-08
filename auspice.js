@@ -1,5 +1,10 @@
 var util = require('util');
 
+if (process.env.AUSPICE_HOME) {
+  console.log("Changing home directory to " + process.env.AUSPICE_HOME);
+  process.chdir(process.env.AUSPICE_HOME);
+}
+
 var proxy_manager = require('./lib/proxy_manager.js');
 
 var logger = require('./utils/logger.js').getLogger('auspice');

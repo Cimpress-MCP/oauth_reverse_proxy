@@ -11,7 +11,7 @@ function CreateNewKey {
 
 # Killall node.js processes because we're mean like that.  If there's no
 # node process, cool.
-Stop-Process -processname node -erroraction 'silentlycontinue'
+#Stop-Process -processname node -erroraction 'silentlycontinue'
 
 Start-Process -NoNewWindow -Wait npm install
 Start-Process -NoNewWindow -Wait -WorkingDirectory test\key_server\ npm install
@@ -24,7 +24,7 @@ Set-Content -Value "{ `"root_dir`": `"$root_dir`" }" -Path config.json
 
 New-Item -ItemType directory -Path $root_dir\8000\8888 -erroraction 'silentlycontinue'
 
-Start-Process -NoNewWindow node auspice.js
+#Start-Process -NoNewWindow node auspice.js
 Start-Process -NoNewWindow -WorkingDirectory test\key_server\ node key_server.js
 
 "Waiting 5 seconds for servers to come online."

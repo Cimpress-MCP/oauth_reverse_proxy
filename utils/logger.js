@@ -7,6 +7,10 @@ var logstash_appender = require('./logstash_appender.js').configure({
   type: "log4js-logstash",
   host: "localhost",
   port: 5140,
+  blatch: {
+    size: 20,
+    timeout: 1000
+  },
   fields: {
     hostname: require('os').hostname(),
     source: "auspice"

@@ -6,7 +6,7 @@ var net = require('net');
  * @param logEvt
  * @returns {{@timestamp: string, @fields: {category: (categoryName|*), level: (levelStr|*)}}}
  */
-function logstashLayout(logEvt, fields) {
+function logstashLayout(logEvt, fields, batch) {
     var key,
         message = {
             '@timestamp': (new Date()).toISOString(),
@@ -23,12 +23,12 @@ function logstashLayout(logEvt, fields) {
         }
     }
 
-    return JSON.stringify(message) + '\n';
+    return JSON.stringify(message);
 }
 
 /**
  * The appender, Gives us the function used for log4js.
- * It Supports batching of commands, we use the json_lines codec for this library,
+ * It Supports batching of commands, we use the json codec for this library,
  * so the \n are mandatory
  *
  * @param config
@@ -45,8 +45,12 @@ function logStashAppender(config, fields, layout) {
 
     //Setup the connection to logstash
     function pushToStash(config, msg) {
+      
+        //console.log("Writing to stash:\n" + msg);
+      
         var client = net.connect({host: config.host, port: config.port}, function () {
             client.write(msg);
+            if (config.batch == undefined) client.write('\n');
             client.end();
         });
         //Fail silently
@@ -58,24 +62,26 @@ function logStashAppender(config, fields, layout) {
     }
 
     return function (logEvt) {
-        //do stuff with the logging event
-        var data = layout(logEvt, fields);
 
         if (config.batch === true) {
+          //do stuff with the logging event
+          var data = layout(logEvt, fields, true);
             messages.push(data);
             clearTimeout(timeOutId);
             if ((process.hrtime(time)[0] >= config.batchTimeout || messages.length > config.batchSize)) {
-                pushToStash(config, messages.join());
+                pushToStash(config, messages.join('\n'));
                 time = process.hrtime();
                 messages = [];
             } else {
                 timeOutId = setTimeout(function () {
-                    pushToStash(config, messages.join());
+                    pushToStash(config, messages.join('\n'));
                     time = process.hrtime();
                     messages = [];
-                }, 1000);
+                }, 10000);
             }
         } else {
+            //do stuff with the logging event
+            var data = layout(logEvt, fields, false);
             pushToStash(config, data);
         }
     };

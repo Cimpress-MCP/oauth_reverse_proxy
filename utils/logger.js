@@ -3,6 +3,18 @@ var sprintf = require('./sprintf.js').sprintf;
 
 log4js.configure('vistaprint_log4js.json');
 
+var logstash_appender = require('./logstash_appender.js').configure({
+  type: "logstash_appender",
+  host: "localhost",
+  port: 5140,
+  fields: {
+    hostname: require('os').hostname(),
+    source: "auspice"
+  }
+});
+
+log4js.addAppender(logstash_appender);
+
 /**
  * Wraps log4js loggers and provides sprintf capabilities for each of the standard log levels.
  * This allows for an arbitrary number of command line parameters composed into the log messaage,

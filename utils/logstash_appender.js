@@ -36,7 +36,7 @@ function logstashLayout(logEvt, fields, batch) {
  * @param layout
  * @returns {Function}
  */
-function logStashAppender(config, fields, layout) {
+function logstashAppender(config, fields, layout) {
     var time = process.hrtime(),
         messages = [],
         timeOutId = 0;
@@ -46,7 +46,7 @@ function logStashAppender(config, fields, layout) {
     //Setup the connection to logstash
     function pushToStash(config, msg) {
       
-        //console.log("Writing to stash:\n" + msg);
+        //console.log("Writing to logstash agent:\n" + msg);
       
         var client = net.connect({host: config.host, port: config.port}, function () {
             client.write(msg);
@@ -116,8 +116,8 @@ function configure(config) {
             }
         }
     }
-    return logStashAppender(options, fields, layout);
+    return logstashAppender(options, fields, layout);
 }
 
-exports.appender = logStashAppender;
+exports.appender = logstashAppender;
 exports.configure = configure;

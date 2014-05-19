@@ -4,13 +4,9 @@ var sprintf = require('./sprintf.js').sprintf;
 log4js.configure('vistaprint_log4js.json');
 
 var logstash_appender = require('./logstash_appender.js').configure({
-  type: "log4js-logstash",
+  type: "logstash_appender",
   host: "localhost",
   port: 5140,
-  blatch: {
-    size: 20,
-    timeout: 1000
-  },
   fields: {
     hostname: require('os').hostname(),
     source: "auspice"

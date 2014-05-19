@@ -28,8 +28,8 @@ function logstashLayout(logEvt, fields, batch) {
 
 /**
  * The appender, Gives us the function used for log4js.
- * It Supports batching of commands, we use the json codec for this library,
- * so the \n are mandatory
+ * It supports batching of messages using the json_lines codec but individual messages
+ * can be sent using the json codec.
  *
  * @param config
  * @param fields

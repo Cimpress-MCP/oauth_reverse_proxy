@@ -18,7 +18,7 @@ var logger = require('./utils/logger.js').getLogger('auspice');
 try {
   var config = require('./utils/config_loader.js').getState(process.env.AUSPICE_CONFIG);
 } catch(e) {
-  logger.error('Failed to load auspice config due to %s', e);
+  logger.error('Failed to load Auspice config due to %s', e);
   process.exit(4);
 }
 

@@ -35,7 +35,7 @@ if (!process.env.AUSPICE_VERSION) {
 }
 
 /**
- * Fail immediately if no AUSPICE_VERSION environment variable is present.
+ * Fail immediately if no AUSPICE_PROXY_PORT environment variable is present.
  *
  * The Auspice proxy port must be passed as an environment variable to the Auspice proccess.
  * Each Auspice service proxies a single port, and knowing a priori which port we are

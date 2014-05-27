@@ -9,6 +9,8 @@ var logstash_appender = require('./logstash_appender.js').configure({
   port: 5140,
   fields: {
     hostname: require('os').hostname(),
+    service_name: process.env.AUSPICE_SERVICE_NAME,
+    auspice_version: process.env.AUSPICE_VERSION,
     source: "auspice"
   }
 });

@@ -1,12 +1,5 @@
-/**
- * If we're running as a Windows service, we'll have an environment variable
- * pointing to the correct working dir for the app.  Update the working dir
- * before doing anything involving relative paths.
- */
-if (process.env.AUSPICE_HOME) {
-  console.log("Changing home directory to " + process.env.AUSPICE_HOME);
-  process.chdir(process.env.AUSPICE_HOME);
-}
+
+var logger = require('../utils/logger.js').getLogger('environment_validator');
 
 /**
  * Fail immediately if no AUSPICE_CONFIG environment variable is present.

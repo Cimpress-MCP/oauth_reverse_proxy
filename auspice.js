@@ -1,8 +1,16 @@
-var util = require('util');
+/**
+ * If we're running as a Windows service, we'll have an environment variable
+ * pointing to the correct working dir for the app.  Update the working dir
+ * before doing anything involving relative paths.
+ */
+if (process.env.AUSPICE_HOME) {
+  console.log("Changing home directory to " + process.env.AUSPICE_HOME);
+  process.chdir(process.env.AUSPICE_HOME);
+}
 
 // Including this module validates that the environment variables are correctly configured.
 // Any failure will terminate this process with an error.
-require('./utils/validate_environment.js');
+require('./utils/environment_validator.js');
 
 var proxy_manager = require('./lib/proxy_manager.js');
 var logger = require('./utils/logger.js').getLogger('auspice');

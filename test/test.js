@@ -130,7 +130,7 @@ describe('Auspice', function() {
     });
     
     // Only test Bash if we're not on Windows.
-    if (os.platform.indexOf('win') === -1) {
+    if (os.platform().indexOf('win') === -1) {
       it ('should service requests from a bash client', function(done) {
         var bashTest = createClientTest('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
         bashTest(done);

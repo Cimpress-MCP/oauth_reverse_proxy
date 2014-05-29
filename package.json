@@ -14,11 +14,15 @@
     "http-proxy": "1.1.2",
     "node-windows": "0.1.5",
     "connect": "2.14.4",
-    "connect-restreamer": "1.0.0"
+    "connect-restreamer": "1.0.0",
+    "mkdirp": "0.5.0",
+    "node-uuid": "1.4.1"
   },
   "devDependencies": {
     "should": "3.3.2",
-    "node-uuid": "1.4.1"
+    "express": "4.0.0",
+    "body-parser": "1.0.2",
+    "method-override": "1.0.2"
   },
   "licenses": [
     {

@@ -4,21 +4,18 @@ var util = require('util');
 app.use(require ('body-parser')());
 app.use(require ('method-override')());
 
+module.exports = new (require('events').EventEmitter)();
+
 app.get("/job", function(req, res) {
-  
-  console.log("Request looks like:\n%s", util.inspect(req.headers));
-  
+  module.exports.emit('GET', '/job', req, res);
   res.send({'status':'ok'});
 });
 
 app.post("/job", function(req, res) {
-  
-  console.log("Request looks like:\n%s", util.inspect(req.headers));
-  console.log("Body looks like:\n%s", util.inspect(req.body));
-  
+  module.exports.emit('POST', '/job', req, res);
   res.send({'status':'ok'});
 });
 
 var server = app.listen(8888, function() {
-  console.log("Listening on port %d", server.address().port);
+  module.exports.emit('started');
 });

@@ -10,11 +10,15 @@
     }
   ],
   "dependencies": {
-    "log4js": "~0.6.13",
-    "http-proxy": "~1.1.2",
-    "node-windows": "~0.1.5",
+    "log4js": "0.6.14",
+    "http-proxy": "1.1.2",
+    "node-windows": "0.1.5",
     "connect": "2.14.4",
     "connect-restreamer": "1.0.0"
+  },
+  "devDependencies": {
+    "should": "3.3.2",
+    "node-uuid": "1.4.1"
   },
   "licenses": [
     {

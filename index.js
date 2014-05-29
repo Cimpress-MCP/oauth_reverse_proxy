@@ -12,7 +12,7 @@ if (process.env.AUSPICE_HOME) {
 // Any failure will terminate this process with an error.
 require('./utils/environment_validator.js');
 
-var proxy_manager = require('./lib/proxy_manager.js');
+var auspice = require('./lib');
 var logger = require('./utils/logger.js').getLogger('auspice');
 
 try {
@@ -30,4 +30,13 @@ process.on('uncaughtException', function(err) {
 
 // Create a proxy manager at our configured root dir.  It is responsible for traversing
 // the key store and creating proxies on the configured ports.
-proxy_manager.init(config.root_dir);
+auspice.init(config.root_dir, function(err, proxy) {
+  // If we caught a fatal error creating the proxy, log it and pause briefly before exiting
+  // to give logstash a chance to flush this error message.
+  if (err) {
+    logger.fatal("Failed to create proxy due to " + err);
+    setTimeout(function() {
+      process.exit(1);
+    }, 2000);
+  }
+});

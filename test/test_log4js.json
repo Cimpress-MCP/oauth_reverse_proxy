@@ -6,17 +6,10 @@
       "level": "info",
       "appender": {
          "type": "file",
-         "filename": "logs/key_server.log",
+         "filename": "logs/test.log",
          "maxLogSize": 20485760,
          "backups": 50,
          "pollInterval": 15
-      }
-   },{
-      "type": "logLevelFilter",
-      "levels": "debug",
-      "level": "trace",
-      "appender": {
-         "type": "console"
       }
    }]
 }

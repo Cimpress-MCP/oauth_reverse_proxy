@@ -1,9 +1,7 @@
 require 'oauth'
-require 'net/http'
-require 'uri'
 
 consumer_key = 'ruby-test-key'
-consumer_secret = Net::HTTP.get_response(URI("http://localhost:8787/proxy/8000/8888/key/#{consumer_key}/")).body
+consumer_secret = File.open("../../keys/8000/8888/#{consumer_key}", 'rb').read
 
 # puts "Using key/secret #{consumer_key}/#{consumer_secret}"
 

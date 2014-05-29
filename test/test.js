@@ -1,6 +1,7 @@
 var should = require('should');
 
 var fs = require('fs');
+var os = require('os');
 var util = require('util');
 
 var job_server = require(__dirname + '/server/job_server.js');
@@ -69,6 +70,23 @@ describe('Jobs Server', function() {
   });
 });
 
+function createClientTest(method, cmd, cwd, key) {
+  return function(cb) {
+    job_server.once(method, function(uri, req, res) {
+      req.headers.should.have.property('vp_user_key', key);
+      cb();
+    });
+    
+    exec(cmd, {cwd: cwd}, function(err, stdout, stderr) {
+      if (err) {
+        // Unregister job_server listeners added by this test since they might not have fired.
+        job_server.removeAllListeners();
+        return cb(err);
+      }
+    });
+  };
+}
+
 // Auspice is an authenticating proxy.  Let's describe it.
 describe('Auspice', function() {
   
@@ -111,25 +129,43 @@ describe('Auspice', function() {
       });
     });
     
-    it ('should service requests from a bash client', function(done) {
-      exec('bash client.sh', {cwd: 'test/clients/bash'}, function(err, stderr, stdout) {
-        if (err) return done(err);
-        done();
+    // Only test Bash if we're not on Windows.
+    if (os.platform.indexOf('win') === -1) {
+      it ('should service requests from a bash client', function(done) {
+        var bashTest = createClientTest('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
+        bashTest(done);
       });
+    }
+    
+    it ('should service requests from a java client', function(done) {
+      var javaTest = createClientTest('POST', 
+        'java -cp target/AuspiceClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.vistaprint.auspice.Client',
+        'test/clients/java/AuspiceClient', 'java-test-key')
+      javaTest(done);
     });
     
     it ('should service requests from a node client', function(done) {
-      exec('node client.js', {cwd: 'test/clients/node'}, function(err, stderr, stdout) {
-        if (err) return done(err);
-        done();
-      });
+      var nodeTest = createClientTest('POST', 'node client.js', 'test/clients/node', 'node-test-key')
+      nodeTest(done);
     });
     
-    it ('should service requests from a python client', function(done) {
-      exec('python client.py', {cwd: 'test/clients/python'}, function(err, stderr, stdout) {
-        if (err) return done(err);
-        done();
-      });
+    it ('should service requests from a perl client', function(done) {
+      var perlTest = createClientTest('GET', 'perl client.pl', 'test/clients/perl', 'perl-test-key')
+      perlTest(done);
     });
+    
+    it ('should service requests from a ruby client', function(done) {
+      var rubyTest = createClientTest('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
+      rubyTest(done);
+    });
+    
+    // Python intermittently fails with a 401 due to a known bug in the client OAuth lib.  Leave
+    // it out for now.
+    /**
+    it ('should service requests from a python client', function(done) {
+      var pythonTest = createClientTest('GET', 'python client.py', 'test/clients/python', 'bash-test-key')
+      pythonTest(done);
+    });
+    **/
   });
 });

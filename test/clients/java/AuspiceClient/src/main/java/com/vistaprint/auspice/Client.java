@@ -1,5 +1,7 @@
 package com.vistaprint.auspice;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,8 +23,8 @@ public class Client {
 
 	public static void main(String[] args) throws Exception {
 		
-		URL consumerKeyUrl = new URL("http://localhost:8787/proxy/8000/8888/key/" + CONSUMER_KEY + "/");
-		String consumerSecret = IOUtils.toString(consumerKeyUrl.openConnection().getInputStream());
+		File consumerKeyFile = new File("../../../keys/8000/8888/" + CONSUMER_KEY);
+		String consumerSecret = IOUtils.toString(new FileInputStream(consumerKeyFile));
 		
 		OAuthConsumer consumer = new CommonsHttpOAuthConsumer(CONSUMER_KEY, consumerSecret);
 

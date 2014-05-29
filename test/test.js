@@ -4,12 +4,12 @@ var fs = require('fs');
 var os = require('os');
 var util = require('util');
 
-var job_server = require(__dirname + '/server/job_server.js');
+var job_server = require('../test/server/job_server.js');
 var job_server_started = false;
 job_server.on('started', function() {
   job_server_started = true;
 });
-var keygen = require(__dirname + '/keygen/');
+var keygen = require('../test/keygen/');
 
 var http = require('http');
 var exec = require('child_process').exec;

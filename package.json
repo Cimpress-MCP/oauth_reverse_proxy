@@ -22,7 +22,8 @@
     "should": "3.3.2",
     "express": "4.0.0",
     "body-parser": "1.0.2",
-    "method-override": "1.0.2"
+    "method-override": "1.0.2",
+    "oauth": "0.9.12"
   },
   "licenses": [
     {

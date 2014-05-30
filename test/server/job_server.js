@@ -18,6 +18,6 @@ app.post("/job", function(req, res) {
   res.send({'status':'ok'});
 });
 
-var server = app.listen(8888, function() {
+var server = app.listen(8080, function() {
   module.exports.emit('started');
 });

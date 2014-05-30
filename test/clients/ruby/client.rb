@@ -1,14 +1,14 @@
 require 'oauth'
 
 consumer_key = 'ruby-test-key'
-consumer_secret = File.open("../../keys/8000/8888/#{consumer_key}", 'rb').read
+consumer_secret = File.open("../../keys/8008/8080/#{consumer_key}", 'rb').read
 
 # puts "Using key/secret #{consumer_key}/#{consumer_secret}"
 
 @consumer=OAuth::Consumer.new(
 	consumer_key,
   consumer_secret,
-	:site => "http://localhost:8000/",
+	:site => "http://localhost:8008/",
   :request_token_path => "",
 	:authorize_path => "",
 	:access_token_path => "",

@@ -24,7 +24,7 @@ describe('Jobs Server', function() {
   
   describe('Unauthenticated GET /job from localhost', function() {
     it ('should return a valid response', function(done) {      
-      http.get('http://localhost:8888/job', function(res) {
+      http.get('http://localhost:8080/job', function(res) {
         res.statusCode.should.equal(200);
         done()
       });
@@ -36,7 +36,7 @@ describe('Jobs Server', function() {
       
       var content = 'data=happy';
       var options = {
-        port: 8888,
+        port: 8080,
         path: '/job',
         method: 'POST',
         
@@ -78,11 +78,7 @@ function createClientTest(method, cmd, cwd, key) {
     });
     
     exec(cmd, {cwd: cwd}, function(err, stdout, stderr) {
-      if (err) {
-        // Unregister job_server listeners added by this test since they might not have fired.
-        job_server.removeAllListeners();
-        return cb(err);
-      }
+      if (err) return cb(err);
     });
   };
 }
@@ -92,14 +88,14 @@ describe('Auspice', function() {
   
   // But first, create the keys we need for test clients.
   before(function(done) {
-    keygen.createKey(__dirname + '/keys', 8000, 8888, 'bash-test-key', function(err) {
-      keygen.createKey(__dirname + '/keys', 8000, 8888, 'dotnet-test-key', function(err) {
-        keygen.createKey(__dirname + '/keys', 8000, 8888, 'java-test-key', function(err) {
-          keygen.createKey(__dirname + '/keys', 8000, 8888, 'node-test-key', function(err) {
-            keygen.createKey(__dirname + '/keys', 8000, 8888, 'perl-test-key', function(err) {
-              keygen.createKey(__dirname + '/keys', 8000, 8888, 'powershell-test-key', function(err) {
-                keygen.createKey(__dirname + '/keys', 8000, 8888, 'python-test-key', function(err) {
-                  keygen.createKey(__dirname + '/keys', 8000, 8888, 'ruby-test-key', function(err) {
+    keygen.createKey(__dirname + '/keys', 8008, 8080, 'bash-test-key', function(err) {
+      keygen.createKey(__dirname + '/keys', 8008, 8080, 'dotnet-test-key', function(err) {
+        keygen.createKey(__dirname + '/keys', 8008, 8080, 'java-test-key', function(err) {
+          keygen.createKey(__dirname + '/keys', 8008, 8080, 'node-test-key', function(err) {
+            keygen.createKey(__dirname + '/keys', 8008, 8080, 'perl-test-key', function(err) {
+              keygen.createKey(__dirname + '/keys', 8008, 8080, 'powershell-test-key', function(err) {
+                keygen.createKey(__dirname + '/keys', 8008, 8080, 'python-test-key', function(err) {
+                  keygen.createKey(__dirname + '/keys', 8008, 8080, 'ruby-test-key', function(err) {
                     done(err);
                   });
                 });
@@ -109,6 +105,11 @@ describe('Auspice', function() {
         });
       });
     });
+  });
+  
+  beforeEach(function() {
+	// Make sure there are no pending event listeners before each test.
+	job_server.removeAllListeners();
   });
   
   var auspice_started = false;
@@ -153,6 +154,16 @@ describe('Auspice', function() {
       var perlTest = createClientTest('GET', 'perl client.pl', 'test/clients/perl', 'perl-test-key')
       perlTest(done);
     });
+    
+    // Only test .Net if we're on Windows.
+    if (os.platform().indexOf('win') === 0) {
+      it ('should service requests from a .Net client', function(done) {
+        var dotNetTest = createClientTest('POST',
+		  '.\\AuspiceClient\\AuspiceClient\\bin\\Debug\\AuspiceClient.exe',
+	      'test/clients/dotnet', 'dotnet-test-key')
+        dotNetTest(done);
+      });
+	}
     
     it ('should service requests from a ruby client', function(done) {
       var rubyTest = createClientTest('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')

@@ -1,7 +1,7 @@
 var util = require('util');
 
 var consumer_key = 'node-test-key';
-var consumer_secret = require('fs').readFileSync('../../keys/8000/8888/' + consumer_key);
+var consumer_secret = require('fs').readFileSync('../../keys/8008/8080/' + consumer_key);
 
 console.log('consumer_key: %s', consumer_key);
 console.log('consumer_secret %s', consumer_secret);
@@ -15,7 +15,7 @@ var post_body = {
   beans: 'either'
 };
 
-oa.post("http://localhost:8000/job?do=query&strings=kill&us=or&not=true", "", "", 
+oa.post("http://localhost:8008/job?do=query&strings=kill&us=or&not=true", "", "", 
   post_body, 'application/x-www-form-urlencoded',
   function (error, data, response) {
     if (error) {

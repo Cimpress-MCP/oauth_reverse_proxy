@@ -5,6 +5,7 @@ using DotNetOpenAuth.OAuth.Messages;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 
 namespace AuspiceClient
@@ -52,20 +53,19 @@ namespace AuspiceClient
         {
             var providerDesc = new ServiceProviderDescription()
             {
-                RequestTokenEndpoint = new MessageReceivingEndpoint("http://localhost:8000/noop", HttpDeliveryMethods.PostRequest),
-                AccessTokenEndpoint = new MessageReceivingEndpoint("http://localhost:8000/noop", HttpDeliveryMethods.PostRequest),
-                UserAuthorizationEndpoint = new MessageReceivingEndpoint("http://localhost:8000/noop", HttpDeliveryMethods.PostRequest),
+                RequestTokenEndpoint = new MessageReceivingEndpoint("http://localhost:8008/noop", HttpDeliveryMethods.PostRequest),
+                AccessTokenEndpoint = new MessageReceivingEndpoint("http://localhost:8008/noop", HttpDeliveryMethods.PostRequest),
+                UserAuthorizationEndpoint = new MessageReceivingEndpoint("http://localhost:8008/noop", HttpDeliveryMethods.PostRequest),
                 ProtocolVersion = ProtocolVersion.V10a,
                 TamperProtectionElements = new ITamperProtectionChannelBindingElement[] { new HmacSha1SigningBindingElement() }
             };
 
             var consumerKey = "dotnet-test-key";
-            var client = new WebClient();
-            var consumerSecret = client.DownloadString("http://localhost:8787/proxy/8000/8888/key/" + consumerKey + "/");
+            var consumerSecret = File.ReadAllText("..\\..\\keys\\8008\\8080\\" + consumerKey);
 
             var zeroLeggedWebConsumer = new DotNetOpenAuth.OAuth.WebConsumer(providerDesc, new ZeroLeggedTokenManager(consumerKey, consumerSecret));
 
-            var endpoint = new MessageReceivingEndpoint("http://localhost:8000/job?query=parameters&also=good", HttpDeliveryMethods.AuthorizationHeaderRequest | HttpDeliveryMethods.PostRequest);
+            var endpoint = new MessageReceivingEndpoint("http://localhost:8008/job?query=parameters&also=good", HttpDeliveryMethods.AuthorizationHeaderRequest | HttpDeliveryMethods.PostRequest);
             var httpRequest = zeroLeggedWebConsumer.PrepareAuthorizedRequest(endpoint, "DUMMY", new Dictionary<String, String>()
             {
                 {"are", "post"},

@@ -5,7 +5,7 @@ use Net::OAuth;
 my $consumer_key = 'perl-test-key';
 
 my $ua = LWP::UserAgent->new;
-my $file = "../../keys/8000/8888/" . $consumer_key;
+my $file = "../../keys/8008/8080/" . $consumer_key;
 my $consumer_secret = do {
     local $/ = undef;
     open my $fh, "<", $file
@@ -15,7 +15,7 @@ my $consumer_secret = do {
 
 print "$consumer_key:$consumer_secret\n";
 
-sub url { 'http://localhost:8000/job'; }
+sub url { 'http://localhost:8008/job'; }
 
 my $oauth_request = Net::OAuth->request('consumer')->new(
   consumer_key => $consumer_key,

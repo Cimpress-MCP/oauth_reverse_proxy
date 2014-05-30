@@ -23,12 +23,12 @@ public class Client {
 
 	public static void main(String[] args) throws Exception {
 		
-		File consumerKeyFile = new File("../../../keys/8000/8888/" + CONSUMER_KEY);
+		File consumerKeyFile = new File("../../../keys/8008/8080/" + CONSUMER_KEY);
 		String consumerSecret = IOUtils.toString(new FileInputStream(consumerKeyFile));
 		
 		OAuthConsumer consumer = new CommonsHttpOAuthConsumer(CONSUMER_KEY, consumerSecret);
 
-		URL url = new URL("http://localhost:8000/job?this=is&fun=right");
+		URL url = new URL("http://localhost:8008/job?this=is&fun=right");
 		
 		HttpPost request = new HttpPost(url.toURI());
 		List<NameValuePair> params = new LinkedList<NameValuePair>();

@@ -28,8 +28,7 @@ process.on('uncaughtException', function(err) {
   logger.error(err);
 });
 
-// Create a proxy manager at our configured root dir.  It is responsible for traversing
-// the key store and creating proxies on the configured ports.
+// Create an auspice instance at our configured root dir.
 auspice.init(config.root_dir, function(err, proxy) {
   // If we caught a fatal error creating the proxy, log it and pause briefly before exiting
   // to give logstash a chance to flush this error message.

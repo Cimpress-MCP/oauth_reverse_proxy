@@ -29,7 +29,7 @@
     "underscore": "1.6.0"
   },
   "scripts": {
-    "test_unix": "AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8008 LOG4JS_CONFIG=./test/test_log4js.json LOG4JS_DISABLE_LOGSTASH=true ./node_modules/mocha/bin/mocha test/test.js --reporter spec",
+    "test_unix": "AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8008 LOG4JS_CONFIG=./test/test_log4js.json LOG4JS_DISABLE_LOGSTASH=true ./node_modules/mocha/bin/mocha test/test.js --reporter spec -t 10000",
     "test_win": "SET AUSPICE_SERVICE_NAME=jobsservice&SET AUSPICE_PROXY_PORT=8008&SET LOG4JS_CONFIG=test\\test_log4js.json&SET LOG4JS_DISABLE_LOGSTASH=true& node .\\node_modules\\mocha\\bin\\mocha --reporter spec -t 10000"
   },
   "licenses": [

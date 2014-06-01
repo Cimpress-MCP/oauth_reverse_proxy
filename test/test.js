@@ -220,7 +220,6 @@ describe('Auspice', function() {
     );
   };
   
-  var auspice_started = false;
   // Describe the Auspice proxy.  This suite represents test cases of failing and successful
   // authentication through the proxy.
   describe('Proxy', function() {
@@ -231,7 +230,6 @@ describe('Auspice', function() {
         
         // Turn the proxy.keys object into an array to get its length
         (_.keys(proxy.keys).length).should.be.exactly(9);
-        auspice_started = true;
         done();    
       });
     });
@@ -253,6 +251,30 @@ describe('Auspice', function() {
     it ('should reject an improperly signed GET where query params are not part of the signature', function(done) {
       request('http://localhost:8008/job?query=should_fail', { headers: {'Authorization': prepare_auth_header() } },
         create_response_validator(401, done)
+      );
+    });
+    
+    // Validate that a GET with query string longer than 1mb fails due to signature mismatch.
+    it ('should reject a GET with a query greater than 1mb', function(done) {
+      
+      //var crazy_large_buffer = new Buffer(1025*1024);
+      var crazy_large_buffer = new Buffer(1024*16);
+      //var crazy_large_buffer = new Buffer(10);
+      for (var i=0; i<crazy_large_buffer.length; ++i) {
+        crazy_large_buffer[i] = 'A'.charCodeAt();
+      }
+      var crazy_large_str = crazy_large_buffer.toString();
+      var crazy_large_url = 'http://localhost:8008/job?query_huge_query=' + crazy_large_str;
+      params.push(['query_huge_query', crazy_large_str]);
+      
+      // Mute console.log message from Express about entity size.  We know this.  It's what we're testing.
+      //console.log = function() {}
+      //console.error = function() {}
+      
+      //console.log('URL is %s', crazy_large_url);
+      
+      request(crazy_large_url, { headers: {'Authorization': prepare_auth_header() } },
+        create_response_validator(413, done)
       );
     });
     
@@ -334,6 +356,10 @@ describe('Auspice', function() {
       );
     });
     
+  });
+  
+  describe('OAuth validation', function() {
+    
     // Validate that an invalid signature method results in a 400 error.
     it ('should reject requests with invalid signature methods', function(done) {
       oauth_headers[2][1] = 'HMAC-SHA256';
@@ -403,44 +429,44 @@ describe('Auspice', function() {
     
     // Only test Bash and Python if we're not on Windows.
     if (os.platform().indexOf('win') !== 0) {
-      it ('should service requests from a bash client', function(done) {
+      it ('bash', function(done) {
         var bashTest = createClientTest('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
         bashTest(done);
       });
       
-      it ('should service requests from a python client', function(done) {
+      it ('python', function(done) {
         var pythonTest = createClientTest('GET', 'python client.py', 'test/clients/python', 'python-test-key')
         pythonTest(done);
       });
     }
     
-    it ('should service requests from a java client', function(done) {
+    it ('java', function(done) {
       var javaTest = createClientTest('POST', 
         'java -cp target/AuspiceClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.vistaprint.auspice.Client',
         'test/clients/java/AuspiceClient', 'java-test-key')
       javaTest(done);
     });
     
-    it ('should service requests from a node client', function(done) {
+    it ('node.js', function(done) {
       var nodeTest = createClientTest('POST', 'node client.js', 'test/clients/node', 'node-test-key')
       nodeTest(done);
     });
     
-    it ('should service requests from a perl client', function(done) {
+    it ('perl', function(done) {
       var perlTest = createClientTest('GET', 'perl client.pl', 'test/clients/perl', 'perl-test-key')
       perlTest(done);
     });
     
     // Only test .Net if we're on Windows.
     if (os.platform().indexOf('win') === 0) {
-      it ('should service requests from a .Net client', function(done) {
+      it ('.Net', function(done) {
         var dotNetTest = createClientTest('POST', '.\\AuspiceClient\\AuspiceClient\\bin\\Debug\\AuspiceClient.exe',
           'test/clients/dotnet', 'dotnet-test-key');
         dotNetTest(done);
       });
 	  }
     
-    it ('should service requests from a ruby client', function(done) {
+    it ('ruby', function(done) {
       var rubyTest = createClientTest('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
       rubyTest(done);
     });

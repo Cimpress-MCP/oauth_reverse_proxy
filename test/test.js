@@ -7,20 +7,29 @@ var os = require('os');
 var request = require('request');
 var util = require('util');
 
-var job_server = require('../test/server/job_server.js');
+var job_server = require('./server/job_server.js');
 var job_server_started = false;
 job_server.on('started', function() {
   job_server_started = true;
 });
-var keygen = require('../test/keygen/');
+var keygen = require('../utils/keygen.js');
 
 var http = require('http');
 var exec = require('child_process').exec;
 
+// Cache console.[log,error] in case we want to mute it for any given test (sometimes Express or
+// other components log expected errors, and we don't want to see them in our test results)
+var console_log = console.log;
+var console_error = console.error;
+
 // Creates a convenience function for validating that an http response has the correct status code
 // and did not result in a protocol-level error (connection failure, etc).
 var create_response_validator = function(expectedStatusCode, done) {
-  return function(err, response, body) {
+  return function(err, response, body) {    
+    // Always reset console.log and console.error in case they've been muted for the test.
+    console.log = console_log;
+    console.error = console_error;
+    
     if (err) return done(err);
     response.statusCode.should.equal(expectedStatusCode);
     if (expectedStatusCode === 200) body.should.equal('{"status":"ok"}');
@@ -28,7 +37,8 @@ var create_response_validator = function(expectedStatusCode, done) {
   };
 };
 
-describe('Jobs Server', function() {
+// Test the job server in isolation to make sure responses are handled as expected without Auspice involved.
+describe('Job Server', function() {
   
   before(function(done) {
     setTimeout(function() {
@@ -63,6 +73,8 @@ describe('Jobs Server', function() {
   });
 });
 
+// Creates a convenience function for running an external client and validating that the correct
+// key is passed to the job server and the correct content is written to disk.
 function createClientTest(method, cmd, cwd, key) {
   return function(cb) {
     job_server.once(method, function(uri, req, res) {
@@ -105,11 +117,8 @@ function signString(key, str) {
   return crypto.createHmac("sha1", key).update(str).digest("base64");
 }
 
-/**
- * Given an array of parameters of type [ [key, value], [key2, value2] ], return
- * a rendered string separated by character sep and where the key and value are
- * transformed by renderFn before being joined.
- */
+// Given an array of parameters of type [ [key, value], [key2, value2] ], return a rendered string separated
+// by character sep and where the key and value are transformed by renderFn before being joined.
 function renderParams(params, sep, renderFn) {
   var out_params = [];
   params = _.flatten(params);
@@ -158,6 +167,10 @@ describe('Auspice', function() {
   beforeEach(function() {
     // Make sure there are no pending event listeners before each test.
     job_server.removeAllListeners();
+    
+    // Always reset console.log and console.error
+    console.log = console_log;
+    console.error = console_error;
     
     var nonce = createNonce();
     var timestamp = new Date().getTime();
@@ -259,6 +272,21 @@ describe('Auspice', function() {
       );
     });
     
+    // Validate that a POST with body greater than 1mb fails due to signature mismatch.
+    it ('should reject a formencoded POST with a body greater than 1mb', function(done) {
+      
+      var crazy_large_buffer = new Buffer(1025*1024);
+      var crazy_huge_form = { 'post': crazy_large_buffer.toString() };
+      
+      // Mute console.log message from Express about entity size.  We know this.  It's what we're testing.
+      console.log = function() {}
+      console.error = function() {}
+      
+      request.post('http://localhost:8008/job', { form: crazy_huge_form, headers: {'Authorization': prepare_auth_header() } },
+        create_response_validator(413, done)
+      );
+    });
+    
     // Validate that a basic PUT works.
     it ('should accept a properly signed PUT with params', function(done) {
       signature_components[0] = 'PUT';
@@ -274,6 +302,21 @@ describe('Auspice', function() {
         create_response_validator(401, done)
       );
     });
+
+    // Validate that a PUT with body greater than 1mb fails due to signature mismatch.
+    it ('should reject a formencoded PUT with a body greater than 1mb', function(done) {
+      
+      var crazy_large_buffer = new Buffer(1025*1024);
+      var crazy_huge_form = { 'post': crazy_large_buffer.toString() };
+      
+      // Mute console.log message from Express about entity size.  We know this.  It's what we're testing.
+      console.log = function() {}
+      console.error = function() {}
+      
+      request.put('http://localhost:8008/job', { form: crazy_huge_form, headers: {'Authorization': prepare_auth_header() } },
+        create_response_validator(413, done)
+      );
+    });
     
     // Validate that a basic DELETE works.
     it ('should accept a properly signed DELETE', function(done) {
@@ -284,7 +327,7 @@ describe('Auspice', function() {
       );
     });
     
-    // Validate that a PUT with unsigned body parameters fails due to signature mismatch.
+    // Validate that a DELETE with unsigned body parameters fails due to signature mismatch.
     it ('should reject an improperly signed DELETE where signature is incorrect', function(done) {
       request.del('http://localhost:8008/job', { headers: {'Authorization': prepare_auth_header() } },
         create_response_validator(401, done)
@@ -352,20 +395,19 @@ describe('Auspice', function() {
       send_authenticated_request(400, done);
     });
     
-    //
-    // Begin library tests.  These test clients are in the test/clients subdirectory.  Each one tests
-    // a limited amount of OAuth functionality to validate that requests can be sent through Auspice
-    // properly.
-    //
+  });
+
+  // These test clients are in the test/clients subdirectory.  Each one tests a limited amount of OAuth
+  // functionality to validate that requests can be sent through Auspice properly using various languages.
+  describe('Clients', function() {
     
     // Only test Bash and Python if we're not on Windows.
-    if (os.platform().indexOf('win') === -1) {
+    if (os.platform().indexOf('win') !== 0) {
       it ('should service requests from a bash client', function(done) {
         var bashTest = createClientTest('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
         bashTest(done);
       });
-	  
-    
+      
       it ('should service requests from a python client', function(done) {
         var pythonTest = createClientTest('GET', 'python client.py', 'test/clients/python', 'python-test-key')
         pythonTest(done);
@@ -402,10 +444,6 @@ describe('Auspice', function() {
       var rubyTest = createClientTest('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
       rubyTest(done);
     });
-    
-    //
-    // End library tests. 
-    //
     
   });
 });

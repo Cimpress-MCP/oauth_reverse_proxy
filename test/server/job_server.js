@@ -36,12 +36,12 @@ app.get("/livecheck", function(req, res) {
   res.send({'status':'ok'});
 });
 
-app.post("/livecheck", function(req, res) {
-  console.log('POST /livecheck');
-  module.exports.emit('POST', '/livecheck', req, res);
+app.get("/healthcheck", function(req, res) {
+  console.log('GET /healthcheck');
+  module.exports.emit('GET', '/healthcheck', req, res);
   res.send({'status':'ok'});
 });
 
-var server = app.listen(8080, function() {
+var server = app.listen(8080, 'localhost', function() {
   module.exports.emit('started');
 });

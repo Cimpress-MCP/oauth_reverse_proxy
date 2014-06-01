@@ -358,11 +358,17 @@ describe('Auspice', function() {
     // properly.
     //
     
-    // Only test Bash if we're not on Windows.
+    // Only test Bash and Python if we're not on Windows.
     if (os.platform().indexOf('win') === -1) {
       it ('should service requests from a bash client', function(done) {
         var bashTest = createClientTest('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
         bashTest(done);
+      });
+	  
+    
+      it ('should service requests from a python client', function(done) {
+        var pythonTest = createClientTest('GET', 'python client.py', 'test/clients/python', 'python-test-key')
+        pythonTest(done);
       });
     }
     
@@ -381,11 +387,6 @@ describe('Auspice', function() {
     it ('should service requests from a perl client', function(done) {
       var perlTest = createClientTest('GET', 'perl client.pl', 'test/clients/perl', 'perl-test-key')
       perlTest(done);
-    });
-    
-    it ('should service requests from a python client', function(done) {
-      var pythonTest = createClientTest('GET', 'python client.py', 'test/clients/python', 'python-test-key')
-      pythonTest(done);
     });
     
     // Only test .Net if we're on Windows.

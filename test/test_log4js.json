@@ -2,8 +2,8 @@
    "appenders": [
    {
       "type": "logLevelFilter",
-      "levels": "trace",
-      "level": "info",
+      "level": "trace",
+      "levels": "info",
       "appender": {
          "type": "file",
          "filename": "logs/test.log",

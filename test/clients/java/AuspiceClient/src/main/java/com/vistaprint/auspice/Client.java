@@ -50,6 +50,6 @@ public class Client {
         HttpResponse response = httpClient.execute(request);
 		
 		// Print the result
-		System.out.println("Got response:\n" + response.getStatusLine());
+		System.out.println(IOUtils.toString(response.getEntity().getContent()));
 	}
 }

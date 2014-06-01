@@ -26,7 +26,6 @@ consumer_secret = File.open("../../keys/8008/8080/#{consumer_key}", 'rb').read
 #resp = @consumer.request(:post, '/job?do=query&strings=kill&us=or&not=&not=would&be=good', nil, {}, 'do=query&strings=kill')
 
 resp = @consumer.request(:get, '/job?do=query&strings=kill&do=any&strings=kill')
-puts resp.code + "\r\n"
 puts resp.body
 
 # TODO: The below won't work because ruby refuses to sign post body

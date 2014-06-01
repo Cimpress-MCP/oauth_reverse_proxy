@@ -18,6 +18,30 @@ app.post("/job", function(req, res) {
   res.send({'status':'ok'});
 });
 
+app.put("/job", function(req, res) {
+  console.log('PUT with key %s', req.headers['vp_user_key']);
+  module.exports.emit('PUT', '/job', req, res);
+  res.send({'status':'ok'});
+});
+
+app.delete("/job/:job_id", function(req, res) {
+  console.log('DELETE with key %s', req.headers['vp_user_key']);
+  module.exports.emit('DELETE', '/job', req, res);
+  res.send({'status':'ok'});
+});
+
+app.get("/livecheck", function(req, res) {
+  console.log('GET /livecheck');
+  module.exports.emit('GET', '/livecheck', req, res);
+  res.send({'status':'ok'});
+});
+
+app.post("/livecheck", function(req, res) {
+  console.log('POST /livecheck');
+  module.exports.emit('POST', '/livecheck', req, res);
+  res.send({'status':'ok'});
+});
+
 var server = app.listen(8080, function() {
   module.exports.emit('started');
 });

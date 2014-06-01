@@ -13,8 +13,6 @@ my $consumer_secret = do {
     <$fh>;
 };
 
-print "$consumer_key:$consumer_secret\n";
-
 sub url { 'http://localhost:8008/job'; }
 
 my $oauth_request = Net::OAuth->request('consumer')->new(
@@ -35,7 +33,7 @@ $req->header('Authorization' => $oauth_request->to_authorization_header);
 
 my $oauth_response = $ua->simple_request($req);
 
-print $oauth_response->as_string;
+print $oauth_response->decoded_content;
 
 sub nonce {
   my @a = ('A'..'Z', 'a'..'z', 0..9);

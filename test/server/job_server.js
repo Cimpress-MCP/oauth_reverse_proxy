@@ -2,7 +2,6 @@ var express = require('express');
 var app = express();
 var util = require('util');
 app.use(require ('body-parser')());
-app.use(require ('method-override')());
 
 module.exports = new (require('events').EventEmitter)();
 

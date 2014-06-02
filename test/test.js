@@ -405,9 +405,11 @@ describe('Auspice', function() {
      */
     var create_request_header_validator = function(method) {
       return function(done) {
+        var all_done = false;
         var my_done = function(err) {
           // If the response validator returned an error, don't bother with the header comparison.
           if (err) return done(err);
+          if (all_done) return;
           if (results.authorized && results.vanilla) {
             // Compare the two sets of request headers
             var keys_to_ignore = ['authorization', 'host', 'vp_user_key'];
@@ -421,7 +423,8 @@ describe('Auspice', function() {
           
             results.vanilla['custom'].should.equal('header');
             results.vanilla['more'].should.equal('custom_headers');
-          
+
+            all_done = true;
             done();
           }
         };

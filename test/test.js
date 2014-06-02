@@ -51,8 +51,8 @@ var send_authenticated_request = function(expectedStatusCode, done) {
   );
 };
 
-  // These cleanup operations need to run before each test to make sure the state of the
-  // suite is consistent.  Placed here, they will be run before all suites and tests.
+// These cleanup operations need to run before each test to make sure the state of the
+// suite is consistent.  Placed here, they will be run before all suites and tests.
 beforeEach(function() {
   
   // Make sure there are no pending event listeners before each test.
@@ -65,7 +65,7 @@ beforeEach(function() {
   var nonce = createNonce();
   var timestamp = new Date().getTime();
   
-  // Rest the signature components we use to working defaults.
+  // Reset the signature components we use to working defaults.
   signature_components = [
     'GET',
     encodeData('http://localhost:8008/job'),
@@ -232,7 +232,7 @@ function signString(key, str) {
   return crypto.createHmac("sha1", key).update(str).digest("base64");
 }
 
-// Given an array of parameters of type [ [key, value], [key2, value2] ], return a rendered string separated
+// Given an array of parameters of type [ key, value, key2, value2 ], return a rendered string separated
 // by character sep and where the key and value are transformed by renderFn before being joined.
 function renderParams(params, sep, renderFn) {
   var out_params = [];
@@ -273,9 +273,7 @@ describe('Auspice', function() {
     // Validate that a GET with query string longer than 16kb fails due to signature mismatch.
     it ('should reject a GET with a query greater than 16kb', function(done) {
       
-      //var crazy_large_buffer = new Buffer(1025*1024);
       var crazy_large_buffer = new Buffer(1024*16);
-      //var crazy_large_buffer = new Buffer(10);
       for (var i=0; i<crazy_large_buffer.length; ++i) {
         crazy_large_buffer[i] = 'A'.charCodeAt();
       }

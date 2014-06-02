@@ -696,11 +696,13 @@ describe('Client tests', function() {
   
   // Only test .Net if we're on Windows.
   if (os.platform().indexOf('win') === 0) {
+  /**
     it ('.Net', function(done) {
       var dotNetTest = create_client_test('POST', '.\\AuspiceClient\\AuspiceClient\\bin\\Debug\\AuspiceClient.exe',
         'test/clients/dotnet', 'dotnet-test-key');
       dotNetTest(done);
     });
+  **/
   }
   
   it ('ruby', function(done) {

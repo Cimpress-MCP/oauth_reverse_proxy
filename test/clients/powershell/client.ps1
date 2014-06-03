@@ -2,9 +2,8 @@
 [Reflection.Assembly]::LoadWithPartialName("System.Net")
 
 $oauth_consumer_key = "powershell-test-key";
-
-$client = new-object System.Net.WebClient;
-$oauth_consumer_secret = $client.DownloadString("http://localhost:8787/proxy/8000/8888/key/" + $oauth_consumer_key + "/");
+$key_path = "..\..\keys\8008\8080\" + $oauth_consumer_key;
+$oauth_consumer_secret = Get-Content -Path $key_path | Out-String;
 
 $oauth_token_secret = "";
 $oauth_nonce = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes([System.DateTime]::Now.Ticks.ToString()));
@@ -34,7 +33,7 @@ $oauth_authorization += 'oauth_signature_method="HMAC-SHA1",'
 $oauth_authorization += 'oauth_timestamp="' + [System.Uri]::EscapeDataString($oauth_timestamp) + '",'
 $oauth_authorization += 'oauth_version="1.0"';
 
-[System.Net.HttpWebRequest] $request = [System.Net.WebRequest]::Create("http://localhost:8000/job");  
+[System.Net.HttpWebRequest] $request = [System.Net.WebRequest]::Create("http://localhost:8008/job");  
 $request.Method = "GET";
 $request.Headers.Add("Authorization", $oauth_authorization);
 $response = $request.GetResponse();
@@ -45,3 +44,5 @@ $result = $sr.ReadToEnd()
 $result
 
 $response.close()
+
+exit

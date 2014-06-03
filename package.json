@@ -10,11 +10,27 @@
     }
   ],
   "dependencies": {
-    "log4js": "~0.6.13",
-    "http-proxy": "~1.1.2",
-    "node-windows": "~0.1.5",
+    "log4js": "0.6.14",
+    "http-proxy": "1.1.2",
+    "node-windows": "0.1.5",
     "connect": "2.14.4",
-    "connect-restreamer": "1.0.0"
+    "connect-restreamer": "1.0.0",
+    "mkdirp": "0.5.0",
+    "node-uuid": "1.4.1"
+  },
+  "devDependencies": {
+    "mocha": "1.2.0",
+    "should": "3.3.2",
+    "express": "4.0.0",
+    "body-parser": "1.0.2",
+    "method-override": "1.0.2",
+    "oauth": "0.9.11",
+    "request": "2.36.0",
+    "underscore": "1.6.0"
+  },
+  "scripts": {
+    "test_unix": "AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8008 LOG4JS_CONFIG=./test/test_log4js.json LOG4JS_DISABLE_LOGSTASH=true ./node_modules/mocha/bin/mocha test/test.js --reporter spec -t 10000",
+    "test_win": "SET AUSPICE_SERVICE_NAME=jobsservice&SET AUSPICE_PROXY_PORT=8008&SET LOG4JS_CONFIG=test\\test_log4js.json&SET LOG4JS_DISABLE_LOGSTASH=true& node .\\node_modules\\mocha\\bin\\mocha --reporter spec -t 10000"
   },
   "licenses": [
     {

@@ -5,13 +5,15 @@ use Net::OAuth;
 my $consumer_key = 'perl-test-key';
 
 my $ua = LWP::UserAgent->new;
-my $consumer_secret_request = HTTP::Request->new(GET => "http://localhost:8787/proxy/8000/8888/key/" . $consumer_key . "/");
-my $consumer_secret_response = $ua->request($consumer_secret_request);
-my $consumer_secret = $consumer_secret_response->content;
+my $file = "../../keys/8008/8080/" . $consumer_key;
+my $consumer_secret = do {
+    local $/ = undef;
+    open my $fh, "<", $file
+        or die "could not open $file: $!";
+    <$fh>;
+};
 
-print "$consumer_key:$consumer_secret\n";
-
-sub url { 'http://localhost:8000/job'; }
+sub url { 'http://localhost:8008/job'; }
 
 my $oauth_request = Net::OAuth->request('consumer')->new(
   consumer_key => $consumer_key,
@@ -31,7 +33,7 @@ $req->header('Authorization' => $oauth_request->to_authorization_header);
 
 my $oauth_response = $ua->simple_request($req);
 
-print $oauth_response->as_string;
+print $oauth_response->decoded_content;
 
 sub nonce {
   my @a = ('A'..'Z', 'a'..'z', 0..9);

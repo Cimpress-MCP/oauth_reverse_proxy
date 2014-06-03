@@ -232,11 +232,15 @@ function signString(key, str) {
   return crypto.createHmac("sha1", key).update(str).digest("base64");
 }
 
-// Given an array of parameters of type [ key, value, key2, value2 ], return a rendered string separated
+// Given an array of parameters of type [ [key, value], [key2, value2] ], return a rendered string separated
 // by character sep and where the key and value are transformed by renderFn before being joined.
 function renderParams(params, sep, renderFn) {
   var out_params = [];
+  // Flatten the nested array into a single array of type [ key, value, key2, value2 ]
   params = _.flatten(params);
+
+  // Fail an assertion if the output array is odd in length.
+  (params.length & 1).should.equal(0);
   for (var i=0; i<params.length; i+=2) {
     out_params[i/2] = renderFn(params[i], params[i+1]);
   }

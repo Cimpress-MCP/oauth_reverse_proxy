@@ -1,5 +1,12 @@
-
+var fs = require('fs');
 var logger = require('../utils/logger.js').getLogger('environment_validator');
+
+// Delay the startup failure to give log messages an opportunity to reach the logstash agent.
+var fail_startup = function(exit_code) {
+  setTimeout(function() {
+    process.exit(exit_code);
+  }, 2000);
+}
 
 /**
  * Fail immediately if no AUSPICE_CONFIG environment variable is present.
@@ -7,9 +14,20 @@ var logger = require('../utils/logger.js').getLogger('environment_validator');
  * The config directory must be passed as an environment variable to the Auspice process.
  * This is used to locate the keystore on disk.
  */
-if (!process.env.AUSPICE_CONFIG) {
-  logger.error("No config file defined for Auspice.");
-  process.exit(1);
+if (!process.env.AUSPICE_KEYSTORE) {
+  logger.error("No keystore defined for Auspice.");
+  return fail_startup(1);
+}
+
+try {
+  var stat = fs.statSync(process.env.AUSPICE_KEYSTORE);
+  if (!stat.isDirectory()) {
+    logger.error("Keystore %s is not present", process.env.AUSPICE_KEYSTORE);
+    return fail_startup(1);
+  }
+} catch(e) {
+  logger.error("Keystore %s is not present", process.env.AUSPICE_KEYSTORE);
+  return fail_startup(1);
 }
 
 /**
@@ -20,7 +38,7 @@ if (!process.env.AUSPICE_CONFIG) {
  */
 if (!process.env.AUSPICE_SERVICE_NAME) {
   logger.error("No service name defined for Auspice.");
-  process.exit(2);
+  return fail_startup(2);
 }
 
 /**
@@ -31,7 +49,7 @@ if (!process.env.AUSPICE_SERVICE_NAME) {
  */
 if (!process.env.AUSPICE_VERSION) {
   logger.error("No version defined for Auspice.");
-  process.exit(3);
+  return fail_startup(3);
 }
 
 /**
@@ -45,5 +63,9 @@ if (!process.env.AUSPICE_VERSION) {
  */
 if (!process.env.AUSPICE_PROXY_PORT) {
   logger.error("No proxy port defined for Auspice.");
-  process.exit(4);
+  return fail_startup(4);
 }
+
+// If we got here, everything validated, so we can export true as the result of module invocation.
+// This will give any callers a simple test as to whether the environment is correctly configured.
+module.exports = true;

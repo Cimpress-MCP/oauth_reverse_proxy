@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<SOAP:Envelope
+    xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+    SOAP:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP:Body>
+        <ns1:getListOfProductsResponse
+            
+xmlns:ns1="http://www.AFictitiousApplication.com/">
+            
+<ns1:listOfProducts SOAP-ENC:arrayType="xsd:string[3]">
+                
+<item>Panel instruments</item>
+                
+<item>Generator controllers</item>
+                
+<item>Fuel control valves</item>
+             </ns1:listOfProducts>
+        </ns1:getListOfProductsResponse>
+   </SOAP:Body>
+</SOAP:Envelope>

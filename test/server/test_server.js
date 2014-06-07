@@ -1,0 +1,124 @@
+var express = require('express');
+var app = express();
+var fs = require('fs');
+var util = require('util');
+app.use(require ('body-parser')());
+app.use(require ('multer')());
+
+// Save ourselves the pain and emotional trauma of having to worry about verb case while looping.
+app.GET = app.get;
+app.POST = app.post;
+app.PUT = app.put;
+app.DELETE = app.delete;
+
+// The job server represents a simple RESTful server we might expect to see behind Auspice.
+function JobServer() {
+  var this_obj = this;
+
+  ['GET', 'DELETE'].forEach(function(verb) {
+    app[verb]("/job/:job_id", function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      console.log('%s with key %s', verb, req.headers['vp_user_key']);
+      this_obj.emit(verb + " /job", req, res);
+      res.send({'status':'ok'});
+    });
+  });
+
+  app.get("/livecheck", function(req, res) {
+    res.setHeader('Content-Type', 'application/json');
+    console.log('GET /livecheck');
+    this_obj.emit('GET /livecheck', req, res);
+    res.send({'status':'ok'});
+  });
+
+  app.get("/healthcheck", function(req, res) {
+    res.setHeader('Content-Type', 'application/json');
+    console.log('GET /healthcheck');
+    this_obj.emit('GET /healthcheck', req, res);
+    res.send({'status':'ok'});
+  });
+
+  // /transactions simulates an endpoint that might return a large, chunked response.
+  ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+    app[verb]('/transactions', function(req, res) {
+      
+      res.setHeader('Content-Type', 'application/json');
+      console.log('%s /transactions with key %s', verb.toUpperCase(), req.headers['vp_user_key']);
+      
+      // Generate a sizeable chunk of json that will be chunked and returned
+      res.write('{\n\t"jobs_list":[');
+    
+      for (var i=0; i<1000; ++i) {
+        res.write('\t\t"job": ');
+        res.write('' + i);
+        res.write(',\n');
+      }
+      
+      process.nextTick(function() {
+        res.write('\t\t"job": 1000\n\t]\n}');
+
+        this_obj.emit(verb.toUpperCase() + " /transactions", req, res);
+        res.end();
+      });
+    });
+  });
+
+  app.POST('/getProducts', function(req, res) {
+    console.log('POST /getProducts with key %s', req.headers['vp_user_key']);
+    this_obj.emit('POST /getProducts', req, res);
+    res.sendfile('./test/resources/list_of_products.xml');
+  });
+  
+  ['POST', 'PUT'].forEach(function(verb) {
+
+    app[verb]("/job", function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      console.log('%s with key %s', verb, req.headers['vp_user_key']);
+      this_obj.emit(verb + " /job", req, res);
+      res.send({'status':'ok'});
+    });
+  
+    // /uploads simulates an endpoint that receives multipart form data for posts and puts
+    app[verb]('/uploads', function(req, res) {
+      console.log('%s /uploads with key %s', verb.toUpperCase(), req.headers['vp_user_key']);
+      
+      var file_path = req.files['binary_data'].path;
+      var expected_length = req.files['binary_data'].size;
+      
+      var is_file_complete = function(cb) {
+        fs.stat(file_path, function(err, stat) {
+          if (err) return cb(false);
+          return cb(stat.size === expected_length);
+        });
+      };
+      
+      var poll_file = function() {
+        is_file_complete(function(complete) {
+          if (complete) {
+            this_obj.emit(verb.toUpperCase() + " /uploads", req, res);
+            res.sendfile(req.files['binary_data'].path);
+          } else {
+            // If the file is not completely loaded, pause 10ms and try again
+            setTimeout(poll_file, 10);
+          }
+        });
+      };
+      poll_file();
+    });
+  });
+}
+
+// Configure JobServer as an event emitter and export a new instance.
+util.inherits(JobServer, require('events').EventEmitter);
+exports.JobServer = new JobServer();
+
+// Init the test server, if necessary.
+var initted = false;
+exports.init = function(port, cb) {
+  // If we're already initted, drop out here.
+  if (initted) return cb();
+  initted = true;
+  app.listen(port, 'localhost', function(err) {
+    cb(err);
+  });
+};

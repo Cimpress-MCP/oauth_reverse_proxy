@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<SOAP:Envelope
+    xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/"
+    SOAP:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <SOAP:Body>
+        <ns1:getListOfProducts xmlns:ns1="http://www.vistaprint.com/soapsucks"/>
+</SOAP:Body>

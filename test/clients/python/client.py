@@ -13,7 +13,7 @@ consumer_key = 'python-test-key'
 consumer_key_file = open('../../keys/8008/8080/' + consumer_key, 'r')
 consumer_secret = consumer_key_file.read()
 
-request = requests.Request('GET', 'http://localhost:8008/job')
+request = requests.Request('GET', 'http://localhost:8008/job/5654546d')
 oauth_hook = OAuthHook('','', consumer_key, consumer_secret, True)
 request = oauth_hook(request)
 prepared = request.prepare()

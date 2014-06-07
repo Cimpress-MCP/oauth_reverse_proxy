@@ -1,55 +1,18 @@
 var should = require('should');
 
 var _ = require('underscore');
-var crypto = require('crypto');
 var fs = require('fs');
-var os = require('os');
-var request = require('request');
+var path = require('path');
 var util = require('util');
 
-var job_server;
+var test_server = require('./server/test_server.js');
+var job_server = test_server.JobServer;
 var keygen = require('../utils/keygen.js');
 
-var http = require('http');
-var exec = require('child_process').exec;
-
-// Cache console.[log,error] in case we want to mute it for any given test (sometimes Express or
-// other components log expected errors, and we don't want to see them in our test results)
-var console_log = console.log;
-var console_error = console.error;
-
-// This is the secret we'll use for signing ad hoc requests for test cases.
-var mocha_secret;
-
-// Variables used for signing requests with OAuth
-var oauth_headers;
-var params;
-var signature_components;
-
-// OAuth header params have the form oauth_version: '1.0'
-var oauth_header_renderer = function(key, value) {
-  return key + '="' + encodeData(value) + '"';
-};
-
-// Params for signing have the form oauth_version=1.0
-var param_renderer = function(key, value) {
-  return key + '=' + value;
-};
-
-// Construct a signature, add it to the OAuth header group, and return the OAuth header string  
-var prepare_auth_header = function() {
-  signature_components[2] = encodeData(renderParams(params, '&', param_renderer));
-  var signature_base = signature_components.join('&');
-  oauth_headers.push(['oauth_signature', signString(mocha_secret, signature_base)]);
-  return 'OAuth ' + renderParams(oauth_headers, ', ', oauth_header_renderer);
-};
-
-// Convenience function for sending a request through auspice and expecting a certain response code.
-var send_authenticated_request = function(expectedStatusCode, done) {
-  request('http://localhost:8008/job', { headers: {'Authorization': prepare_auth_header()} },
-    create_response_validator(expectedStatusCode, done)
-  );
-};
+// All the messy business of creating and sending requests (both authenticated and unauthenticated)
+// lives in request_sender.
+var request_sender = require('./request_sender.js');
+var ResponseValidatorFactoryClass = request_sender.ResponseValidator;
 
 // These cleanup operations need to run before each test to make sure the state of the
 // suite is consistent.  Placed here, they will be run before all suites and tests.
@@ -58,58 +21,32 @@ beforeEach(function() {
   // Make sure there are no pending event listeners before each test.
   if (job_server) job_server.removeAllListeners();
   
-  // Always reset console.log and console.error
-  console.log = console_log;
-  console.error = console_error;
-  
-  var nonce = createNonce();
-  var timestamp = new Date().getTime();
-  
-  // Reset the signature components we use to working defaults.
-  signature_components = [
-    'GET',
-    encodeData('http://localhost:8008/job'),
-    'param_placeholder'
-  ];
-  
-  // Fill a valid set of oauth headers that we can monkey with as needed for our test cases.
-  oauth_headers = [
-    [ 'oauth_consumer_key', 'mocha-test-key' ],
-    [ 'oauth_nonce', nonce ],
-    [ 'oauth_signature_method', 'HMAC-SHA1'],
-    [ 'oauth_timestamp', timestamp],
-    [ 'oauth_version', '1.0' ]
-  ];
-  
-  // Since there may be params that aren't headers, clone params here.
-  params = _.clone(oauth_headers);
+  // Reset the internal state of the request_sender so each unit test gets a tabula rasa.
+  request_sender.reset();
 });
 
-// Creates a convenience function for validating that an http response has the correct status code
-// and did not result in a protocol-level error (connection failure, etc).
-var create_response_validator = function(expectedStatusCode, additionalValidation, done) {
-  return function(err, response, body) {
+var IGNORABLE_REQUEST_HEADERS = ['authorization', 'host', 'vp_user_key', 'content-type'];
+var IGNORABLE_RESPONSE_HEADERS = [ 'date' ];
+
+// Compare the two sets of headers and return true only if they are equal in both name and
+// value, aside from the keys listed in keys_to_ignore.
+var compare_headers = function(auth, unauth, keys_to_ignore) {
   
-    if (!done) {
-      done = additionalValidation;
-      additionalValidation = undefined;
-    }
+  // Default to an empty set if no keys were provided.
+  keys_to_ignore = keys_to_ignore || {};
+
+  // Deep compare the objects after omitting the set of keys that may differ between calls.
+  var rvalue = _.isEqual(
+    _.omit(auth, keys_to_ignore),
+    _.omit(unauth, keys_to_ignore)
+  );
   
-    // Always reset console.log and console.error in case they've been muted for the test.
-    console.log = console_log;
-    console.error = console_error;
-  
-    if (err) return done(err);
-    response.statusCode.should.equal(expectedStatusCode);
-    // Validate that all responses have a connection header of keep-alive.  For performance reasons,
-    // Auspice should never be disabling keep-alives.
-    response.headers.connection.should.equal('keep-alive');
-    if (expectedStatusCode === 200) body.should.equal('{"status":"ok"}');
-  
-    // If an additional validation function was provided, run it now on the received response and body.
-    if (additionalValidation) additionalValidation(response, body, done);
-    done();
-  };
+  // If we have a header difference, this may the result of a transient condition and very difficult
+  // to reproduce.  Log the headers to make sure we know what happened.
+  if (!rvalue) 
+    console.log('auth:\n%s\n,unauth:\n%s\nto_ignore:\n%s', util.inspect(auth), util.inspect(unauth), util.inspect(keys_to_ignore));
+    
+  return rvalue;
 };
 
 describe('Auspice Resiliency', function() {
@@ -125,7 +62,7 @@ describe('Auspice Resiliency', function() {
                 keygen.createKey(__dirname + '/keys', 8008, 8080, 'python-test-key', function(err) {
                   keygen.createKey(__dirname + '/keys', 8008, 8080, 'ruby-test-key', function(err) {
                     keygen.createKey(__dirname + '/keys', 8008, 8080, 'mocha-test-key', function(err) {
-                      mocha_secret = fs.readFileSync(__dirname + '/keys/8008/8080/mocha-test-key') + '&';
+                      request_sender.mocha_secret = fs.readFileSync(__dirname + '/keys/8008/8080/mocha-test-key') + '&';
                       done(err);
                     });
                   });
@@ -145,107 +82,60 @@ describe('Auspice Resiliency', function() {
       
       // Turn the proxy.keys object into an array to get its length
       (_.keys(proxy.keys).length).should.be.exactly(9);
-      done();    
+      done();
     });
   });
   
   it ('should gracefully handle /livecheck requests to offline hosts', function(done) {
-    request('http://localhost:8008/livecheck', function(err, res, body) {
-      if (err) return done(err);
-      
-      res.statusCode.should.equal(500);
-      done();
-    });
+    request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8008/livecheck', null, 500, done);
   });
-  
-  it ('should gracefully handle authenticated requests to offline hosts', function(done) {
-    request('http://localhost:8008/job', { headers: {'Authorization': prepare_auth_header()} }, function(err, res, body) {
-      if (err) return done(err);
-      
-      res.statusCode.should.equal(500);
-      done();
-    });
+
+  it ("should gracefully handle authenticated GET requests to offline hosts", function(done) {
+    request_sender.sendSimpleAuthenticatedRequest('GET', 500, done);
   });
+
 });
 
 // Test the job server in isolation to make sure responses are handled as expected without Auspice involved.
 describe('Job Server', function() {
   
   before(function(done) {
-   job_server = require('./server/job_server.js');
-   job_server.on('started', function() {
-     done();
+   test_server.init(8080, function(err) {
+     done(err);
    });
   });
   
-  describe('Unauthenticated GET /job from localhost', function() {
-    it ('should return a valid response', function(done) {      
-      request('http://localhost:8080/job', create_response_validator(200, done));
+  // Run tests for unauthenticated GETs and DELETEs
+  ['GET', 'DELETE'].forEach(function(verb) {
+    it ('should return a valid response to a ' + verb, function(done) {
+      request_sender.sendRequest(verb, 'http://localhost:8080/job/unauthenticated_uri', null, 200, done);
     });
   });
   
-  describe('Unauthenticated POST /job from localhost', function() {
-    it ('should return a valid response', function(done) {
-      var content = 'data=happy';
-      request.post('http://localhost:8080/job', {form:{data:'happy'}}, create_response_validator(200, done));
+  ['PUT', 'POST'].forEach(function(verb) {
+    it ('should return a valid response to formencoded ' + verb, function(done) {
+      request_sender.sendRequest(verb, 'http://localhost:8080/job', {form:{data:'happy'}}, 200, done);
+    });
+    
+    it ('should return a valid response to a multipart ' + verb, function(done) {
+      // Send an unauthenticated multipart POST or PUT
+      var r = request_sender.sendRequest(verb, 'http://localhost:8080/uploads', null, 200, done);
+      
+      // Populate the form for the authenticated POST or PUT
+      var form = r.form();
+      form.append('first_field', 'multipart_enabled');
+      form.append('binary_data', fs.createReadStream(path.join(__dirname, 'resources/booch.jpg')));
     });
   });
   
-  describe('Unauthenticated PUT /job from localhost', function() {
-    it ('should return a valid response', function(done) {
-      var content = 'data=happy';
-      request.put('http://localhost:8080/job', {form:{data:'happy'}}, create_response_validator(200, done));
-    });
-  });
-  
-  describe('Unauthenticated DELETE /job from localhost', function() {
-    it ('should return a valid response', function(done) {
-      request.del('http://localhost:8080/job/12345', create_response_validator(200, done));
-    });
+  // Test a SOAP-ish message
+  it ('should handle a SOAP-like POST', function(done) {
+      var soap_headers = {headers:{'content-type':'application/soap+xml; charset=utf-8'}};
+      // Send an unauthenticated SOAP POST
+      fs.createReadStream('./test/resources/get_list_of_products.xml').pipe(
+        request_sender.sendRequest('POST', 'http://localhost:8080/getProducts', soap_headers, 200, done));
   });
 });
-
-// Create random nonce string
-function createNonce() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    for( var i=0; i < 10; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
-}
-
-// Encode signable strings
-function encodeData(toEncode) {
-  if( toEncode == null || toEncode === "" ) return "";
-  else {
-    var result= encodeURIComponent(toEncode);
-    // Fix the mismatch between RFC3986's and Javascript's beliefs in what is right and wrong.
-    return result.replace(/\!/g, "%21").replace(/\'/g, "%27").replace(/\(/g, "%28")
-                 .replace(/\)/g, "%29").replace(/\*/g, "%2A");
-  }
-}
-
-// Sign the provided string.  This is used for ad hoc tests run from within the suite.
-function signString(key, str) {
-  return crypto.createHmac("sha1", key).update(str).digest("base64");
-}
-
-// Given an array of parameters of type [ [key, value], [key2, value2] ], return a rendered string separated
-// by character sep and where the key and value are transformed by renderFn before being joined.
-function renderParams(params, sep, renderFn) {
-  var out_params = [];
-  // Flatten the nested array into a single array of type [ key, value, key2, value2 ]
-  params = _.flatten(params);
-
-  // Fail an assertion if the output array is odd in length.
-  (params.length & 1).should.equal(0);
-  for (var i=0; i<params.length; i+=2) {
-    out_params[i/2] = renderFn(params[i], params[i+1]);
-  }
-  return out_params.join(sep);
-}
 
 // Auspice is an authenticating proxy.  Let's describe it.
 describe('Auspice', function() {
@@ -254,462 +144,439 @@ describe('Auspice', function() {
   // authentication through the proxy.
   describe('Authenticating proxy functionality', function() {
     
-    // Validate that a basic GET request works.
-    it ('should accept a properly signed basic GET request', function(done) {      
-      send_authenticated_request(200, done);
-    });
-    
-    // Validate that a GET with query parameters works.
-    it ('should accept a properly signed GET with query', function(done) {
-      params.push(['query', 'ok']);
-      request('http://localhost:8008/job?query=ok', { headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(200, done)
-      );
-    });
-    
-    // Validate that a GET with unsigned query parameters fails due to signature mismatch.
-    it ('should reject an improperly signed GET where query params are not part of the signature', function(done) {
-      request('http://localhost:8008/job?query=should_fail', { headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(401, done)
-      );
-    });
-    
-    // Validate that a GET with query string longer than 16kb fails due to signature mismatch.
-    it ('should reject a GET with a query greater than 16kb', function(done) {
+    // GETs and DELETEs have the same URL format and do not expect input, so test them both in a loop.
+    ['GET', 'DELETE'].forEach(function(verb) {
       
-      var crazy_large_buffer = new Buffer(1024*16);
-      for (var i=0; i<crazy_large_buffer.length; ++i) {
-        crazy_large_buffer[i] = 'A'.charCodeAt();
-      }
-      var crazy_large_str = crazy_large_buffer.toString();
-      var crazy_large_url = 'http://localhost:8008/job?query_huge_query=' + crazy_large_str;
-      params.push(['query_huge_query', crazy_large_str]);
-      
-      request(crazy_large_url, { headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(413, done)
-      );
-    });
-    
-    // Validate that a basic, empty POST works.
-    it ('should accept a properly signed POST with no params', function(done) {
-      signature_components[0] = 'POST';
-      request.post('http://localhost:8008/job', { headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(200, done)
-      );
-    });
-    
-    // Validate that a basic POST works.
-    it ('should accept a properly signed POST with params', function(done) {
-      signature_components[0] = 'POST';
-      params.push(['post', 'ok']);
-      
-      job_server.once('POST', function(uri, req, res) {
-        req.headers.should.have.property('vp_user_key', 'mocha-test-key');
-        req.method.should.equal('POST');
-        _.isEqual(req.body, {'post':'ok'}).should.equal(true);
+      // Validate that a basic GET or DELETE request works.
+      it ("should accept a properly signed basic " + verb + " request", function(done) {
+        request_sender.sendSimpleAuthenticatedRequest(verb, 200, done);
       });
-      
-      request.post('http://localhost:8008/job', { form: {'post': 'ok'}, headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(200, done)
-      );
-    });
     
-    // Validate that a POST with unsigned body parameters fails due to signature mismatch.
-    it ('should reject an improperly signed POST where params are not part of the signature', function(done) {
-      request.post('http://localhost:8008/job', { form: {'post': 'ok'}, headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(401, done)
-      );
-    });
-    
-    // Validate that a POST with body greater than 1mb fails due to signature mismatch.
-    it ('should reject a formencoded POST with a body greater than 1mb', function(done) {
-      
-      var crazy_large_buffer = new Buffer(1025*1024);
-      var crazy_huge_form = { 'post': crazy_large_buffer.toString() };
-      
-      // Mute console.log message from Express about entity size.  We know this.  It's what we're testing.
-      console.log = function() {}
-      console.error = function() {}
-      
-      request.post('http://localhost:8008/job', { form: crazy_huge_form, headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(413, done)
-      );
-    });
-    
-    // Validate that a basic PUT works.
-    it ('should accept a properly signed PUT with params', function(done) {
-      signature_components[0] = 'PUT';
-      params.push(['put', 'ok']);
-
-      job_server.once('PUT', function(uri, req, res) {
-        req.headers.should.have.property('vp_user_key', 'mocha-test-key');
-        req.method.should.equal('PUT');
-        _.isEqual(req.body, {'put':'ok'}).should.equal(true);
+      // Validate that a GET or DELETE with query parameters works.
+      it ("should accept a properly signed " + verb + " with query", function(done) {
+        request_sender.params.push(['query', 'ok']);
+        request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/job/12345?query=ok', null, 200, done);
       });
-      
-      request.put('http://localhost:8008/job', { form: {'put': 'ok'}, headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(200, done)
-      );
-    });
     
-    // Validate that a PUT with unsigned body parameters fails due to signature mismatch.
-    it ('should reject an improperly signed PUT where params are not part of the signature', function(done) {
-      request.put('http://localhost:8008/job', { form: {'put': 'ok'}, headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(401, done)
-      );
+      // Validate that a GET or DELETE with unsigned query parameters fails due to signature mismatch.
+      it ("should reject an improperly signed " + verb + " where query params are not part of the signature", function(done) {
+        request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/job/12345?query=should_fail', null, 401, done);
+      });
     });
 
-    // Validate that a PUT with body greater than 1mb fails due to signature mismatch.
-    it ('should reject a formencoded PUT with a body greater than 1mb', function(done) {
+    // We want to test that giant query strings aren't allowed for any verb, so loop over them all
+    ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
       
-      var crazy_large_buffer = new Buffer(1025*1024);
-      var crazy_huge_form = { 'post': crazy_large_buffer.toString() };
+      // Validate that a GET or DELETE with query string longer than 16kb fails due to signature mismatch.
+      it ("should reject a " + verb + " with a query greater than 16kb", function(done) {
+        var crazy_large_buffer = new Buffer(1024*16);
+        for (var i=0; i<crazy_large_buffer.length; ++i) {
+          crazy_large_buffer[i] = 'A'.charCodeAt();
+        }
+        var crazy_large_str = crazy_large_buffer.toString();
+        var crazy_large_url = 'http://localhost:8008/job/crazy_huge_job?query_huge_query=' + crazy_large_str;
+        request_sender.params.push(['query_huge_query', crazy_large_str]);
+        
+        request_sender.sendAuthenticatedRequest(verb, crazy_large_url, null, 413, done);
+      });
+    });
+    
+    // Validate that a basic POST or PUT works.  Loop over each verb, running the common tests between them.
+    ['POST', 'PUT'].forEach(function(verb) {
       
-      // Mute console.log message from Express about entity size.  We know this.  It's what we're testing.
-      console.log = function() {}
-      console.error = function() {}
+      // Validate that a basic, empty POST or PUT works.
+      it ("should accept a properly signed " + verb + " with no params", function(done) {
+        request_sender.sendSimpleAuthenticatedRequest(verb, 200, done);
+      });
       
-      request.put('http://localhost:8008/job', { form: crazy_huge_form, headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(413, done)
-      );
-    });
-    
-    // Validate that a basic DELETE works.
-    it ('should accept a properly signed DELETE', function(done) {
-      signature_components[0] = 'DELETE';
-      signature_components[1] = encodeData('http://localhost:8008/job/12345');
-      request.del('http://localhost:8008/job/12345', { headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(200, done)
-      );
-    });
-    
-    // Validate that a DELETE with unsigned body parameters fails due to signature mismatch.
-    it ('should reject an improperly signed DELETE where signature is incorrect', function(done) {
-      request.del('http://localhost:8008/job', { headers: {'Authorization': prepare_auth_header() } },
-        create_response_validator(401, done)
-      );
-    });
-  });
-  
-  describe('Message integrity protection', function() {
-    
-    beforeEach(function() {
-      // Mute console.log messages from job server.  It gets chatty when you proxy more than a single
-      // request per test, as we do in each test in this suite.
-      console.log = function() {}
-    });
-    
-    /**
-     * This creates a function that will run a request both with and without authentication
-     * and validate that the only deviations in the request headers are deviations we expect.
-     * This function takes as its parameter the method type we want to test, and returns a
-     * function that describes a Mocha testcase.
-     */
-    var create_request_header_validator = function(method) {
-      return function(done) {
-        var all_done = false;
-        var my_done = function(err) {
-          // If the response validator returned an error, don't bother with the header comparison.
-          if (err) return done(err);
-          if (all_done) return;
-          if (results.authorized && results.vanilla) {
-            // Compare the two sets of request headers
-            var keys_to_ignore = ['authorization', 'host', 'vp_user_key'];
+      it ("should accept a properly signed " + verb + " with params", function(done) {
+        job_server.once(verb + " /job", function(req, res) {
+          req.headers.should.have.property('vp_user_key', 'mocha-test-key');
+          req.method.should.equal(verb);
+          _.isEqual(req.body, {'submit':'ok'}).should.equal(true);
+        });
+        
+        // Add the params to the signature.  Without this line, the call will fail with a 401.
+        request_sender.params.push('submit', 'ok');
+        request_sender.sendAuthenticatedRequest(verb, null, {form:{submit:'ok'}}, 200, done);
+      });
+      
+      // Validate that a POST or PUT with unsigned body parameters fails due to signature mismatch.
+      it ("should reject an improperly signed " + verb + " where params are not part of the signature", function(done) {
+        request_sender.sendAuthenticatedRequest(verb, null, {form:{submit:'ok'}}, 401, done);
+      });
+      
+      // Validate that a POST or PUT with body greater than 1mb fails due to signature mismatch.
+      it ("should reject a formencoded " + verb + " with a body greater than 1mb", function(done) {
+        var crazy_large_buffer = new Buffer(1025*1024);
+        var crazy_huge_form = { 'post': crazy_large_buffer.toString() };
+      
+        // Mute console.err message from Express about entity size.  We know this.  It's what we're testing.
+        var _console_error = console.error;
+        console.error = function() {}
+
+        // Send an authenticated request with a giant form body.
+        request_sender.sendAuthenticatedRequest(verb, null, {form:crazy_huge_form}, 413, function(err) {
+          // reset console.err
+          console.error = _console_error;
+          done(err);
+        });
+      });
+      
+      // Validate that a multipart POST or PUT succeeds.
+      it ("should accept a multipart " + verb, function(done) {
+        var unauthenticated_request;
+        var authenticated_request;
+        
+        // Set a job_server listener to grab the authenticated request when it hits the job server
+        job_server.once(verb + " /uploads", function(req, res) {
+          authenticated_request = req;
+        });
+        
+        // Send an authenticated multipart POST or PUT
+        var r = request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/uploads', null, 200, function(err, res, body) {
+          
+          var authenticated_response = res;
+          var authenticated_response_body = body;
+          
+          // Set a job_server listener to grab the unauthenticated request when it hits the job server
+          job_server.once(verb + " /uploads", function(req, res) {
+            unauthenticated_request = req;
+          });
+          
+          // Send an unauthenticated multipart POST or PUT
+          var r = request_sender.sendRequest(verb, 'http://localhost:8080/uploads', null, 200, function(err, res, body) {
+            
+            var unauthenticated_response = res;
+            var unauthenticated_response_body = body;
           
             // Deep compare the objects after omitting the set of keys known a priori to differ when
             // the proxy is used.
-            (_.isEqual(
-              _.omit(results.authorized, keys_to_ignore),
-              _.omit(results.vanilla, keys_to_ignore))
+            compare_headers(authenticated_request.headers, unauthenticated_request.headers, IGNORABLE_REQUEST_HEADERS).should.equal(true);
+            
+            // Validate that the request was sent multipart and chunked.
+            authenticated_request.headers['content-type'].should.startWith('multipart/form-data; boundary=');
+            authenticated_request.headers['transfer-encoding'].should.equal('chunked');
+
+            // Now validate that the response headers and body are correct.  Note that we explicitly ignore
+            // last-modified and etag in the header comparison because it can differ by a second based on when the
+            // disk writes from multer quiesced.
+            compare_headers(
+              authenticated_response.headers, unauthenticated_response.headers,
+              ['date', 'last-modified', 'etag']
             ).should.equal(true);
+            
+            // Compare the bodies, and make sure we got a large enough response to be plausible.
+            authenticated_response_body.should.equal(unauthenticated_response_body);
+            authenticated_response_body.length.should.be.greaterThan(1000);
           
-            results.vanilla['custom'].should.equal('header');
-            results.vanilla['more'].should.equal('custom_headers');
-
-            all_done = true;
             done();
-          }
-        };
-      
-        var results = {
-          'authorized' : undefined,
-          'vanilla' : undefined
-        };
-      
-        var headers = {
-          'custom': 'header',
-          'more': 'custom_headers'
-        };
-
-        // Make sure we sign for the appropriate method type
-        signature_components[0] = method;
-
-        var vanilla_url = 'http://localhost:8080/job';
-        var authorized_url = 'http://localhost:8008/job';
-
-        // Run the appropriate request based on the method desired (get, post, put, del)
-        var method_function_name = method.toLowerCase();
-        if (method_function_name === 'delete') {
-          // Delete requires slightly special handling since we use a different URL scheme
-          method_function_name = 'del';
-          vanilla_url = 'http://localhost:8080/job/1234';
-          authorized_url = 'http://localhost:8008/job/1234';
-          signature_components[1] = encodeData(authorized_url);
-        }
-      
-        // Job server event listener to collect the request headers from 
-        job_server.on(method, function(uri, req, res) {
-          if (!results.authorized) {
-            results.authorized = req.headers;
-            // Once we've seen the authorized request, make an unauthorized request to gather its headers.
-            request[method_function_name](vanilla_url, {headers: headers}, create_response_validator(200, my_done));
-          } else {
-            results.vanilla = req.headers;
-          }
+          });
+        
+          // Populate the form for the unauthenticated POST or PUT
+          var form = r.form();
+          form.append('first_field', 'multipart_enabled');
+          form.append('binary_data', fs.createReadStream(path.join(__dirname, 'resources/booch.jpg')));
         });
-               
-        request[method_function_name](authorized_url,
-          // For the authorized version of this request, extend our custom headers with the OAuth header.
-          { headers: _.extend({'Authorization': prepare_auth_header()}, headers) },
-          create_response_validator(200, my_done)
-        );
-      };
-    };
-    
-    // Run the request header validator once for each verb.
-    ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(method) {
-      it ('should proxy request headers from a ' + method + ' intact', create_request_header_validator(method));    
-    });
-    
-    /**
-     * This creates a function that will run a request both with and without authentication
-     * and validate that there are no deviations in the response headers.  This function takes
-     * as its parameter the method type we want to test, and returns a function that describes
-     * a Mocha testcase.
-     */
-    var create_response_header_validator = function(method) {
-      return function(done) {
-        var my_done = function(err) {
-          // If the response validator returned an error, don't bother with the header comparison.
-          if (err) return done(err);
-          if (results.authorized && results.vanilla) {
-            // Deep compare the two
-            (_.isEqual(results.authorized, results.vanilla)).should.equal(true);
-            _.keys(results.authorized).length.should.be.above(4);
+        
+        // Populate the form for the authenticated POST or PUT
+        var form = r.form();
+        form.append('first_field', 'multipart_enabled');
+        form.append('binary_data', fs.createReadStream(path.join(__dirname, 'resources/booch.jpg')));
+      });
+      
+      // Validate that a JSON POST or PUT succeeds.
+      it ("should accept a " + verb + " with a JSON body", function(done) {
+        var unauthenticated_request;
+        var authenticated_request;
+        
+        // Set a job_server listener to grab the authenticated request when it hits the job server
+        job_server.once(verb + " /transactions", function(req, res) {
+          authenticated_request = req;
+        });
+        
+        // Send an authenticated JSON POST or PUT
+        fs.createReadStream('./test/resources/test.json').pipe(
+          request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/transactions', null, 200, function(err, res, body) {
+          
+          var authenticated_response = res;
+          var authenticated_response_body = body;
+          
+          // Set a job_server listener to grab the unauthenticated request when it hits the job server
+          job_server.once(verb + " /transactions", function(req, res) {
+            unauthenticated_request = req;
+          });
+          
+          // Send an unauthenticated JSON POST or PUT
+          fs.createReadStream('./test/resources/test.json').pipe(
+            request_sender.sendRequest(verb, 'http://localhost:8080/transactions', null, 200, function(err, res, body) {
+            
+            var unauthenticated_response = res;
+            var unauthenticated_response_body = body;
+          
+            // Deep compare the objects after omitting the set of keys known a priori to differ when
+            // the proxy is used.
+            compare_headers(authenticated_request.headers, unauthenticated_request.headers, IGNORABLE_REQUEST_HEADERS).should.equal(true);
+            
+            // Validate that the request was sent JSON and chunked.
+            authenticated_request.headers['content-type'].should.equal('application/json');
+            authenticated_request.headers['transfer-encoding'].should.equal('chunked');
+
+            // Now validate that the response headers and body are correct.  Note that we explicitly ignore
+            // last-modified and etag in the header comparison because it can differ by a second based on when the
+            // disk writes from multer quiesced.
+            compare_headers(
+              authenticated_response.headers, unauthenticated_response.headers,
+              ['date', 'last-modified', 'etag']
+            ).should.equal(true);
+            
+            // Compare the bodies, and make sure we got a large enough response to be plausible.
+            authenticated_response_body.should.equal(unauthenticated_response_body);
+            authenticated_response_body.length.should.be.greaterThan(1000);
+          
             done();
-          }
-        };
+          }));
+        }));
+      });
+    });
+    
+    // Test SOAP-ish messages
+    it ('should handle a SOAP request', function(done) {
+      var unauthenticated_request;
+      var authenticated_request;
       
-        var results = {
-          'authorized' : undefined,
-          'vanilla' : undefined
-        };
+      // Set a job_server listener to grab the authenticated request when it hits the job server
+      job_server.once('POST /getProducts', function(req, res) {
+        authenticated_request = req;
+      });
       
-        var create_custom_validator = function(header_collection) {
-          return function(res, body, done) {
-            results[header_collection] = res.headers;
-          };
-        };
+      var soap_headers = {headers:{'content-type':'application/soap+xml; charset=utf-8'}};
+      
+      // Send an authenticated multipart POST or PUT
+      fs.createReadStream('./test/resources/get_list_of_products.xml').pipe(
+        request_sender.sendAuthenticatedRequest('POST', 'http://localhost:8008/getProducts', soap_headers, 200, function(err, res, body) {
+        
+        var authenticated_response = res;
+        var authenticated_response_body = body;
+        
+        // Set a job_server listener to grab the unauthenticated request when it hits the job server
+        job_server.once('POST /getProducts', function(req, res) {
+          unauthenticated_request = req;
+        });
+        
+        // Send an unauthenticated multipart POST or PUT
+        fs.createReadStream('./test/resources/get_list_of_products.xml').pipe(
+          request_sender.sendRequest('POST', 'http://localhost:8080/getProducts', soap_headers, 200, function(err, res, body) {
+          
+          var unauthenticated_response = res;
+          var unauthenticated_response_body = body;
+        
+          // Deep compare the objects after omitting the set of keys known a priori to differ when
+          // the proxy is used.
+          compare_headers(authenticated_request.headers, unauthenticated_request.headers, IGNORABLE_REQUEST_HEADERS).should.equal(true);
+          
+          // Validate that the request was sent multipart and chunked.
+          authenticated_request.headers['content-type'].should.equal('application/soap+xml; charset=utf-8');
+          authenticated_request.headers['transfer-encoding'].should.equal('chunked');
 
-        // Make sure we sign for the appropriate method type
-        signature_components[0] = method;
+          // Now validate that the response headers and body are correct.  Note that we explicitly ignore
+          // last-modified and etag in the header comparison because it can differ by a second based on when the
+          // disk writes from multer quiesced.
+          compare_headers(
+            authenticated_response.headers, unauthenticated_response.headers,
+            ['date', 'last-modified', 'etag']
+          ).should.equal(true);
+          
+          // Compare the bodies, and make sure we got a large enough response to be plausible.
+          authenticated_response_body.should.equal(unauthenticated_response_body);
+          authenticated_response_body.length.should.be.greaterThan(500);
+        
+          done();
+        }));
+      }));
+    });
+  });
+  
+  // This is a set of tests to validate that Auspice does not tamper with the request or response
+  // headers or other components of the messages that transit through the proxy.  Unlike many of
+  // the other test suites, this requires that we send two requests (one authenticated and one
+  // unauthenticated) to validate that there are no unexpected differences in content.
+  describe('Message integrity protection', function() {
 
-        var vanilla_url = 'http://localhost:8080/job';
-        var authorized_url = 'http://localhost:8008/job';
+    // Run the message integrity validations once for each verb.
+    ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
 
-        // Run the appropriate request based on the method desired (get, post, put, del)
-        var method_function_name = method.toLowerCase();
-        if (method_function_name === 'delete') {
-          // Delete requires slightly special handling since we use a different URL scheme
-          method_function_name = 'del';
-          vanilla_url = 'http://localhost:8080/job/1234';
-          authorized_url = 'http://localhost:8008/job/1234';
-          signature_components[1] = encodeData(authorized_url);
+      // A custom set of headers to send with our requests.
+      var custom_headers = {
+        headers: {
+          custom: 'header',
+          more: 'custom_headers'
         }
-      
-        request[method_function_name](authorized_url, { headers: {'Authorization': prepare_auth_header() } },
-          create_response_validator(200, create_custom_validator('authorized'), my_done)
-        );
-      
-        request[method_function_name](vanilla_url, create_response_validator(200, create_custom_validator('vanilla'), my_done));
       };
-    };
+      
+      // This test sends a request to both an authenticated and unauthenticated endpoint, with custom
+      // headers, and validates that there are no differences (other than expected differences in
+      // auth headers, for example).
+      it ("should proxy headers to and from a " + verb + " intact", function(done) {
+        var authenticated_url = request_sender.VERB_DEFAULT_ROUTES[verb];
+        var vanilla_url = authenticated_url.replace(8008, 8080);
+        
+        var vanilla_request_headers;
+        var authenticated_request_headers;
+        
+        job_server.once(verb + " /job", function(req, res) {
+          vanilla_request_headers = req.headers;
+        });
+        
+        request_sender.sendRequest(verb, vanilla_url, custom_headers, 200, function(err, res, body) {
+          if (err) return done(err);
 
-    // Run the response header validator once for each verb.
-    ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(method) {
-      it ('should proxy response headers from a ' + method + ' intact', create_response_header_validator(method));    
+          job_server.once(verb + " /job", function(req, res) {
+            authenticated_request_headers = req.headers;
+          });
+          
+          var vanilla_response_headers = res.headers;
+          request_sender.sendAuthenticatedRequest(verb, authenticated_url, custom_headers, 200, function(err, res, body) {
+            if (err) return done(err);
+          
+            var authenticated_response_headers = res.headers;
+          
+            // Compare the two sets of response headers
+            compare_headers(authenticated_response_headers, vanilla_response_headers, IGNORABLE_RESPONSE_HEADERS).should.equal(true);
+            _.keys(authenticated_response_headers).length.should.be.above(4);
+
+            // Compare the two sets of request headers          
+            compare_headers(authenticated_request_headers, vanilla_request_headers, IGNORABLE_REQUEST_HEADERS).should.equal(true);
+          
+            vanilla_request_headers['custom'].should.equal('header');
+            vanilla_request_headers['more'].should.equal('custom_headers');
+            
+            done();
+          });
+        });
+      });
+      
+      it ("should support chunked responses for " + verb, function(done) {
+        request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/transactions', null, 200, function(err, auth_res, auth_body) {
+          if (err) return done(err);
+        
+          auth_res.headers['transfer-encoding'].should.equal('chunked');
+          request_sender.sendRequest(verb, 'http://localhost:8080/transactions', null, 200, function(err, res, body) {
+            if (err) return done(err);
+          
+            auth_res.headers['transfer-encoding'].should.equal('chunked');
+            auth_body.should.equal(body);
+            done();
+          });
+        });
+      });
     });
   });
-  
+
+  // This is a set of tests for handling /livecheck-style URLs.  We allow either /livecheck or /healthcheck through
+  // without authentication if the verb is GET.  All other verbs and all other forms of those URLs (for example,
+  // with query strings or with paths) are rejected.  This is to prevent a crafty/lazy developer from using the
+  // /livecheck route as a way to tunnel information to their underlying service without authenticating.  Auspice
+  // is, after all, a tool meant to enforce developer inconvenience.  
   describe('Livecheck exceptions', function() {
-    it ('should allow /livecheck URLs through without authentication', function(done) {
-      request('http://localhost:8008/livecheck', create_response_validator(200, done));
+    
+    // Create a test case sending a url and expecting a given response.
+    var create_livecheck_test = function(verb, url, expected_status_code) {
+      return function(done) {
+        // Send a request with a given verb and url, validating that expectedStatusCode matches.
+        request_sender.sendRequest(verb, url, null, expected_status_code, done);
+      }
+    };
+    
+    // For each livecheck-style URL, which is any that has a case-insensitive path of /livecheck or /healthcheck...
+    ['http://localhost:8008/livecheck', 'http://localhost:8008/healthcheck', 
+     'http://localhost:8008/liveCheck', 'http://localhost:8008/healthCheck'].forEach(function(url) {
+       // Create unit tests to validate that we accept all GETs and reject everything else.
+       ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+         if (verb === 'GET')
+           it ("should allow GET " + url + " through without authentication", create_livecheck_test(verb, url, 200));
+        else
+          it ("should reject " + verb + "s to " + url + " URLs that lack authentication", create_livecheck_test(verb, url, 400));
+      });
     });
     
-    it ('should allow /healthcheck URLs through without authentication', function(done) {
-      request('http://localhost:8008/healthcheck', create_response_validator(200, done));
-    });
-    
-    it ('should allow /livecheck URLs through, regardless of case, without authentication', function(done) {
-      request('http://localhost:8008/liveCheck', create_response_validator(200, done));
-    });
-    
-    it ('should allow /healthcheck URLs through, regardless of case, without authentication', function(done) {
-      request('http://localhost:8008/healthCheck', create_response_validator(200, done));
-    });
-    
-    it ('should reject /livecheck-like URLs that lack authentication', function(done) {
-      request('http://localhost:8008/livecheck?query=so&sneaky', create_response_validator(400, done));
-    });
-    
-    it ('should reject /healthcheck-like URLs that lack authentication', function(done) {
-      request('http://localhost:8008/healthcheck?query=so&sneaky', create_response_validator(400, done));
-    });
-    
-    it ('should reject POSTs to /livecheck URLs that lack authentication', function(done) {
-      request.post('http://localhost:8008/livecheck', create_response_validator(400, done));
-    });
-    
-    it ('should reject PUTs to /livecheck URLs that lack authentication', function(done) {
-      request.put('http://localhost:8008/livecheck', create_response_validator(400, done));
-    });
-    
-    it ('should reject DELETEs to /livecheck URLs that lack authentication', function(done) {
-      request.del('http://localhost:8008/livecheck', create_response_validator(400, done));
+    // For each invalid livecheck-style URL (those with a query string or path), validate that unauthenticated GETs
+    // are rejected
+    ['http://localhost:8008/livecheck?query=so&sneaky', 'http://localhost:8008/healthcheck?query=so&sneaky',
+     'http://localhost:8008/livecheck/soSneaky', 'http://localhost:8008/healthcheck/soSneaky'].forEach(function(url) {
+      it ("should reject unauthenticated GETs to " + url, function(done) {
+        request_sender.sendRequest('GET', url, null, 400, done);
+      });
     });
   });
   
+  // This is a set of tests for missing OAuth components, incorrectly specified OAuth parameters, etc.  These are
+  // health tests for our OAuth validations: any spurious 200s returned here represent weaknesses in Auspice's security.
   describe('Weedy OAuth validations', function() {
     
-    // Validate that an invalid signature method results in a 400 error.
-    it ('should reject requests with invalid signature methods', function(done) {
-      oauth_headers[2][1] = 'HMAC-SHA256';
-      send_authenticated_request(400, done);
-    });
+    // Run these tests for each verb.  While verb handling inside of Auspice is consistent and these results should
+    // always be the same, that may not always be the case.  This is a hedge against future stupidity.
+    ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+
+      // Validate that an invalid signature method results in a 400 error.
+      it ("should reject " + verb + " requests with invalid signature methods", function(done) {
+        request_sender.oauth_headers[2][1] = 'HMAC-SHA256';
+        request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+      });
     
-    // Validate that a missing oauth component results in a 400 error.
-    it ('should reject requests without a consumer key', function(done) {
-      oauth_headers.splice(0, 1);
-      send_authenticated_request(400, done);
-    });
+      // Validate that a missing oauth component results in a 400 error.
+      it ("should reject " + verb + " requests without a consumer key", function(done) {
+        request_sender.oauth_headers.splice(0, 1);
+        request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+      });
     
-    // Validate that a missing oauth component results in a 400 error.
-    it ('should reject requests without a nonce', function(done) {
-      oauth_headers.splice(1, 1);
-      send_authenticated_request(400, done);
-    });
+      // Validate that a missing oauth component results in a 400 error.
+      it ("should reject " + verb + " requests without a nonce", function(done) {
+        request_sender.oauth_headers.splice(1, 1);
+        request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+      });
     
-    // Validate that a missing oauth component results in a 400 error.
-    it ('should reject requests without a signature method', function(done) {
-      oauth_headers.splice(2, 1);
-      send_authenticated_request(400, done);
-    });
+      // Validate that a missing oauth component results in a 400 error.
+      it ("should reject " + verb + " requests without a signature method", function(done) {
+        request_sender.oauth_headers.splice(2, 1);
+        request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+      });
     
-    // Validate that a missing oauth component results in a 400 error.
-    it ('should reject requests without a timestamp', function(done) {
-      oauth_headers.splice(3, 1);
-      send_authenticated_request(400, done);
-    });
+      // Validate that a missing oauth component results in a 400 error.
+      it ("should reject " + verb + " requests without a timestamp", function(done) {
+        request_sender.oauth_headers.splice(3, 1);
+        request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+      });
     
-    // Validate that incorrect Authorization mechanism results in a 401 error.
-    it ('should reject requests with non-OAuth Authorization headers', function(done) {
-      request('http://localhost:8008/job', { headers: {'Authorization': 'Basic ABCDEFHG=' } },
-        create_response_validator(400, done)
-      );
-    });
+      // Validate that incorrect Authorization mechanism results in a 400 error.
+      it ("should reject " + verb + " requests with non-OAuth Authorization headers", function(done) {
+        request_sender.sendAuthenticatedRequest(verb, null, { headers: {'Authorization': 'Basic ABCDEFHG=' } }, 400, done);
+      });
     
-    // Validate that an unmatched consumer key results in a 401 error.
-    it ('should reject requests with unmatched consumer keys', function(done) {
-      oauth_headers[0][1] = 'not-mocha-test-key';
-      send_authenticated_request(401, done);
-    });
+      // Validate that an unmatched consumer key results in a 401 error.
+      it ("should reject " + verb + " requests with unmatched consumer keys", function(done) {
+        request_sender.oauth_headers[0][1] = 'not-mocha-test-key';
+        request_sender.sendSimpleAuthenticatedRequest(verb, 401, done);
+      });
     
-    // Validate that an invalid (low) timestamp results in a 401 error.
-    it ('should reject timestamps that are too low', function(done) {
-      oauth_headers[3][1] = 1234;
-      send_authenticated_request(401, done);
-    });
+      // Validate that an invalid (low) timestamp results in a 401 error.
+      it ("should reject " + verb + " requests with timestamps that are too low", function(done) {
+        request_sender.oauth_headers[3][1] = 1234;
+        request_sender.sendSimpleAuthenticatedRequest(verb, 401, done);
+      });
     
-    // Validate that an invalid (high) timestamp causes a 401 error.
-    it ('should reject timestamps that are too high', function(done) {
-      oauth_headers[3][1] = 9999999999999;
-      send_authenticated_request(401, done);
-    });
+      // Validate that an invalid (high) timestamp causes a 401 error.
+      it ("should reject " + verb + " request timestamps that are too high", function(done) {
+        request_sender.oauth_headers[3][1] = 9999999999999;
+        request_sender.sendSimpleAuthenticatedRequest(verb, 401, done);
+      });
     
-    // Validate that an invalid version causes a 401 error.
-    it ('should reject versions that are wrong', function(done) {
-      oauth_headers[4][1] = '2.0';
-      send_authenticated_request(400, done);
-    });
-    
+      // Validate that an invalid version causes a 401 error.
+      it ("should reject " + verb + " requests with versions that are wrong", function(done) {
+        request_sender.oauth_headers[4][1] = '2.0';
+        request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+      });
+    });    
   });
 });
 
-// Creates a convenience function for running an external client and validating that the correct
-// key is passed to the job server and the correct content is written to disk.
-var create_client_test = function(method, cmd, cwd, key) {
-  return function(cb) {
-    job_server.once(method, function(uri, req, res) {
-      req.headers.should.have.property('vp_user_key', key);
-    });
-  
-    exec(cmd, {cwd: cwd}, function(err, stdout, stderr) {
-      if (err) return cb(err);
-      stderr.should.equal('');
-      stdout.trim().should.equal('{"status":"ok"}');
-      cb();
-    });
-  };
-};
-
-// These test clients are in the test/clients subdirectory.  Each one tests a limited amount of OAuth
-// functionality to validate that requests can be sent through Auspice properly using various languages.
-describe('Client tests', function() {
-  
-  // Only test Bash and Python if we're not on Windows.
-  if (os.platform().indexOf('win') !== 0) {
-    it ('bash', function(done) {
-      var bashTest = create_client_test('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
-      bashTest(done);
-    });
-    
-    it ('python', function(done) {
-      var pythonTest = create_client_test('GET', 'python client.py', 'test/clients/python', 'python-test-key')
-      pythonTest(done);
-    });
-  }
-  
-  it ('java', function(done) {
-    var javaTest = create_client_test('POST', 
-      'java -cp target/AuspiceClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.vistaprint.auspice.Client',
-      'test/clients/java/AuspiceClient', 'java-test-key')
-    javaTest(done);
-  });
-  
-  it ('node.js', function(done) {
-    var nodeTest = create_client_test('POST', 'node client.js', 'test/clients/node', 'node-test-key')
-    nodeTest(done);
-  });
-  
-  it ('perl', function(done) {
-    var perlTest = create_client_test('GET', 'perl client.pl', 'test/clients/perl', 'perl-test-key')
-    perlTest(done);
-  });
-  
-  // Only test .Net if we're on Windows.
-  if (os.platform().indexOf('win') === 0) {
-  /**
-    it ('.Net', function(done) {
-      var dotNetTest = create_client_test('POST', '.\\AuspiceClient\\AuspiceClient\\bin\\Debug\\AuspiceClient.exe',
-        'test/clients/dotnet', 'dotnet-test-key');
-      dotNetTest(done);
-    });
-  **/
-  }
-  
-  it ('ruby', function(done) {
-    var rubyTest = create_client_test('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
-    rubyTest(done);
-  });
-  
-});

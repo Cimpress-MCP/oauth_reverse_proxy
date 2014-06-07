@@ -13,7 +13,7 @@ my $consumer_secret = do {
     <$fh>;
 };
 
-sub url { 'http://localhost:8008/job'; }
+sub url { 'http://localhost:8008/job/675345'; }
 
 my $oauth_request = Net::OAuth->request('consumer')->new(
   consumer_key => $consumer_key,

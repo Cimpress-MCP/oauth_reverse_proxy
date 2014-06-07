@@ -65,8 +65,20 @@ function JobServer() {
 
   app.POST('/getProducts', function(req, res) {
     console.log('POST /getProducts with key %s', req.headers['vp_user_key']);
-    this_obj.emit('POST /getProducts', req, res);
-    res.sendfile('./test/resources/list_of_products.xml');
+    
+    var data = '';
+
+    req.on('data', function (chunk) {
+        data += chunk;
+    });
+
+    req.on('end', function () {
+      req.body = data;
+      this_obj.emit('POST /getProducts', req, res);
+      res.sendfile('./test/resources/list_of_products.xml');
+    });
+    
+    
   });
   
   ['POST', 'PUT'].forEach(function(verb) {

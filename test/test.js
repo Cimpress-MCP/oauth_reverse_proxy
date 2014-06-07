@@ -3,7 +3,9 @@ var should = require('should');
 var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
+var stream = require('stream')
 var util = require('util');
+
 
 var test_server = require('./server/test_server.js');
 var job_server = test_server.JobServer;
@@ -27,6 +29,20 @@ beforeEach(function() {
 
 var IGNORABLE_REQUEST_HEADERS = ['authorization', 'host', 'vp_user_key', 'content-type'];
 var IGNORABLE_RESPONSE_HEADERS = [ 'date' ];
+
+var STOCK_JSON_CONTENTS = fs.readFileSync('./test/resources/test.json', {encoding:'utf8'});
+var STOCK_JSON_OBJECT = JSON.parse(STOCK_JSON_CONTENTS);
+
+var STOCK_JSON_STREAM = new stream();
+STOCK_JSON_STREAM.pipe = function(target) {
+  target.write(STOCK_JSON_CONTENTS);
+}
+
+var STOCK_XML_CONTENTS = fs.readFileSync('./test/resources/get_list_of_products.xml', {encoding:'utf8'});
+var STOCK_XML_STREAM = new stream();
+STOCK_XML_STREAM.pipe = function(target) {
+  target.write(STOCK_XML_CONTENTS);
+}
 
 // Compare the two sets of headers and return true only if they are equal in both name and
 // value, aside from the keys listed in keys_to_ignore.
@@ -132,8 +148,16 @@ describe('Job Server', function() {
   it ('should handle a SOAP-like POST', function(done) {
       var soap_headers = {headers:{'content-type':'application/soap+xml; charset=utf-8'}};
       // Send an unauthenticated SOAP POST
-      fs.createReadStream('./test/resources/get_list_of_products.xml').pipe(
+      STOCK_XML_STREAM.pipe(
         request_sender.sendRequest('POST', 'http://localhost:8080/getProducts', soap_headers, 200, done));
+  });
+  
+  // Test a JSON message
+  it ('should handle a JSON POST', function(done) {
+      var json_headers = {headers:{'content-type':'application/json; charset=utf-8'}};
+      // Send an unauthenticated SOAP POST
+      STOCK_JSON_STREAM.pipe(
+        request_sender.sendRequest('POST', 'http://localhost:8080/transactions', json_headers, 200, done));
   });
 });
 
@@ -293,11 +317,14 @@ describe('Auspice', function() {
         // Set a job_server listener to grab the authenticated request when it hits the job server
         job_server.once(verb + " /transactions", function(req, res) {
           authenticated_request = req;
+          (_.isEqual(authenticated_request.body, STOCK_JSON_OBJECT)).should.equal(true);
         });
         
+        var json_header = {headers:{'content-type':'application/json'}};
+        
         // Send an authenticated JSON POST or PUT
-        fs.createReadStream('./test/resources/test.json').pipe(
-          request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/transactions', null, 200, function(err, res, body) {
+        STOCK_JSON_STREAM.pipe(
+          request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/transactions', json_header, 200, function(err, res, body) {
           
           var authenticated_response = res;
           var authenticated_response_body = body;
@@ -305,11 +332,13 @@ describe('Auspice', function() {
           // Set a job_server listener to grab the unauthenticated request when it hits the job server
           job_server.once(verb + " /transactions", function(req, res) {
             unauthenticated_request = req;
+            // Validate that the JSON message made it to the server intact.
+            (_.isEqual(unauthenticated_request.body, STOCK_JSON_OBJECT)).should.equal(true);
           });
           
           // Send an unauthenticated JSON POST or PUT
-          fs.createReadStream('./test/resources/test.json').pipe(
-            request_sender.sendRequest(verb, 'http://localhost:8080/transactions', null, 200, function(err, res, body) {
+          STOCK_JSON_STREAM.pipe(
+            request_sender.sendRequest(verb, 'http://localhost:8080/transactions', json_header, 200, function(err, res, body) {
             
             var unauthenticated_response = res;
             var unauthenticated_response_body = body;
@@ -348,12 +377,13 @@ describe('Auspice', function() {
       // Set a job_server listener to grab the authenticated request when it hits the job server
       job_server.once('POST /getProducts', function(req, res) {
         authenticated_request = req;
+        req.body.should.equal(STOCK_XML_CONTENTS);
       });
       
       var soap_headers = {headers:{'content-type':'application/soap+xml; charset=utf-8'}};
       
       // Send an authenticated multipart POST or PUT
-      fs.createReadStream('./test/resources/get_list_of_products.xml').pipe(
+      STOCK_XML_STREAM.pipe(
         request_sender.sendAuthenticatedRequest('POST', 'http://localhost:8008/getProducts', soap_headers, 200, function(err, res, body) {
         
         var authenticated_response = res;
@@ -362,10 +392,11 @@ describe('Auspice', function() {
         // Set a job_server listener to grab the unauthenticated request when it hits the job server
         job_server.once('POST /getProducts', function(req, res) {
           unauthenticated_request = req;
+          req.body.should.equal(STOCK_XML_CONTENTS);
         });
         
         // Send an unauthenticated multipart POST or PUT
-        fs.createReadStream('./test/resources/get_list_of_products.xml').pipe(
+        STOCK_XML_STREAM.pipe(
           request_sender.sendRequest('POST', 'http://localhost:8080/getProducts', soap_headers, 200, function(err, res, body) {
           
           var unauthenticated_response = res;

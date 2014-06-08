@@ -2,6 +2,7 @@ var _ = require('underscore');
 var fs = require('fs');
 var should = require('should');
 var stream = require('stream');
+var util = require('util');
 
 exports.IGNORABLE_REQUEST_HEADERS = ['authorization', 'host', 'vp_user_key', 'content-type'];
 exports.IGNORABLE_RESPONSE_HEADERS = [ 'date' ];

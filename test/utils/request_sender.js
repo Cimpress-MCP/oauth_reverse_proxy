@@ -3,6 +3,7 @@ var should = require('should');
 var _ = require('underscore');
 var crypto = require('crypto');
 var fs = require('fs');
+var querystring = require('querystring');
 var request = require('request');
 // This saves us from having to special case calls to delete since it's the only verb where the
 // name doesn't match the method name.  For the others, we're just being lazy and saying we don't
@@ -15,8 +16,19 @@ request.PUT = request.put;
 var url_utils = require('url');
 var util = require('util');
 
+var validation_tools = require('./validation_tools.js');
+
 // This is the secret we'll use for signing ad hoc requests for test cases.
 exports.mocha_secret;
+
+// Set and export constants for configuring the way auth credentials are delivered in our test
+// cases.  OAuth credentials can be delivered by Authorization header or Query-String, and, less
+// standardly, in the body of a POST.  We want to test all 3 while defaulting to Auth header.
+var CREDENTIAL_TRANSPORT_HEADER = exports.CREDENTIAL_TRANSPORT_HEADER = "header";
+var CREDENTIAL_TRANSPORT_QUERY = exports.CREDENTIAL_TRANSPORT_QUERY = "query";
+var CREDENTIAL_TRANSPORT_BODY = exports.CREDENTIAL_TRANSPORT_BODY = "post";
+
+var credential_transport = CREDENTIAL_TRANSPORT_HEADER;
 
 // Variables used for signing requests with OAuth
 var oauth_headers = exports.oauth_headers = [];
@@ -42,16 +54,75 @@ var param_renderer = function(key, value) {
   return key + '=' + value;
 };
 
-// Construct a signature, add it to the OAuth header group, and return the OAuth header string  
-var prepare_auth_header = function() {
+// Given an array of parameters of type [ [key, value], [key2, value2] ], return a rendered string separated
+// by character sep and where the key and value are transformed by renderFn before being joined.
+function renderParams(params, sep, renderFn) {
+  var out_params = [];
+  // Flatten the nested array into a single array of type [ key, value, key2, value2 ]
+  params = _.flatten(params);
+
+  // Fail an assertion if the output array is odd in length.
+  (params.length & 1).should.equal(0);
+  for (var i=0; i<params.length; i+=2) {
+    out_params[i/2] = renderFn(params[i], params[i+1]);
+  }
+  return out_params.join(sep);
+}
+
+// Construct a signature, add it to the OAuth header group, and create a rendered version of
+// these headers using the provided renderFn.  If none is provided, render these as
+// Authorization headers.
+var prepare_auth_credentials = function(renderFn) {
+  
+  // The default renderer will render the oauth credentials for an Authorization header.
+  renderFn = renderFn || function() { return 'OAuth ' + renderParams(oauth_headers, ', ', oauth_header_renderer); };
+  
   // The url should not be encoded before prepare_auth_header is called.  This just cuts down on
   // the number of times we need to spread encodeData throughout the tests.
   signature_components[1] = encodeData(signature_components[1]);
   signature_components[2] = encodeData(renderParams(params, '&', param_renderer));
   var signature_base = signature_components.join('&');
-  //console.log("signature_base:\n%s", signature_base);
+  // console.log("signature_base:\n%s", signature_base);
   oauth_headers.push(['oauth_signature', signString(exports.mocha_secret, signature_base)]);
-  return 'OAuth ' + renderParams(oauth_headers, ', ', oauth_header_renderer);
+  return renderFn();
+};
+
+// Fill in the options array with the credentials populated in whatever mechanism is appropriate,
+// header, query string, or POST body.
+function populateTransport(options) {
+  if (credential_transport === CREDENTIAL_TRANSPORT_HEADER) {
+    var existing_headers = options.headers || {};
+    // Create auth headers and merge them with any headers provided in options.  We do it in this order
+    // because we have some tests that set Authorization to something non-OAuth.  We want those tests
+    // to fail, so we need their bogus authentication headers to overwrite the OAuth header.
+    var headers = _.extend({'Authorization': prepare_auth_credentials()}, existing_headers);
+    _.extend(options, { headers: headers });
+  } else if (credential_transport === CREDENTIAL_TRANSPORT_QUERY) {
+    var qs = prepare_auth_credentials(function() {
+      return querystring.stringify(_.object(oauth_headers));
+    });
+    
+    qs = (options.query) ? '&' + qs : '?' + qs;
+    options.uri = options.uri + qs;
+  } else if (credential_transport === CREDENTIAL_TRANSPORT_BODY) {
+    var form = prepare_auth_credentials(function() {
+      return _.object(oauth_headers);
+    });
+    
+    // If there are existing form params, merge them.  Otherwise, the form params we generated from
+    // our auth credentials are all we'll send with this PUT or POST.
+    options.form = options.form ? _.extend(options.form, form) : form;
+  }
+  
+  return options;
+}
+
+// Allow clients to set the credential transport, but only to one of our three allowed options.
+exports.setCredentialTransport = function(transport) {
+  if (transport !== CREDENTIAL_TRANSPORT_HEADER && transport !== CREDENTIAL_TRANSPORT_QUERY && transport !== CREDENTIAL_TRANSPORT_BODY) {
+    return should.fail('Invalid auth header transport ' + transport);
+  }
+  credential_transport = transport;
 };
 
 // Convenience function for sending a request and expecting a certain response code.
@@ -63,7 +134,7 @@ exports.sendRequest = function(verb, url, options, expected_status_code, done) {
   options = options || {};
   _.extend(options, url_utils.parse(url));
   _.extend(options, { method: verb, uri: url });
-  return request(options, create_response_validator(expected_status_code, done));
+  return request(options, validation_tools.createResponseValidator(expected_status_code, done));
 };
 
 // Ok, now we're really going nuts with currying and partials.  This creates a prefilled version of
@@ -83,13 +154,12 @@ exports.sendAuthenticatedRequest = function(verb, url, options, expected_status_
   signature_components[0] = options.method;
   signature_components[1] = 'http://' + options.hostname + ':' + options.port + options.pathname;
   
-  var existing_headers = options.headers || {};
-  // Create auth headers and merge them with any headers provided in options.  We do it in this order
-  // because we have some tests that set Authorization to something non-OAuth.  We want those tests
-  // to fail, so we need their bogus authentication headers to overwrite the OAuth header.
-  var headers = _.extend({'Authorization': prepare_auth_header()}, existing_headers);
-  _.extend(options, { headers: headers });
+  // We don't technically need to reset the options value, but it does make it more clear that
+  // we may be modifying options in populateTransport.
+  options = populateTransport(options);
   
+  // Rewrite the url parameter if it's been overridden by populateTransport
+  url = options.uri ? options.uri : url;
   return exports.sendRequest(verb, url, options, expected_status_code, done);
 };
 
@@ -99,6 +169,10 @@ exports.sendSimpleAuthenticatedRequest = _.partial(exports.sendAuthenticatedRequ
 
 // Called from beforeEach, resets the state of the request sender so that each unit test is clean.
 exports.reset = function() {
+  
+  // Our default mechanism for delivering credentials is an Auth header.
+  exports.setCredentialTransport(CREDENTIAL_TRANSPORT_HEADER);
+  
   var nonce = createNonce();
   var timestamp = new Date().getTime();
   
@@ -129,23 +203,6 @@ exports.reset = function() {
   });
 };
 
-// Creates a convenience function for validating that an http response has the correct status code
-// and did not result in a protocol-level error (connection failure, etc).
-var create_response_validator = function(expected_status_code, done) {
-  return function(err, response, body) {
-    if (err) return done(err);
-    response.statusCode.should.equal(expected_status_code);
-    // Validate that all responses have a connection header of keep-alive.  For performance reasons,
-    // Auspice should never be disabling keep-alives.
-    response.headers.connection.should.equal('keep-alive');
-    // We know that all requests to the JobServer should return {"status":"ok"}, so add that validation.
-    if (expected_status_code === 200 && response.request.path.indexOf('/job') != -1) body.should.equal('{"status":"ok"}');
-    
-    // Otherwise, if we made it here, the test is complete.
-    done(null, response, body);
-  };
-};
-
 // Create random nonce string
 function createNonce() {
   var text = "";
@@ -168,19 +225,4 @@ function encodeData(toEncode) {
 // Sign the provided string.  This is used for ad hoc tests run from within the suite.
 function signString(key, str) {
   return crypto.createHmac("sha1", key).update(str).digest("base64");
-}
-
-// Given an array of parameters of type [ [key, value], [key2, value2] ], return a rendered string separated
-// by character sep and where the key and value are transformed by renderFn before being joined.
-function renderParams(params, sep, renderFn) {
-  var out_params = [];
-  // Flatten the nested array into a single array of type [ key, value, key2, value2 ]
-  params = _.flatten(params);
-
-  // Fail an assertion if the output array is odd in length.
-  (params.length & 1).should.equal(0);
-  for (var i=0; i<params.length; i+=2) {
-    out_params[i/2] = renderFn(params[i], params[i+1]);
-  }
-  return out_params.join(sep);
 }

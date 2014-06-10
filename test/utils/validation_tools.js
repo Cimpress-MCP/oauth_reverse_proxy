@@ -7,6 +7,8 @@ var util = require('util');
 exports.IGNORABLE_REQUEST_HEADERS = ['authorization', 'host', 'vp_user_key', 'content-type'];
 exports.IGNORABLE_RESPONSE_HEADERS = [ 'date' ];
 
+exports.LOREM_IPSUM = fs.readFileSync('./test/resources/lorem_ipsum.txt', {encoding:'utf8'});
+
 exports.STOCK_JSON_CONTENTS = fs.readFileSync('./test/resources/test.json', {encoding:'utf8'});
 exports.STOCK_JSON_OBJECT = JSON.parse(exports.STOCK_JSON_CONTENTS);
 

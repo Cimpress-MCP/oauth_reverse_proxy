@@ -15,6 +15,7 @@ request.POST = request.post;
 request.PUT = request.put;
 var url_utils = require('url');
 var util = require('util');
+var zlib = require('zlib');
 
 var validation_tools = require('./validation_tools.js');
 
@@ -134,7 +135,45 @@ exports.sendRequest = function(verb, url, options, expected_status_code, done) {
   options = options || {};
   _.extend(options, url_utils.parse(url));
   _.extend(options, { method: verb, uri: url });
-  return request(options, validation_tools.createResponseValidator(expected_status_code, done));
+  
+  var validation = validation_tools.createResponseValidator(expected_status_code, done);
+  // In the common case where we aren't doing any gzip or deflate, make a simple request() call.
+  if (!(options.headers && options.headers['accept-encoding']))
+    return request(options, validation);
+  
+  // If we need to decompress content, make a more complicated request call, using the request
+  // object as a stream.  This could be done with pipes and would probably be a bit more elegant,
+  // but I think this style is a bit easier to read.
+  var req = request(options);
+  req.on('response', function(res) {
+    var chunks = [];
+    res.on('data', function(chunk) {
+      chunks.push(chunk);
+    });
+
+    // Once we have the full response, decide whether it needs to be gunzipped or inflated.
+    res.on('end', function() {
+      var buffer = Buffer.concat(chunks);
+      var encoding = res.headers['content-encoding'];
+      if (encoding == 'gzip') {
+        zlib.gunzip(buffer, function(encoding_err, decoded) {
+          if (!decoded) return done(encoding_err);
+          validation(null, res, decoded.toString());
+        });
+      } else if (encoding == 'deflate') {
+        zlib.inflate(buffer, function(encoding_err, decoded) {
+          if (!decoded) return done(encoding_err);
+          validation(null, res, decoded.toString());
+        });
+      } else {
+        validation(null, res, buffer.toString());
+      }
+    });
+  }); 
+  
+  req.on('error', function(err) {
+    validation(err);
+  });
 };
 
 // Ok, now we're really going nuts with currying and partials.  This creates a prefilled version of

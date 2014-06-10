@@ -11,7 +11,7 @@ var job_server = test_server.JobServer;
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
 require('./auspice_bootstrap_test.js');
 
-describe('Auspice OAuth credentials', function() {
+describe('Auspice OAuth credential transport', function() {
   
   var validate_requests = function(verb, url, transport, options, request_setup_fn, done) {
     var alternative_transport_based_request;

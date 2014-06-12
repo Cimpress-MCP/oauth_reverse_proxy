@@ -27,7 +27,8 @@
     "oauth": "0.9.11",
     "request": "2.36.0",
     "multer": "0.1.0",
-    "underscore": "~1.6.0"
+    "underscore": "1.6.0",
+    "compression": "1.0.6"
   },
   "scripts": {
     "run_auspice_unix": "AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8000 LOG4JS_CONFIG=./vistaprint_log4js.json AUSPICE_VERSION=0.2.0 AUSPICE_KEYSTORE=/var/vistaprint/auspice/ node .",

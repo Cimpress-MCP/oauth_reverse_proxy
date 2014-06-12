@@ -44,6 +44,27 @@ describe('Job Server', function() {
     });
   });
   
+  // Test a compressed reply
+  ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+    it ('should handle a gzip compressed reply to a ' + verb, function(done) {
+      request_sender.sendRequest(verb, 'http://localhost:8080/compressed_content', {headers:{'accept-encoding':'gzip'}}, 200,
+      function(err, res, body) {
+        res.headers['content-encoding'].should.equal('gzip');
+        body.should.equal(validation_tools.LOREM_IPSUM);
+        done();
+      });
+    });
+    
+    it ('should handle a deflate compressed reply to a ' + verb, function(done) {
+      request_sender.sendRequest(verb, 'http://localhost:8080/compressed_content', {headers:{'accept-encoding':'deflate'}}, 200,
+      function(err, res, body) {
+        res.headers['content-encoding'].should.equal('deflate');
+        body.should.equal(validation_tools.LOREM_IPSUM);
+        done();
+      });
+    });
+  });
+  
   // Test a SOAP-ish message
   it ('should handle a SOAP-like POST', function(done) {
       var soap_headers = {headers:{'content-type':'application/soap+xml; charset=utf-8'}};

@@ -7,6 +7,8 @@ var util = require('util');
 exports.IGNORABLE_REQUEST_HEADERS = ['authorization', 'host', 'vp_user_key', 'content-type'];
 exports.IGNORABLE_RESPONSE_HEADERS = [ 'date' ];
 
+exports.LOREM_IPSUM = fs.readFileSync('./test/resources/lorem_ipsum.txt', {encoding:'utf8'});
+
 exports.STOCK_JSON_CONTENTS = fs.readFileSync('./test/resources/test.json', {encoding:'utf8'});
 exports.STOCK_JSON_OBJECT = JSON.parse(exports.STOCK_JSON_CONTENTS);
 
@@ -40,4 +42,21 @@ module.exports.compareHeaders = function(auth, unauth, keys_to_ignore) {
     console.log('auth:\n%s\n,unauth:\n%s\nto_ignore:\n%s', util.inspect(auth), util.inspect(unauth), util.inspect(keys_to_ignore));
     
   return rvalue;
+};
+
+// Creates a convenience function for validating that an http response has the correct status code
+// and did not result in a protocol-level error (connection failure, etc).
+exports.createResponseValidator = function(expected_status_code, done) {
+  return function(err, response, body) {
+    if (err) return done(err);
+    response.statusCode.should.equal(expected_status_code);
+    // Validate that all responses have a connection header of keep-alive.  For performance reasons,
+    // Auspice should never be disabling keep-alives.
+    response.headers.connection.should.equal('keep-alive');
+    // We know that all requests to the JobServer should return {"status":"ok"}, so add that validation.
+    if (expected_status_code === 200 && response.request.path.indexOf('/job') != -1) body.should.equal('{"status":"ok"}');
+    
+    // Otherwise, if we made it here, the test is complete.
+    done(null, response, body);
+  };
 };

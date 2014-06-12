@@ -5,6 +5,8 @@ var util = require('util');
 app.use(require ('body-parser')());
 app.use(require ('multer')());
 
+var compress = require('compression');
+
 // Save ourselves the pain and emotional trauma of having to worry about verb case while looping.
 app.GET = app.get;
 app.POST = app.post;
@@ -36,6 +38,20 @@ function JobServer() {
     console.log('GET /healthcheck');
     this_obj.emit('GET /healthcheck', req, res);
     res.send({'status':'ok'});
+  });
+
+  // /transactions simulates an endpoint that might return a large, chunked response.
+  ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+    app[verb]('/compressed_content', function(req, res, next) {
+      
+      res.setHeader('Content-Type', 'text/plain');
+      console.log('%s /compressed_content with key %s', verb.toUpperCase(), req.headers['vp_user_key']);
+      
+      compress()(req, res, function() {
+        res.write(fs.readFileSync('./test/resources/lorem_ipsum.txt'), 'utf8');
+        res.end();
+      });
+    });
   });
 
   // /transactions simulates an endpoint that might return a large, chunked response.

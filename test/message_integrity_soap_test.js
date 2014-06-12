@@ -32,7 +32,7 @@ describe('Auspice message integrity: SOAP', function() {
     
     var soap_headers = {headers:{'content-type':'application/soap+xml; charset=utf-8'}};
     
-    // Send an authenticated multipart POST or PUT
+    // Send an authenticated multipart POST
     validation_tools.STOCK_XML_STREAM.pipe(
       request_sender.sendAuthenticatedRequest('POST', 'http://localhost:8008/getProducts', soap_headers, 200, function(err, res, body) {
       
@@ -81,4 +81,3 @@ describe('Auspice message integrity: SOAP', function() {
     }));
   });
 });
-

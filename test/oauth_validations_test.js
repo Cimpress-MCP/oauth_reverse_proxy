@@ -3,7 +3,7 @@ var should = require('should');
 var request_sender = require('./utils/request_sender.js');
 
 // All tests must require auspice_bootstrap_test since that creates our proxy, starts our job server, and
-// and registers a beforeEach to keep the request_sender and job_server clean between test runs.  
+// and registers a beforeEach to keep the request_sender and job_server clean between test runs.
 require('./auspice_bootstrap_test.js');
 
 // This is a set of tests for missing OAuth components, incorrectly specified OAuth parameters, etc.  These are

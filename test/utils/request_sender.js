@@ -3,6 +3,7 @@ var should = require('should');
 var _ = require('underscore');
 var crypto = require('crypto');
 var fs = require('fs');
+
 var querystring = require('querystring');
 var request = require('request');
 // This saves us from having to special case calls to delete since it's the only verb where the
@@ -43,7 +44,7 @@ var VERB_DEFAULT_ROUTES = exports.VERB_DEFAULT_ROUTES = {
   'POST': 'http://localhost:8008/job',
   'PUT': 'http://localhost:8008/job',
   'DELETE': 'http://localhost:8008/job/12345'
-}
+};
 
 // OAuth header params have the form oauth_version: '1.0'
 var oauth_header_renderer = function(key, value) {
@@ -213,7 +214,8 @@ exports.reset = function() {
   exports.setCredentialTransport(CREDENTIAL_TRANSPORT_HEADER);
   
   var nonce = createNonce();
-  var timestamp = new Date().getTime();
+  // Grab current epoch ms time.
+  var timestamp = Date.now();
   
   // Reset the signature components we use to working defaults.
   signature_components = [

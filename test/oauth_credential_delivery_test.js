@@ -11,6 +11,8 @@ var job_server = test_server.JobServer;
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
 require('./auspice_bootstrap_test.js');
 
+// This is a set of tests to validate that OAuth credentials can be sent on the query string or even in
+// the body of POSTs and PUTs in addition to via the more traditional Authorization header.
 describe('Auspice OAuth credential transport', function() {
   
   var validate_requests = function(verb, url, transport, options, request_setup_fn, done) {

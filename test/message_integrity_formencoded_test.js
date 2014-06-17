@@ -29,7 +29,7 @@ describe('Auspice message integrity: formencoded', function() {
     
     it ("should accept a properly signed " + verb + " with params", function(done) {
       job_server.once(verb + " /job", function(req, res) {
-        req.headers.should.have.property('vp-auspice-consumer-key', 'mocha-test-key');
+        req.headers.should.have.property('x-vp-auspice-consumer-key', 'mocha-test-key');
         req.method.should.equal(verb);
         _.isEqual(req.body, {'submit':'ok'}).should.equal(true);
       });

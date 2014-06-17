@@ -105,13 +105,13 @@ describe('Auspice OAuth credential transport', function() {
   });
   
   ['PUT', 'POST'].forEach(function(verb) {
-    it ("should accept credentials for " + verb + " via POST or auth header", function(done) {
+    it ("should accept credentials for " + verb + " via entity body or auth header", function(done) {
       validate_requests(verb, 'http://localhost:8008/job', request_sender.CREDENTIAL_TRANSPORT_BODY, null, null, done);
     });
   });
   
   ['PUT', 'POST'].forEach(function(verb) {
-    it ("should accept credentials for " + verb + " via POST or auth header with existing POST parameters", function(done) {
+    it ("should accept credentials for " + verb + " via entity body or auth header with existing POST parameters", function(done) {
       
       var request_setup_fn = function() {
         request_sender.params.push(['posts', 'are']);

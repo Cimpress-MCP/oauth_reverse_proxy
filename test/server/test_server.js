@@ -20,7 +20,7 @@ function JobServer() {
   ['GET', 'DELETE'].forEach(function(verb) {
     app[verb]("/job/:job_id", function(req, res) {
       res.setHeader('Content-Type', 'application/json');
-      console.log('%s with key %s', verb, req.headers['vp-auspice-consumer-key']);
+      console.log('%s with key %s', verb, req.headers['x-vp-auspice-consumer-key']);
       this_obj.emit(verb + " /job", req, res);
       res.send({'status':'ok'});
     });
@@ -45,7 +45,7 @@ function JobServer() {
     app[verb]('/compressed_content', function(req, res, next) {
       
       res.setHeader('Content-Type', 'text/plain');
-      console.log('%s /compressed_content with key %s', verb.toUpperCase(), req.headers['vp-auspice-consumer-key']);
+      console.log('%s /compressed_content with key %s', verb.toUpperCase(), req.headers['x-vp-auspice-consumer-key']);
       
       compress()(req, res, function() {
         res.write(fs.readFileSync('./test/resources/lorem_ipsum.txt'), 'utf8');
@@ -59,7 +59,7 @@ function JobServer() {
     app[verb]('/transactions', function(req, res) {
       
       res.setHeader('Content-Type', 'application/json');
-      console.log('%s /transactions with key %s', verb.toUpperCase(), req.headers['vp-auspice-consumer-key']);
+      console.log('%s /transactions with key %s', verb.toUpperCase(), req.headers['x-vp-auspice-consumer-key']);
       
       // Generate a sizeable chunk of json that will be chunked and returned
       res.write('{\n\t"jobs_list":[');
@@ -80,7 +80,7 @@ function JobServer() {
   });
 
   app.POST('/getProducts', function(req, res) {
-    console.log('POST /getProducts with key %s', req.headers['vp-auspice-consumer-key']);
+    console.log('POST /getProducts with key %s', req.headers['x-vp-auspice-consumer-key']);
     
     var data = '';
 
@@ -101,14 +101,14 @@ function JobServer() {
 
     app[verb]("/job", function(req, res) {
       res.setHeader('Content-Type', 'application/json');
-      console.log('%s with key %s', verb, req.headers['vp-auspice-consumer-key']);
+      console.log('%s with key %s', verb, req.headers['x-vp-auspice-consumer-key']);
       this_obj.emit(verb + " /job", req, res);
       res.send({'status':'ok'});
     });
   
     // /uploads simulates an endpoint that receives multipart form data for posts and puts
     app[verb]('/uploads', function(req, res) {
-      console.log('%s /uploads with key %s', verb.toUpperCase(), req.headers['vp-auspice-consumer-key']);
+      console.log('%s /uploads with key %s', verb.toUpperCase(), req.headers['x-vp-auspice-consumer-key']);
       
       var file_path = req.files['binary_data'].path;
       var expected_length = req.files['binary_data'].size;

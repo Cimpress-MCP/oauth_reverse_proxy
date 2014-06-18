@@ -60,15 +60,34 @@ describe('Client library tests', function() {
     perlTest(done);
   });
   
-  // Only test .Net if we're on Windows.
+  // Only test Powershell and .Net if we're on Windows.
   if (os.platform().indexOf('win') === 0) {
-  /**
+    it ('Powershell', function(done) {
+	    // For some reason, Powershell only runs cleanly with spawn, not with the simpler exec semantics used
+	    // in other tests.
+	    var spawn = require("child_process").spawn,child;
+	    var output = '';
+	    child = spawn("powershell.exe",[".\\client.ps1"], {cwd: 'test/clients/powershell'});
+	    child.stdout.on("data",function(data){
+        output += data;
+	    });
+
+	    child.stderr.on("data",function(data){
+        console.log("err: " + data);
+      });
+      
+      child.on("exit",function(){
+        output.trim().should.endWith('{"status":"ok"}');
+        done();
+      });
+      child.stdin.end(); 
+    });
+	
     it ('.Net', function(done) {
-      var dotNetTest = create_client_test('POST', '.\\AuspiceClient\\AuspiceClient\\bin\\Debug\\AuspiceClient.exe',
+      var dotNetTest = create_client_test('POST', 'Auspice\\Client\\bin\\Release\\Client.exe',
         'test/clients/dotnet', 'dotnet-test-key');
       dotNetTest(done);
     });
-  **/
   }
   
   it ('should support requests from ruby', function(done) {

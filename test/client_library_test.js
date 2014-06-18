@@ -82,7 +82,7 @@ describe('Client library tests', function() {
 	});
 	
     it ('.Net', function(done) {
-      var dotNetTest = create_client_test('POST', 'Auspice\\Client\\bin\\Debug\\Client.exe',
+      var dotNetTest = create_client_test('POST', 'Auspice\\Client\\bin\\Release\\Client.exe',
         'test/clients/dotnet', 'dotnet-test-key');
       dotNetTest(done);
     });

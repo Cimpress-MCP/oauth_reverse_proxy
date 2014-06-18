@@ -4,7 +4,10 @@ var should = require('should');
 var stream = require('stream');
 var util = require('util');
 
-exports.IGNORABLE_REQUEST_HEADERS = ['authorization', 'host', 'vp_user_key', 'content-type'];
+exports.IGNORABLE_REQUEST_HEADERS = ['authorization', 'x-vp-auspice-consumer-key', 'content-type', 'via', 'x-vp-correlatorid'];
+['for', 'port', 'proto'].forEach(function(header) {
+  exports.IGNORABLE_REQUEST_HEADERS.push('x-forwarded-' + header);
+});
 exports.IGNORABLE_RESPONSE_HEADERS = [ 'date' ];
 
 exports.LOREM_IPSUM = fs.readFileSync('./test/resources/lorem_ipsum.txt', {encoding:'utf8'});

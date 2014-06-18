@@ -1,8 +1,5 @@
 var _ = require('underscore');
 
-var request_sender = require('./utils/request_sender.js');
-var validation_tools = require('./utils/validation_tools.js');
-
 var job_server = require('./server/test_server.js').JobServer;
 
 // All the messy business of creating and sending requests (both authenticated and unauthenticated)

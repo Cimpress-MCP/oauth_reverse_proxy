@@ -41,7 +41,7 @@ describe('Auspice Config Validation', function() {
   it ('should reject an attempt to init a proxy with a missing from_port directory', function(done) {
     mkdirp('./test/keys', function() {
       auspice.init('./test/keys', function(err, proxy) {
-        err.should.equal('Unable to load from_port path ./test/keys/8008');
+        err.should.startWith('Unable to load from_port path');
         done();
       });
     });

@@ -14,6 +14,49 @@ require('./auspice_bootstrap_test.js');
 
 // This is a set of tests to validate that Auspice correctly adds the x-forwarded-* and via headers to the proxied request.
 describe('Auspice request header tampering: addition of x-forwarded-*, via, and correlator id', function() {
+    
+  it('should append correct headers for inbound HTTP connections', function(done) {
+    // Validate that standard HTTP connection handling works.
+    var stub_request = {
+      headers: {
+        host: 'prdlexbun001.vistaprint.svc'
+      },
+      connection: {
+        remoteAddress: '10.10.10.1'
+      }
+    };
+    
+    var xforwarder = header_modifier.applyXForwardedHeaders();
+    xforwarder(stub_request, null, function() {
+      stub_request.headers['x-forwarded-port'].should.equal('80');
+      stub_request.headers['x-forwarded-for'].should.equal('10.10.10.1');
+      stub_request.headers['x-forwarded-proto'].should.equal('http');
+      stub_request.headers['via'].should.equal('1.1 localhost (Auspice vtst)');
+      done();
+    });
+  });
+  
+  it('should append correct headers for inbound SSL connections', function(done) {
+    // Validate that SSL-specific handling works.  HTTPs connections must have the connection.pair set to be a realistic test.
+    var stub_request = {
+      headers: {
+        host: 'prdlexbun001.vistaprint.svc'
+      },
+      connection: {
+        remoteAddress: '10.10.10.1',
+        pair: true
+      }
+    };
+    
+    var xforwarder = header_modifier.applyXForwardedHeaders();
+    xforwarder(stub_request, null, function() {
+      stub_request.headers['x-forwarded-port'].should.equal('443');
+      stub_request.headers['x-forwarded-for'].should.equal('10.10.10.1');
+      stub_request.headers['x-forwarded-proto'].should.equal('https');
+      stub_request.headers['via'].should.equal('1.1 localhost (Auspice vtst)');
+      done();
+    });
+  });
   
   // Validate that a basic POST or PUT works.  Loop over each verb, running the common tests between them.
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
@@ -128,5 +171,5 @@ describe('Auspice request header tampering: host', function() {
       });
     });
   });
-  
 });
+

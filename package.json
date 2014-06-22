@@ -31,13 +31,14 @@
     "compression": "1.0.6",
     "istanbul": "0.2.11",
     "xunit-file": "0.0.5",
-    "rimraf": "2.2.8"
+    "rimraf": "2.2.8",
+    "chmodr": "~0.1.0"
   },
   "scripts": {
     "run_auspice_unix": "AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8000 LOG4JS_CONFIG=./vistaprint_log4js.json AUSPICE_VERSION=0.2.0 AUSPICE_KEYSTORE=/var/vistaprint/auspice/ node .",
     "run_auspice_win": "AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8000 LOG4JS_CONFIG=vistaprint_log4js.json AUSPICE_VERSION=0.2.0 AUSPICE_KEYSTORE=c:\\keystore\\ node .",
-    "test_unix": "AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8008 LOG4JS_CONFIG=./test/resources/test_log4js.json LOG4JS_DISABLE_LOGSTASH=true node_modules/.bin/istanbul cover --root lib --dir ./reports ./node_modules/.bin/_mocha -- --reporter spec -t 10000 test",
-    "test_win": "SET AUSPICE_SERVICE_NAME=jobsservice&SET AUSPICE_PROXY_PORT=8008&SET LOG4JS_CONFIG=test\\resources\\test_log4js.json&SET LOG4JS_DISABLE_LOGSTASH=true& .\\node_modules\\.bin\\istanbul.cmd cover --root lib --dir reports .\\node_modules\\mocha\\bin\\_mocha -- --reporter spec -t 10000 test"
+    "test_unix": "AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8008 AUSPICE_VERSION=tst LOG4JS_CONFIG=./test/resources/test_log4js.json LOG4JS_DISABLE_LOGSTASH=true node_modules/.bin/istanbul cover --root lib --dir ./reports ./node_modules/.bin/_mocha -- --reporter spec -t 10000 test",
+    "test_win": "SET AUSPICE_SERVICE_NAME=jobsservice&SET AUSPICE_PROXY_PORT=8008&SET AUSPICE_VERSION=tst&SET LOG4JS_CONFIG=test\\resources\\test_log4js.json&SET LOG4JS_DISABLE_LOGSTASH=true& .\\node_modules\\.bin\\istanbul.cmd cover --root lib --dir reports .\\node_modules\\mocha\\bin\\_mocha -- --reporter spec -t 10000 test"
   },
   "licenses": [
     {

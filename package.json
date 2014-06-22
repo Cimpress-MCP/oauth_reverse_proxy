@@ -31,8 +31,7 @@
     "compression": "1.0.6",
     "istanbul": "0.2.11",
     "xunit-file": "0.0.5",
-    "rimraf": "2.2.8",
-    "chmodr": "~0.1.0"
+    "rimraf": "2.2.8"
   },
   "scripts": {
     "run_auspice_unix": "AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8000 LOG4JS_CONFIG=./vistaprint_log4js.json AUSPICE_VERSION=0.2.0 AUSPICE_KEYSTORE=/var/vistaprint/auspice/ node .",

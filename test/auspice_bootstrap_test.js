@@ -1,7 +1,9 @@
 var should = require('should');
 var _ = require('underscore');
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 
+var auspice = require('../lib');
 var keygen = require('../utils/keygen.js');
 var request_sender = require('./utils/request_sender.js');
 
@@ -26,17 +28,19 @@ describe('Auspice Bootstrap', function() {
   
   // Before starting Auspice, create the keys we need for test clients.
   before(function(done) {
-    keygen.createKey(__dirname + '/keys', 8008, 8080, 'bash-test-key', function(err) {
-      keygen.createKey(__dirname + '/keys', 8008, 8080, 'dotnet-test-key', function(err) {
-        keygen.createKey(__dirname + '/keys', 8008, 8080, 'java-test-key', function(err) {
-          keygen.createKey(__dirname + '/keys', 8008, 8080, 'node-test-key', function(err) {
-            keygen.createKey(__dirname + '/keys', 8008, 8080, 'perl-test-key', function(err) {
-              keygen.createKey(__dirname + '/keys', 8008, 8080, 'powershell-test-key', function(err) {
-                keygen.createKey(__dirname + '/keys', 8008, 8080, 'python-test-key', function(err) {
-                  keygen.createKey(__dirname + '/keys', 8008, 8080, 'ruby-test-key', function(err) {
-                    keygen.createKey(__dirname + '/keys', 8008, 8080, 'mocha-test-key', function(err) {
-                      request_sender.mocha_secret = fs.readFileSync(__dirname + '/keys/8008/8080/mocha-test-key') + '&';
-                      done(err);
+    mkdirp('./test/keys/8008/8080', function(err) {
+      keygen.createKey('./test/keys', 8008, 8080, 'bash-test-key', function(err) {
+        keygen.createKey('./test/keys', 8008, 8080, 'dotnet-test-key', function(err) {
+          keygen.createKey('./test/keys', 8008, 8080, 'java-test-key', function(err) {
+            keygen.createKey('./test/keys', 8008, 8080, 'node-test-key', function(err) {
+              keygen.createKey('./test/keys', 8008, 8080, 'perl-test-key', function(err) {
+                keygen.createKey('./test/keys', 8008, 8080, 'powershell-test-key', function(err) {
+                  keygen.createKey('./test/keys', 8008, 8080, 'python-test-key', function(err) {
+                    keygen.createKey('./test/keys', 8008, 8080, 'ruby-test-key', function(err) {
+                      keygen.createKey('./test/keys', 8008, 8080, 'mocha-test-key', function(err) {
+                        request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
+                        done(err);
+                      });
                     });
                   });
                 });
@@ -50,8 +54,7 @@ describe('Auspice Bootstrap', function() {
   
   // Test that the proxy starts and loads all the keys created in the before function.
   it ('should start cleanly', function(done) {
-    var auspice = require(__dirname + '/../lib');
-    auspice.init(__dirname + '/keys', function(err, proxy) {
+    auspice.init('./test/keys', function(err, proxy) {
       if (err) return should.fail('Auspice startup failed: ' + err);
       
       // Turn the proxy.keys object into an array to get its length

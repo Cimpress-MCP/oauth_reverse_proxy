@@ -44,6 +44,30 @@ describe('Auspice OAuth validations', function() {
       request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
     });
   
+    // Validate that an empty consumer key string results in a 400 error.
+    it ("should reject " + verb + " requests with consumer keys that are empty strings", function(done) {
+      request_sender.oauth_headers[0][1] = '';
+      request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+    });
+  
+    // Validate that an empty nonce string results in a 400 error.
+    it ("should reject " + verb + " requests with nonces that are empty strings", function(done) {
+      request_sender.oauth_headers[1][1] = '';
+      request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+    });
+  
+    // Validate that an empty signature method string results in a 400 error.
+    it ("should reject " + verb + " requests with signature methods that are empty strings", function(done) {
+      request_sender.oauth_headers[2][1] = '';
+      request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+    });
+  
+    // Validate that an empty timestamp string results in a 400 error.
+    it ("should reject " + verb + " requests with timestamps that are empty strings", function(done) {
+      request_sender.oauth_headers[3][1] = '';
+      request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
+    });
+  
     // Validate that incorrect Authorization mechanism results in a 400 error.
     it ("should reject " + verb + " requests with non-OAuth Authorization headers", function(done) {
       request_sender.sendAuthenticatedRequest(verb, null, { headers: {'Authorization': 'Basic ABCDEFHG=' } }, 400, done);
@@ -67,10 +91,102 @@ describe('Auspice OAuth validations', function() {
       request_sender.sendSimpleAuthenticatedRequest(verb, 401, done);
     });
   
+    // Validate that non-numeric timestamp results in a 401 error.
+    it ("should reject " + verb + " requests with timestamps that are not numeric", function(done) {
+      request_sender.oauth_headers[3][1] = 'cant_fool_a_fooler';
+      request_sender.sendSimpleAuthenticatedRequest(verb, 401, done);
+    });
+  
     // Validate that an invalid version causes a 401 error.
     it ("should reject " + verb + " requests with versions that are wrong", function(done) {
       request_sender.oauth_headers[4][1] = '2.0';
       request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
     });
   });    
+});
+
+// Tests the validator's handling of specially formatted mock-requests, allowing us to get into the weeds
+// of specific use cases that might be difficult to achieve by sending actual requests.
+describe('Auspice request validation', function() {
+
+  var authenticator = require('../lib/authenticator.js');
+
+  // The request validator function used in the connect workflow for node-http-proxy.
+  var request_validator = authenticator.requestValidator();
+
+  // The oauth validator function used in the connect workflow for node-http-proxy.
+  var oauth_validator = authenticator.oauthValidator({'mock_key':'mock_secret'});
+  
+  // Create a mock response that can be used to validate that the correct failure states are registered.
+  var create_res = function(done, expected_code, expected_message) {
+    return {
+      writeHead: function(code, message) {
+        code.should.equal(expected_code);
+        message.should.equal(expected_message);
+      },
+      end: function() {
+        done();
+      }
+    };
+  };
+  
+  it ('should reject a null request even though that should never ever happen', function(done) {
+    var res = create_res(done, 400, 'Invalid request');
+    // Attempt to validate an empty request.
+    request_validator(null, res, null);
+  });
+  
+  it ('should reject a request with no headers even though that should never ever happen', function(done) {
+    var res = create_res(done, 400, 'Invalid request');
+
+    var req = {};
+    // Attempt to validate a hopelessly flawed request.
+    request_validator(req, res, null);
+  });
+  
+  it ('should reject a request with no method even though that should never ever happen', function(done) {
+    var res = create_res(done, 400, 'Invalid request');
+    
+    var req = {};
+    req.headers = {'host':'localhost'};
+    
+    // Attempt to validate a hopelessly flawed request.
+    request_validator(req, res, null);
+  });
+  
+  it ('should reject a request with no url even though that should never ever happen', function(done) {
+    var res = create_res(done, 400, 'Invalid request');
+    
+    var req = {};
+    req.headers = {'host':'localhost'};
+    req.method = 'GET';
+
+    // Attempt to validate a hopelessly flawed request.
+    request_validator(req, res, null);
+  });
+  
+  it ('should reject a request with no url even though that should never ever happen', function(done) {
+    var res = create_res(done, 400, 'Invalid request');
+    
+    var req = {};
+    req.headers = {'host':'localhost'};
+    req.method = 'GET';
+    
+    // Attempt to validate a hopelessly flawed request.
+    request_validator(req, res, null);
+  });
+  
+  // We can finally populate our stub request with everything necessary to pass the test for a /livecheck route.
+  // But we pass in a null next function knowing this will cause the validator to throw an exception.
+  it ('should handle an uncaught exception in the validator method even though that should never ever happen', function(done) {
+    var res = create_res(done, 500, 'Internal error');
+
+    var req = {};
+    req.headers = {'host':'localhost'};
+    req.method = 'GET';
+    req.url = '/livecheck';
+    
+    oauth_validator(req, res, null);
+  });
+  
 });

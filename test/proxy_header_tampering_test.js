@@ -58,7 +58,7 @@ describe('Auspice request header tampering: addition of x-forwarded-*, via, and 
     });
   });
   
-  // Validate that a basic POST or PUT works.  Loop over each verb, running the common tests between them.
+  // Validate that a basic authenticated request works.  Loop over each verb, running the common tests between them.
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
     
     var expected_headers = [
@@ -83,18 +83,72 @@ describe('Auspice request header tampering: addition of x-forwarded-*, via, and 
     });
   });
   
-  // Validate that a basic POST or PUT works.  Loop over each verb, running the common tests between them.
+  // Validate that a basic authenticated request works.  Loop over each verb, running the common tests between them.
+  ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+    
+    var expected_headers = [
+      ['host', 'localhost:8080'],
+      ['x-forwarded-for', '127.0.0.1'],
+      ['x-forwarded-port', '8008'],
+      ['x-forwarded-proto', 'http'],
+      ['via', '1.1 localhost (Auspice v' + process.env.AUSPICE_VERSION + ')']
+    ];
+    
+    it("should add x-forwarded-* and via headers to proxied " + verb + " requests", function(done) {
+      job_server.once(verb + " /job", function(req, res) {
+        expected_headers.forEach(function(header_pair) {
+          req.headers[header_pair[0]].should.equal(header_pair[1]);
+        });
+        
+        // Also check for correlator id and match that it's a UUID per RFC 4122 v4. 
+        req.headers['x-vp-correlatorid'].should.match(/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/);
+      });
+      
+      request_sender.sendSimpleAuthenticatedRequest(verb, 200, done);
+    });
+  });
+  
+  // Validate that a basic authenticated request works.  Loop over each verb, running the common tests between them.
+  ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+    
+    var expected_headers = [
+      ['host', 'localhost:8080'],
+      ['x-forwarded-for', '127.0.0.1'],
+      ['x-forwarded-port', '8008'],
+      ['x-forwarded-proto', 'http'],
+      ['via', '1.1 localhost (Auspice v' + process.env.AUSPICE_VERSION + ')']
+    ];
+    
+    it("should add x-forwarded-* and via headers to proxied " + verb + " requests", function(done) {
+      job_server.once(verb + " /job", function(req, res) {
+        expected_headers.forEach(function(header_pair) {
+          req.headers[header_pair[0]].should.equal(header_pair[1]);
+        });
+        
+        // Also check for correlator id and match that it's a UUID per RFC 4122 v4. 
+        req.headers['x-vp-correlatorid'].should.match(/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/);
+      });
+      
+      request_sender.sendSimpleAuthenticatedRequest(verb, 200, done);
+    });
+  });
+  
+  // Validate that a basic HTTPs-forwarded request works.  Loop over each verb, running the common tests between them.
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
     
     var expected_headers = [
       ['host', 'localhost:8080'],
       ['x-forwarded-for', '10.10.56.32,127.0.0.1'],
       ['x-forwarded-port', '8888,8008'],
-      ['x-forwarded-proto', 'http,http'],
+      ['x-forwarded-proto', 'https,http'],
       ['via', '1.1 devlexicebun001,1.1 localhost (Auspice v' + process.env.AUSPICE_VERSION + ')']
     ];
     
-    it("should append x-forwarded-* and via headers to proxied " + verb + " requests with existing x-forwarded-* headers", function(done) {
+    // The x-forwarded-proto header being HTTPs indicates to us that the original request was HTTPs and the only
+    // signature we need to calculate is HTTPs.  However, request_sender only knows how to make HTTP calls, so we
+    // will get a 401 for this test.  That is expected and normal: it means that we calculated the signature only
+    // once and failed when the HTTPs signature didn't match our request signature.
+    it("should handle proxied HTTPs " + verb + " but fail since the request URL was not actually HTTPs", function(done) {
       job_server.once(verb + " /job", function(req, res) {
         expected_headers.forEach(function(header_pair) {
           req.headers[header_pair[0]].should.equal(header_pair[1]);
@@ -106,12 +160,12 @@ describe('Auspice request header tampering: addition of x-forwarded-*, via, and 
       var existing_headers = {
         'x-forwarded-for': '10.10.56.32',
         'x-forwarded-port': '8888',
-        'x-forwarded-proto': 'http',
+        'x-forwarded-proto': 'https',
         'via': '1.1 devlexicebun001',
         'x-vp-correlatorid': '1d324044-308c-4b7b-b324-684f21d68c55'
       };
 
-      request_sender.sendAuthenticatedRequest(verb, null, {headers:existing_headers}, 200, done);
+      request_sender.sendAuthenticatedRequest(verb, null, {headers:existing_headers}, 401, done);
     });
   });
 });

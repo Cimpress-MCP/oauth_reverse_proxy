@@ -93,8 +93,11 @@ describe('Auspice OAuth credential transport', function() {
   
   ['GET', 'DELETE'].forEach(function(verb) {
     it ("should accept credentials for " + verb + " via query string or auth header with existing query string", function(done) {
-      
+            
       var request_setup_fn = function() {
+        // We need a test case where we ignore realm.  Now seems as good a time as any.
+        request_sender.oauth_headers.push(['realm', 'ignorable']);
+        
         request_sender.params.push(['params', 'are']);
         request_sender.params.push(['still', 'ok']);
       };
@@ -114,6 +117,9 @@ describe('Auspice OAuth credential transport', function() {
     it ("should accept credentials for " + verb + " via entity body or auth header with existing POST parameters", function(done) {
       
       var request_setup_fn = function() {
+        // We need a test case where we ignore realm.  Now seems as good a time as any.
+        request_sender.oauth_headers.push(['realm', 'ignorable']);
+        
         request_sender.params.push(['posts', 'are']);
         request_sender.params.push(['still', 'ok']);
       };

@@ -16,7 +16,7 @@ exports.createKey = function(root_dir, from_port, to_port, key_id, cb) {
   var keystore_path = createKeystorePath(root_dir, from_port, to_port, key_id);
   require('mkdirp')(keystore_path, function(err) {
     if (err) return cb(err);
-    
+
     var keyfile = keystore_path + path.sep + key_id;
     fs.writeFile(keyfile, uuid.v4(), function(err) {
       return cb(err);

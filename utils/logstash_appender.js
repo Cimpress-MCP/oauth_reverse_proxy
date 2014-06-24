@@ -45,9 +45,9 @@ function logstashAppender(config, fields, layout) {
 
     //Setup the connection to logstash
     function pushToStash(config, msg) {
-      
+
         //console.log("Writing to logstash agent:\n" + msg);
-      
+
         var client = net.connect({host: config.host, port: config.port}, function () {
             client.write(msg);
             if (config.batch == undefined) client.write('\n');

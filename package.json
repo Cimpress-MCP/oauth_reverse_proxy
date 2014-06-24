@@ -16,6 +16,7 @@
     "connect": "2.14.4",
     "connect-restreamer": "1.0.0",
     "mkdirp": "0.5.0",
+    "underscore": "1.6.0",
     "node-uuid": "1.4.1"
   },
   "devDependencies": {
@@ -27,7 +28,6 @@
     "oauth": "0.9.11",
     "request": "2.36.0",
     "multer": "0.1.0",
-    "underscore": "1.6.0",
     "compression": "1.0.6",
     "istanbul": "0.2.11",
     "rimraf": "2.2.8",

@@ -15,7 +15,7 @@ func check(e error) {
 
 func main() {
 	var consumerKey string = "golang-test-key"
-	var consumerSecretPath string = "../../keys/8008/8080/" + consumerKey
+	var consumerSecretPath string = "../../../../keys/8008/8080/" + consumerKey
 	secret, err := ioutil.ReadFile(consumerSecretPath)
 	check(err)
 	consumerSecret := string(secret)

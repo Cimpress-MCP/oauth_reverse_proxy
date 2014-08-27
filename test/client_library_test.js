@@ -42,6 +42,11 @@ describe('Client library tests', function() {
       var pythonTest = create_client_test('GET', 'python client.py', 'test/clients/python', 'python-test-key')
       pythonTest(done);
     });
+
+    it ('should support requests from golang', function(done) {
+      var golangTest = create_client_test('GET', './client', 'test/clients/golang/bin/mac', 'golang-test-key')
+      golangTest(done);
+    });
   }
   
   it ('should support requests from java', function(done) {
@@ -89,6 +94,8 @@ describe('Client library tests', function() {
         'test/clients/dotnet', 'dotnet-test-key');
       dotNetTest(done);
     });
+
+    //Go lang executate for Windows goes here
   }
   
   it ('should support requests from ruby', function(done) {
@@ -97,9 +104,6 @@ describe('Client library tests', function() {
   });
 
 
-  it ('should support requests from golang', function(done) {
-    var golangTest = create_client_test('GET', 'go run client.go', 'test/clients/golang', 'golang-test-key')
-    golangTest(done);
-  });
+  
   
 });

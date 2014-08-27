@@ -42,7 +42,9 @@ describe('Client library tests', function() {
       var pythonTest = create_client_test('GET', 'python client.py', 'test/clients/python', 'python-test-key')
       pythonTest(done);
     });
+  }
 
+  if(os.platform().indexOf('mac') >= 0) {
     it ('should support requests from golang', function(done) {
       var golangTest = create_client_test('GET', './client', 'test/clients/golang/bin/mac', 'golang-test-key')
       golangTest(done);

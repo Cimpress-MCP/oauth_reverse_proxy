@@ -95,7 +95,10 @@ describe('Client library tests', function() {
       dotNetTest(done);
     });
 
-    //Go lang executate for Windows goes here
+    it ('golang', function(done) {
+      var golangTest = create_client_test('GET', 'client.exe', 'test\\clients\\golang\\bin\\windows', 'golang-test-key')
+      golangTest(done);
+    });
   }
   
   it ('should support requests from ruby', function(done) {

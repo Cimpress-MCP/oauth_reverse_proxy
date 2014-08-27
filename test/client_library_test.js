@@ -44,7 +44,7 @@ describe('Client library tests', function() {
     });
   }
 
-  if(os.platform().indexOf('mac') >= 0) {
+  if(os.platform() === "darwin") {
     it ('should support requests from golang', function(done) {
       var golangTest = create_client_test('GET', './client', 'test/clients/golang/bin/mac', 'golang-test-key')
       golangTest(done);

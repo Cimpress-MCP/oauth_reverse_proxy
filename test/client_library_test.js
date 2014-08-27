@@ -31,6 +31,7 @@ var create_client_test = function(verb, cmd, cwd, key) {
 describe('Client library tests', function() {
   
   // Only test Bash and Python if we're not on Windows.
+
   if (os.platform().indexOf('win') !== 0) {
     it ('should support requests from bash', function(done) {
       var bashTest = create_client_test('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
@@ -93,6 +94,12 @@ describe('Client library tests', function() {
   it ('should support requests from ruby', function(done) {
     var rubyTest = create_client_test('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
     rubyTest(done);
+  });
+
+
+  it ('should support requests from golang', function(done) {
+    var golangTest = create_client_test('GET', 'go run client.go', 'test/clients/golang', 'golang-test-key')
+    golangTest(done);
   });
   
 });

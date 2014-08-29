@@ -102,7 +102,13 @@ describe('Auspice OAuth validations', function() {
       request_sender.oauth_headers[4][1] = '2.0';
       request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
     });
-  });    
+
+    //Validate that an invalid secret will cause an 401 error.
+    it ("should reject " + verb + " strings with escape sequences", function(done) {
+      request_sender.oauth_headers[0][1] = 'escapechars-test-key';
+      request_sender.sendSimpleAuthenticatedRequest(verb, 401, done);
+    });
+  });
 });
 
 // Tests the validator's handling of specially formatted mock-requests, allowing us to get into the weeds
@@ -188,5 +194,5 @@ describe('Auspice request validation', function() {
     
     oauth_validator(req, res, null);
   });
-  
 });
+

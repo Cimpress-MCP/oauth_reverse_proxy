@@ -40,8 +40,10 @@ describe('Auspice Bootstrap', function() {
                       keygen.createKey('./test/keys', 8008, 8080, 'golang-test-key', function(err) {
                         keygen.createKey('./test/keys', 8008, 8080, 'mocha-test-key', function(err) {
                           keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) {
-                            request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
-                            done(err);
+                            keygen.createKey('./test/keys', 8008, 8080, 'base64-test-key', 'hello world!======', function(err) {
+                              request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
+                              done(err);
+                            });
                           });
                         });
                       });

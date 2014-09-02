@@ -4,6 +4,8 @@ var _ = require('underscore');
 var crypto = require('crypto');
 var fs = require('fs');
 
+var encoding = require('../../utils/encoding.js');
+
 var querystring = require('querystring');
 var request = require('request');
 // This saves us from having to special case calls to delete since it's the only verb where the
@@ -48,7 +50,7 @@ var VERB_DEFAULT_ROUTES = exports.VERB_DEFAULT_ROUTES = {
 
 // OAuth header params have the form oauth_version: '1.0'
 var oauth_header_renderer = function(key, value) {
-  return key + '="' + encodeData(value) + '"';
+  return key + '="' + encoding.encodeData(value) + '"';
 };
 
 // Params for signing have the form oauth_version=1.0
@@ -80,9 +82,9 @@ var prepare_auth_credentials = function(renderFn) {
   renderFn = renderFn || function() { return 'OAuth ' + renderParams(oauth_headers, ', ', oauth_header_renderer); };
   
   // The url should not be encoded before prepare_auth_header is called.  This just cuts down on
-  // the number of times we need to spread encodeData throughout the tests.
-  signature_components[1] = encodeData(signature_components[1]);
-  signature_components[2] = encodeData(renderParams(params, '&', param_renderer));
+  // the number of times we need to spread encoding.encodeData throughout the tests.
+  signature_components[1] = encoding.encodeData(signature_components[1]);
+  signature_components[2] = encoding.encodeData(renderParams(params, '&', param_renderer));
   var signature_base = signature_components.join('&');
   // console.log("signature_base:\n%s", signature_base);
   oauth_headers.push(['oauth_signature', signString(exports.mocha_secret, signature_base)]);
@@ -250,17 +252,6 @@ function createNonce() {
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for( var i=0; i < 10; i++ ) text += possible.charAt(Math.floor(Math.random() * possible.length));
   return text;
-}
-
-// Encode signable strings
-function encodeData(toEncode) {
-  if( toEncode == null || toEncode === "" ) return "";
-  else {
-    var result= encodeURIComponent(toEncode);
-    // Fix the mismatch between RFC3986's and Javascript's beliefs in what is right and wrong.
-    return result.replace(/\!/g, "%21").replace(/\'/g, "%27").replace(/\(/g, "%28")
-                 .replace(/\)/g, "%29").replace(/\*/g, "%2A");
-  }
 }
 
 // Sign the provided string.  This is used for ad hoc tests run from within the suite.

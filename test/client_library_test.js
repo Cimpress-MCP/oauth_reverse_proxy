@@ -30,26 +30,10 @@ var create_client_test = function(verb, cmd, cwd, key) {
 // functionality to validate that requests can be sent through Auspice properly using various languages.
 describe('Client library tests', function() {
   
-  // Only test Bash and Python if we're not on Windows.
-
-  if (os.platform().indexOf('win') !== 0) {
-    it ('should support requests from bash', function(done) {
-      var bashTest = create_client_test('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
-      bashTest(done);
-    });
-    
-    it ('should support requests from python', function(done) {
-      var pythonTest = create_client_test('GET', 'python client.py', 'test/clients/python', 'python-test-key')
-      pythonTest(done);
-    });
-  }
-
-  if(os.platform() === "darwin") {
-    it ('should support requests from golang', function(done) {
-      var golangTest = create_client_test('GET', './client', 'test/clients/golang/bin/mac', 'golang-test-key')
-      golangTest(done);
-    });
-  }
+  it ('should support requests from ruby', function(done) {
+    var rubyTest = create_client_test('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
+    rubyTest(done);
+  });
   
   it ('should support requests from java', function(done) {
     var javaTest = create_client_test('POST', 
@@ -67,8 +51,24 @@ describe('Client library tests', function() {
     var perlTest = create_client_test('GET', 'perl client.pl', 'test/clients/perl', 'perl-test-key')
     perlTest(done);
   });
+
+  // Mac-specific client tests
+  if(os.platform() === "darwin") {
+    it ('should support requests from golang', function(done) {
+      var golangTest = create_client_test('GET', './client', 'test/clients/golang/bin/mac', 'golang-test-key')
+      golangTest(done);
+    });
+  }
+
+  // Linux-specific client tests
+  if(os.platform() === "linux") {
+    it ('should support requests from golang', function(done) {
+      var golangTest = create_client_test('GET', './client', 'test/clients/golang/bin/linux', 'golang-test-key')
+      golangTest(done);
+    });
+  }
   
-  // Only test Powershell and .Net if we're on Windows.
+  // Windows-specific client tests
   if (os.platform().indexOf('win') === 0) {
     it ('Powershell', function(done) {
 	    // For some reason, Powershell only runs cleanly with spawn, not with the simpler exec semantics used
@@ -102,13 +102,17 @@ describe('Client library tests', function() {
       golangTest(done);
     });
   }
-  
-  it ('should support requests from ruby', function(done) {
-    var rubyTest = create_client_test('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
-    rubyTest(done);
-  });
+  // If it's not a Windows machine, run these tests.
+  else {
+    it ('should support requests from bash', function(done) {
+      var bashTest = create_client_test('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
+      bashTest(done);
+    });
+    
+    it ('should support requests from python', function(done) {
+      var pythonTest = create_client_test('GET', 'python client.py', 'test/clients/python', 'python-test-key')
+      pythonTest(done);
+    });
+  }
 
-
-  
-  
 });

@@ -2,3 +2,4 @@ daemon
 node_modules
 target
 reports
+.DS_Store

@@ -12,13 +12,18 @@ function createKeystorePath(root_dir, from_port, to_port) {
 /**
  * Create a key with a randomized secret at file location /root_dir/from_port/to_port/key_id
  */
-exports.createKey = function(root_dir, from_port, to_port, key_id, cb) {
+exports.createKey = function(root_dir, from_port, to_port, key_id, secret, cb) {
+  if (!cb) { 
+    cb = secret; 
+    secret = uuid.v4();
+  }
+
   var keystore_path = createKeystorePath(root_dir, from_port, to_port, key_id);
   require('mkdirp')(keystore_path, function(err) {
     if (err) return cb(err);
 
     var keyfile = keystore_path + path.sep + key_id;
-    fs.writeFile(keyfile, uuid.v4(), function(err) {
+    fs.writeFile(keyfile, secret, function(err) {
       return cb(err);
     });
   });

@@ -103,9 +103,15 @@ describe('Auspice OAuth validations', function() {
       request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
     });
 
-    //Validate that an invalid secret will cause an 401 error.
-    it ("should reject " + verb + " strings with escape sequences", function(done) {
+    // Validate that an invalid secret will cause an 401 error.
+    it ("should reject " + verb + " secrets that have strings with escape sequences", function(done) {
       request_sender.oauth_headers[0][1] = 'escapechars-test-key';
+      request_sender.sendSimpleAuthenticatedRequest(verb, 401, done);
+    });
+
+    // Validate that an invalid secret will cause an 401 error.
+    it ("should reject " + verb + " secrets that are byte strings", function(done) {
+      request_sender.oauth_headers[0][1] = 'bytes-test-key';
       request_sender.sendSimpleAuthenticatedRequest(verb, 401, done);
     });
   });

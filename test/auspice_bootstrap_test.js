@@ -44,7 +44,7 @@ describe('Auspice Bootstrap', function() {
                             keygen.createKey('./test/keys', 8008, 8080, 'base64-test-key', 'helloworld========', function(err) {
                               // Keys that are expected to be rejected
                               keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) { 
-                                keygen.createKey('./test/keys', 8008, 8080, 'bytes-test-key', crypto.randomBytes(64), function(err) { 
+                                keygen.createKey('./test/keys', 8008, 8080, 'bytes-test-key', crypto.randomBytes(256), function(err) { 
                                   request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
                                   done(err);
                                 });

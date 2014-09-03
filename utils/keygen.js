@@ -40,7 +40,3 @@ if (process.argv[1].indexOf('keygen') != -1) {
     console.log('usage: node ./test/keygen/ root_dir from_port to_port key_id');
   }
 }
-
-/**
- * Similar to createKey() with addition to 
- */

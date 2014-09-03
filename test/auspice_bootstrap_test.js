@@ -2,6 +2,7 @@ var should = require('should');
 var _ = require('underscore');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
+var crypto = require('crypto');
 
 var auspice = require('../lib');
 var keygen = require('../utils/keygen.js');
@@ -38,11 +39,16 @@ describe('Auspice Bootstrap', function() {
                   keygen.createKey('./test/keys', 8008, 8080, 'python-test-key', function(err) {
                     keygen.createKey('./test/keys', 8008, 8080, 'ruby-test-key', function(err) {
                       keygen.createKey('./test/keys', 8008, 8080, 'golang-test-key', function(err) {
-                        keygen.createKey('./test/keys', 8008, 8080, 'mocha-test-key', function(err) {
-                          keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) {
-                            keygen.createKey('./test/keys', 8008, 8080, 'base64-test-key', 'hello world!======', function(err) {
-                              request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
-                              done(err);
+                        keygen.createKey('./test/keys', 8008, 8080, 'mocha-test-key', function(err) {                          
+                          keygen.createKey('./test/keys', 8008, 8080, 'allowedsymbols-test-key', 'abc.def-ghi_jkl=', function(err) {
+                            keygen.createKey('./test/keys', 8008, 8080, 'base64-test-key', 'helloworld========', function(err) {
+                              // Keys that are expected to be rejected
+                              keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) { 
+                                keygen.createKey('./test/keys', 8008, 8080, 'bytes-test-key', crypto.randomBytes(64), function(err) { 
+                                  request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
+                                  done(err);
+                                });
+                              });
                             });
                           });
                         });
@@ -64,7 +70,7 @@ describe('Auspice Bootstrap', function() {
       if (err) return should.fail('Auspice startup failed: ' + err);
       
       // Turn the proxy.keys object into an array to get its length
-      (_.keys(proxy.keys).length).should.be.exactly(10);
+      (_.keys(proxy.keys).length).should.be.exactly(12);
       done();
     });
   });

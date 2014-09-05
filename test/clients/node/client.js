@@ -12,7 +12,7 @@ var post_body = {
   beans: 'either'
 };
 
-oa.post("http://localhost:8008/job?do=query&strings=kill&us=or&not=true", "", "", 
+oa.post("http://localhost:8008/job?do=query&strings=kill&us=or&not=true", "", "",
   post_body, 'application/x-www-form-urlencoded',
   function (error, data, response) {
     if (error) {

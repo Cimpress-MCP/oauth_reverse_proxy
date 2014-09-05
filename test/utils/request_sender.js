@@ -77,10 +77,10 @@ function renderParams(params, sep, renderFn) {
 // these headers using the provided renderFn.  If none is provided, render these as
 // Authorization headers.
 var prepare_auth_credentials = function(renderFn) {
-  
+
   // The default renderer will render the oauth credentials for an Authorization header.
   renderFn = renderFn || function() { return 'OAuth ' + renderParams(oauth_headers, ', ', oauth_header_renderer); };
-  
+
   // The url should not be encoded before prepare_auth_header is called.  This just cuts down on
   // the number of times we need to spread encoding.encodeData throughout the tests.
   signature_components[1] = encoding.encodeData(signature_components[1]);
@@ -105,19 +105,19 @@ function populateTransport(options) {
     var qs = prepare_auth_credentials(function() {
       return querystring.stringify(_.object(oauth_headers));
     });
-    
+
     qs = (options.query) ? '&' + qs : '?' + qs;
     options.uri = options.uri + qs;
   } else if (credential_transport === CREDENTIAL_TRANSPORT_BODY) {
     var form = prepare_auth_credentials(function() {
       return _.object(oauth_headers);
     });
-    
+
     // If there are existing form params, merge them.  Otherwise, the form params we generated from
     // our auth credentials are all we'll send with this PUT or POST.
     options.form = options.form ? _.extend(options.form, form) : form;
   }
-  
+
   return options;
 }
 
@@ -138,12 +138,12 @@ exports.sendRequest = function(verb, url, options, expected_status_code, done) {
   options = options || {};
   _.extend(options, url_utils.parse(url));
   _.extend(options, { method: verb, uri: url });
-  
+
   var validation = validation_tools.createResponseValidator(expected_status_code, done);
   // In the common case where we aren't doing any gzip or deflate, make a simple request() call.
   if (!(options.headers && options.headers['accept-encoding']))
     return request(options, validation);
-  
+
   // If we need to decompress content, make a more complicated request call, using the request
   // object as a stream.  This could be done with pipes and would probably be a bit more elegant,
   // but I think this style is a bit easier to read.
@@ -172,8 +172,8 @@ exports.sendRequest = function(verb, url, options, expected_status_code, done) {
         validation(null, res, buffer.toString());
       }
     });
-  }); 
-  
+  });
+
   req.on('error', function(err) {
     validation(err);
   });
@@ -192,14 +192,14 @@ exports.sendAuthenticatedRequest = function(verb, url, options, expected_status_
   options = options || {};
   _.extend(options, url_utils.parse(url));
   _.extend(options, { method: verb, uri: url });
-  
+
   signature_components[0] = options.method;
   signature_components[1] = 'http://' + options.hostname + ':' + options.port + options.pathname;
-  
+
   // We don't technically need to reset the options value, but it does make it more clear that
   // we may be modifying options in populateTransport.
   options = populateTransport(options);
-  
+
   // Rewrite the url parameter if it's been overridden by populateTransport
   url = options.uri ? options.uri : url;
   return exports.sendRequest(verb, url, options, expected_status_code, done);
@@ -211,25 +211,25 @@ exports.sendSimpleAuthenticatedRequest = _.partial(exports.sendAuthenticatedRequ
 
 // Called from beforeEach, resets the state of the request sender so that each unit test is clean.
 exports.reset = function() {
-  
+
   // Our default mechanism for delivering credentials is an Auth header.
   exports.setCredentialTransport(CREDENTIAL_TRANSPORT_HEADER);
-  
+
   var nonce = createNonce();
   // Grab current epoch ms time.
   var timestamp = Date.now();
-  
+
   // Reset the signature components we use to working defaults.
   signature_components = [
     'GET',
     undefined,
     'param_placeholder'
   ];
-  
+
   // Empty the oauth_headers and params arrays
   oauth_headers.length = 0;
   params.length = 0;
-  
+
   // Fill a valid set of oauth headers that we can monkey with as needed for our test cases.  Loop over
   // each of these defaults and add them to our oauth_headers and params arrays.
   [
@@ -240,7 +240,7 @@ exports.reset = function() {
     [ 'oauth_version', '1.0' ]
   ].forEach(function(header) {
     oauth_headers.push(header);
-    
+
     // Since there may be params that aren't headers, we populate the params array separately.
     params.push(header);
   });

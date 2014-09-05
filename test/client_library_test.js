@@ -16,7 +16,7 @@ var create_client_test = function(verb, cmd, cwd, key) {
     job_server.once(verb, function(uri, req, res) {
       req.headers.should.have.property('vp_user_key', key);
     });
-  
+
     exec(cmd, {cwd: cwd}, function(err, stdout, stderr) {
       if (err) return cb(err);
       stderr.should.equal('');
@@ -29,24 +29,24 @@ var create_client_test = function(verb, cmd, cwd, key) {
 // These test clients are in the test/clients subdirectory.  Each one tests a limited amount of OAuth
 // functionality to validate that requests can be sent through Auspice properly using various languages.
 describe('Client library tests', function() {
-  
+
   it ('should support requests from ruby', function(done) {
     var rubyTest = create_client_test('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
     rubyTest(done);
   });
-  
+
   it ('should support requests from java', function(done) {
-    var javaTest = create_client_test('POST', 
+    var javaTest = create_client_test('POST',
       'java -cp target/AuspiceClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.vistaprint.auspice.Client',
       'test/clients/java/AuspiceClient', 'java-test-key')
     javaTest(done);
   });
-  
+
   it ('should support requests from node.js', function(done) {
     var nodeTest = create_client_test('POST', 'node client.js', 'test/clients/node', 'node-test-key')
     nodeTest(done);
   });
-  
+
   it ('should support requests from perl', function(done) {
     var perlTest = create_client_test('GET', 'perl client.pl', 'test/clients/perl', 'perl-test-key')
     perlTest(done);
@@ -67,7 +67,7 @@ describe('Client library tests', function() {
       golangTest(done);
     });
   }
-  
+
   // Windows-specific client tests
   if (os.platform().indexOf('win') === 0) {
     it ('Powershell', function(done) {
@@ -83,14 +83,14 @@ describe('Client library tests', function() {
 	    child.stderr.on("data",function(data){
         console.log("err: " + data);
       });
-      
+
       child.on("exit",function(){
         output.trim().should.endWith('{"status":"ok"}');
         done();
       });
-      child.stdin.end(); 
+      child.stdin.end();
     });
-	
+
     it ('.Net', function(done) {
       var dotNetTest = create_client_test('POST', 'Auspice\\Client\\bin\\Release\\Client.exe',
         'test/clients/dotnet', 'dotnet-test-key');
@@ -108,7 +108,7 @@ describe('Client library tests', function() {
       var bashTest = create_client_test('GET', 'bash client.sh', 'test/clients/bash', 'bash-test-key')
       bashTest(done);
     });
-    
+
     it ('should support requests from python', function(done) {
       var pythonTest = create_client_test('GET', 'python client.py', 'test/clients/python', 'python-test-key')
       pythonTest(done);

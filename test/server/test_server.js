@@ -45,10 +45,10 @@ function JobServer() {
   // /transactions simulates an endpoint that might return a large, chunked response.
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
     app[verb]('/compressed_content', function(req, res, next) {
-      
+
       res.setHeader('Content-Type', 'text/plain');
       console.log('%s /compressed_content with key %s', verb.toUpperCase(), req.headers[CONSUMER_KEY_HEADER]);
-      
+
       compress()(req, res, function() {
         res.write(fs.readFileSync('./test/resources/lorem_ipsum.txt'), 'utf8');
         res.end();
@@ -59,19 +59,19 @@ function JobServer() {
   // /transactions simulates an endpoint that might return a large, chunked response.
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
     app[verb]('/transactions', function(req, res) {
-      
+
       res.setHeader('Content-Type', 'application/json');
       console.log('%s /transactions with key %s', verb.toUpperCase(), req.headers[CONSUMER_KEY_HEADER]);
-      
+
       // Generate a sizeable chunk of json that will be chunked and returned
       res.write('{\n\t"jobs_list":[');
-    
+
       for (var i=0; i<1000; ++i) {
         res.write('\t\t"job": ');
         res.write('' + i);
         res.write(',\n');
       }
-      
+
       process.nextTick(function() {
         res.write('\t\t"job": 1000\n\t]\n}');
 
@@ -83,7 +83,7 @@ function JobServer() {
 
   app.POST('/getProducts', function(req, res) {
     console.log('POST /getProducts with key %s', req.headers[CONSUMER_KEY_HEADER]);
-    
+
     var data = '';
 
     req.on('data', function (chunk) {
@@ -95,10 +95,10 @@ function JobServer() {
       this_obj.emit('POST /getProducts', req, res);
       res.sendfile('./test/resources/list_of_products.xml');
     });
-    
-    
+
+
   });
-  
+
   ['POST', 'PUT'].forEach(function(verb) {
 
     app[verb]("/job", function(req, res) {
@@ -107,21 +107,21 @@ function JobServer() {
       this_obj.emit(verb + " /job", req, res);
       res.send({'status':'ok'});
     });
-  
+
     // /uploads simulates an endpoint that receives multipart form data for posts and puts
     app[verb]('/uploads', function(req, res) {
       console.log('%s /uploads with key %s', verb.toUpperCase(), req.headers[CONSUMER_KEY_HEADER]);
-      
+
       var file_path = req.files['binary_data'].path;
       var expected_length = req.files['binary_data'].size;
-      
+
       var is_file_complete = function(cb) {
         fs.stat(file_path, function(err, stat) {
           if (err) return cb(false);
           return cb(stat.size === expected_length);
         });
       };
-      
+
       var poll_file = function() {
         is_file_complete(function(complete) {
           if (complete) {

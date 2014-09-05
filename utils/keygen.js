@@ -13,8 +13,8 @@ function createKeystorePath(root_dir, from_port, to_port) {
  * Create a key with a randomized secret at file location /root_dir/from_port/to_port/key_id
  */
 exports.createKey = function(root_dir, from_port, to_port, key_id, secret, cb) {
-  if (!cb) { 
-    cb = secret; 
+  if (!cb) {
+    cb = secret;
     secret = uuid.v4();
   }
 

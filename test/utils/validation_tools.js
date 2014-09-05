@@ -29,7 +29,7 @@ exports.STOCK_XML_STREAM.pipe = function(target) {
 // Compare the two sets of headers and return true only if they are equal in both name and
 // value, aside from the keys listed in keys_to_ignore.
 module.exports.compareHeaders = function(auth, unauth, keys_to_ignore) {
-  
+
   // Default to an empty set if no keys were provided.
   keys_to_ignore = keys_to_ignore || {};
 
@@ -38,12 +38,12 @@ module.exports.compareHeaders = function(auth, unauth, keys_to_ignore) {
     _.omit(auth, keys_to_ignore),
     _.omit(unauth, keys_to_ignore)
   );
-  
+
   // If we have a header difference, this may the result of a transient condition and very difficult
   // to reproduce.  Log the headers to make sure we know what happened.
-  if (!rvalue) 
+  if (!rvalue)
     console.log('auth:\n%s\n,unauth:\n%s\nto_ignore:\n%s', util.inspect(auth), util.inspect(unauth), util.inspect(keys_to_ignore));
-    
+
   return rvalue;
 };
 
@@ -58,7 +58,7 @@ exports.createResponseValidator = function(expected_status_code, done) {
     response.headers.connection.should.equal('keep-alive');
     // We know that all requests to the JobServer should return {"status":"ok"}, so add that validation.
     if (expected_status_code === 200 && response.request.path.indexOf('/job') != -1) body.should.equal('{"status":"ok"}');
-    
+
     // Otherwise, if we made it here, the test is complete.
     done(null, response, body);
   };

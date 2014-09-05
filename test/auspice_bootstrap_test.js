@@ -66,8 +66,6 @@ describe('Auspice Bootstrap', function() {
       });
     });
   });
-
-  var my_proxy;
   
   // Test that the proxy starts and loads all the keys created in the before function.
   it ('should start cleanly', function(done) {

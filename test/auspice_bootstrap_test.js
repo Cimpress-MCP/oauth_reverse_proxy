@@ -1,6 +1,7 @@
 var should = require('should');
 var _ = require('underscore');
 var fs = require('fs');
+var rimraf = require('rimraf');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 
@@ -29,24 +30,26 @@ describe('Auspice Bootstrap', function() {
   
   // Before starting Auspice, create the keys we need for test clients.
   before(function(done) {
-    mkdirp('./test/keys/8008/8080', function(err) {
-      keygen.createKey('./test/keys', 8008, 8080, 'bash-test-key', function(err) {
-        keygen.createKey('./test/keys', 8008, 8080, 'dotnet-test-key', function(err) {
-          keygen.createKey('./test/keys', 8008, 8080, 'java-test-key', function(err) {
-            keygen.createKey('./test/keys', 8008, 8080, 'node-test-key', function(err) {
-              keygen.createKey('./test/keys', 8008, 8080, 'perl-test-key', function(err) {
-                keygen.createKey('./test/keys', 8008, 8080, 'powershell-test-key', function(err) {
-                  keygen.createKey('./test/keys', 8008, 8080, 'python-test-key', function(err) {
-                    keygen.createKey('./test/keys', 8008, 8080, 'ruby-test-key', function(err) {
-                      keygen.createKey('./test/keys', 8008, 8080, 'golang-test-key', function(err) {
-                        keygen.createKey('./test/keys', 8008, 8080, 'mocha-test-key', function(err) {                          
-                          keygen.createKey('./test/keys', 8008, 8080, 'allowedsymbols-test-key', 'abc.def-ghi_jkl=', function(err) {
-                            keygen.createKey('./test/keys', 8008, 8080, 'base64-test-key', 'helloworld========', function(err) {
-                              // Keys that are expected to be rejected
-                              keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) { 
-                                keygen.createKey('./test/keys', 8008, 8080, 'bytes-test-key', crypto.randomBytes(256), function(err) { 
-                                  request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
-                                  done(err);
+    rimraf('./test/keys/8008/8080', function(err) {
+      mkdirp('./test/keys/8008/8080', function(err) {
+        keygen.createKey('./test/keys', 8008, 8080, 'bash-test-key', function(err) {
+          keygen.createKey('./test/keys', 8008, 8080, 'dotnet-test-key', function(err) {
+            keygen.createKey('./test/keys', 8008, 8080, 'java-test-key', function(err) {
+              keygen.createKey('./test/keys', 8008, 8080, 'node-test-key', function(err) {
+                keygen.createKey('./test/keys', 8008, 8080, 'perl-test-key', function(err) {
+                  keygen.createKey('./test/keys', 8008, 8080, 'powershell-test-key', function(err) {
+                    keygen.createKey('./test/keys', 8008, 8080, 'python-test-key', function(err) {
+                      keygen.createKey('./test/keys', 8008, 8080, 'ruby-test-key', function(err) {
+                        keygen.createKey('./test/keys', 8008, 8080, 'golang-test-key', function(err) {
+                          keygen.createKey('./test/keys', 8008, 8080, 'mocha-test-key', function(err) {                          
+                            keygen.createKey('./test/keys', 8008, 8080, 'allowedsymbols-test-key', 'abc.def-ghi_jkl=', function(err) {
+                              keygen.createKey('./test/keys', 8008, 8080, 'base64-test-key', 'helloworld========', function(err) {
+                                // Keys that are expected to be rejected
+                                keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) { 
+                                  keygen.createKey('./test/keys', 8008, 8080, 'bytes-test-key', crypto.randomBytes(256), function(err) { 
+                                    request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
+                                    done(err);
+                                  });
                                 });
                               });
                             });
@@ -63,14 +66,16 @@ describe('Auspice Bootstrap', function() {
       });
     });
   });
+
+  var my_proxy;
   
   // Test that the proxy starts and loads all the keys created in the before function.
   it ('should start cleanly', function(done) {
     auspice.init('./test/keys', function(err, proxy) {
-      if (err) return should.fail('Auspice startup failed: ' + err);
-      
+      if (err) done('Auspice startup failed: ' + err);      
+      exports.proxy = proxy;
       // Turn the proxy.keys object into an array to get its length
-      (_.keys(proxy.keys).length).should.be.exactly(12);
+      _.keys(exports.proxy.keys).length.should.be.exactly(12);
       done();
     });
   });

@@ -20,17 +20,17 @@
     "node-uuid": "1.4.1"
   },
   "devDependencies": {
-    "mocha": "1.20.1",
-    "should": "3.3.2",
-    "express": "4.0.0",
     "body-parser": "1.0.2",
+    "compression": "1.0.6",
+    "express": "4.0.0",
+    "istanbul": "0.2.11",
     "method-override": "1.0.2",
+    "mocha": "^1.21.4",
+    "multer": "0.1.0",
     "oauth": "0.9.11",
     "request": "2.36.0",
-    "multer": "0.1.0",
-    "compression": "1.0.6",
-    "istanbul": "0.2.11",
     "rimraf": "2.2.8",
+    "should": "^4.0.4",
     "xunit-file": "0.0.5"
   },
   "scripts": {

@@ -102,19 +102,4 @@ describe('Proxy config validation', function() {
       });
     });
   });
-  
-  it ('should reject an attempt to init a proxy with invalid keys', function(done) {
-    mkdirp('./test/keys/8008/8080', function() {
-      fs.writeFile('./test/keys/8008/8080/empty_key', '', function(err) {
-        if (err) return should.fail(err);
-        mkdirp('./test/keys/8008/8080/directory_as_key', function(err) {
-          var proxy = new proxy_class('8008', '8080', './test/keys/8008/8080');
-          proxy.start(function(err) {
-            err.should.equal('No keys found.');
-            done();
-          });
-        });
-      });
-    });
-  });
 });

@@ -13,7 +13,7 @@ var request_sender = require('./utils/request_sender.js');
 require('./auspice_bootstrap_test.js');
 
 // This is a set of tests to validate that Auspice correctly adds the x-forwarded-* and via headers to the proxied request.
-describe('Auspice request header tampering: addition of x-forwarded-*, via, and correlator id', function() {
+describe('Auspice request header tampering: addition of x-forwarded-* and via', function() {
 
   it('should append correct headers for inbound HTTP connections', function(done) {
     // Validate that standard HTTP connection handling works.
@@ -74,9 +74,6 @@ describe('Auspice request header tampering: addition of x-forwarded-*, via, and 
         expected_headers.forEach(function(header_pair) {
           req.headers[header_pair[0]].should.equal(header_pair[1]);
         });
-
-        // Also check for correlator id and match that it's a UUID per RFC 4122 v4.
-        req.headers['x-vp-correlatorid'].should.match(/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/);
       });
 
       request_sender.sendSimpleAuthenticatedRequest(verb, 200, done);
@@ -99,9 +96,6 @@ describe('Auspice request header tampering: addition of x-forwarded-*, via, and 
         expected_headers.forEach(function(header_pair) {
           req.headers[header_pair[0]].should.equal(header_pair[1]);
         });
-
-        // Also check for correlator id and match that it's a UUID per RFC 4122 v4.
-        req.headers['x-vp-correlatorid'].should.match(/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/);
       });
 
       request_sender.sendSimpleAuthenticatedRequest(verb, 200, done);
@@ -124,9 +118,6 @@ describe('Auspice request header tampering: addition of x-forwarded-*, via, and 
         expected_headers.forEach(function(header_pair) {
           req.headers[header_pair[0]].should.equal(header_pair[1]);
         });
-
-        // Also check for correlator id and match that it's a UUID per RFC 4122 v4.
-        req.headers['x-vp-correlatorid'].should.match(/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}/);
       });
 
       request_sender.sendSimpleAuthenticatedRequest(verb, 200, done);

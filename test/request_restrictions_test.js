@@ -14,8 +14,15 @@ describe('Additional request restrictions', function() {
 
   // Validate that a basic authenticated request works.  Loop over each verb, running the common tests between them.
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
-  	it ('should reject ' + verb + ' on non-whitelisted URIs', function(done) {
-  		request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/funkypath', {}, 401, done);
-  	});
+    it ('should reject ' + verb + ' on non-whitelisted URIs', function(done) {
+      request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/funkypath', {}, 401, done);
+    });
+  });
+
+  // Validate that a basic authenticated request works.  Loop over each verb, running the common tests between them.
+  ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+    it ('should reject ' + verb + ' with non-whitelisted Host: headers', function(done) {
+      request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/job', {'headers': {'host': 'funkhost.com'}}, 401, done);
+    });
   });
 });

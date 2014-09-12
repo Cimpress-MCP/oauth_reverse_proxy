@@ -20,6 +20,7 @@ exports.createKey = function(root_dir, from_port, to_port, key_id, secret, cb) {
 
   var keystore_path = createKeystorePath(root_dir, from_port, to_port, key_id);
   require('mkdirp')(keystore_path, function(err) {
+    /* istanbul ignore if */
     if (err) return cb(err);
 
     var keyfile = keystore_path + path.sep + key_id;
@@ -30,6 +31,7 @@ exports.createKey = function(root_dir, from_port, to_port, key_id, secret, cb) {
 }
 
 // Invoked from the command line with the correct number of args
+/* istanbul ignore next */
 if (process.argv[1].indexOf('keygen') != -1) {
   if (process.argv.length === 6) {
     var args = process.argv;

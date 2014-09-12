@@ -2,10 +2,12 @@ var log4js = require('log4js');
 var sprintf = require('./sprintf.js').sprintf;
 
 // Allow an environment variable to override our default location for log4js config
+/* istanbul ignore next */
 var config_file = process.env.LOG4JS_CONFIG || 'vistaprint_log4js.json';
 
 log4js.configure(config_file);
 
+/* istanbul ignore next */
 if (!process.env.LOG4JS_DISABLE_LOGSTASH) {
   var logstash_appender = require('./logstash_appender.js').configure({
     type: "logstash_appender",
@@ -34,6 +36,7 @@ if (!process.env.LOG4JS_DISABLE_LOGSTASH) {
  * configuration found in the provided file.  If this string is blank, log4js will search for a
  * log4js.json somewhere in the require paths.
  */
+ /* istanbul ignore next */
 exports.getLogger = function(categoryName, config_file) {
   if (config_file !== undefined) {
     log4js.clearAppenders();

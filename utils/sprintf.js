@@ -58,6 +58,7 @@ Changelog:
  - initial release
 **/
 
+/* istanbul ignore next */
 exports.sprintf = (function() {
 	function get_type(variable) {
 		return Object.prototype.toString.call(variable).slice(8, -1).toLowerCase();
@@ -177,6 +178,7 @@ exports.sprintf = (function() {
 	return str_format;
 })();
 
+/* istanbul ignore next */
 exports.vsprintf = function(fmt, argv) {
 	argv.unshift(fmt);
 	return sprintf.apply(null, argv);

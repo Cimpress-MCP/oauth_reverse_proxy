@@ -3,3 +3,7 @@ node_modules
 target
 reports
 .DS_Store
+nuget-packages/
+*.suo
+bin/
+debug/

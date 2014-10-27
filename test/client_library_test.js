@@ -91,10 +91,16 @@ describe('Client library tests', function() {
       child.stdin.end();
     });
 
-    it ('.Net', function(done) {
+    it ('DotNetOpenAuth', function(done) {
       var dotNetTest = create_client_test('POST', 'Auspice\\Client\\bin\\Release\\Client.exe',
         'test/clients/dotnet', 'dotnet-test-key');
       dotNetTest(done);
+    });
+
+    it ('RestSharp', function(done) {
+      var restsharpTest = create_client_test('POST', 'Auspice\\RestSharpClient\\bin\\Release\\RestSharpClient.exe',
+        'test/clients/dotnet', 'restsharp-test-key');
+      restsharpTest(done);
     });
 
     it ('golang', function(done) {

@@ -10,7 +10,7 @@ namespace RestSharpClient
     {
         static void Main(string[] args)
         {
-            var consumerKey = "dotnet-test-key";
+            var consumerKey = "restsharp-test-key";
             var consumerSecret = File.ReadAllText("..\\..\\keys\\8008\\8080\\" + consumerKey);
 
             RestClient client = new RestClient("http://localhost:8008/")
@@ -25,8 +25,6 @@ namespace RestSharpClient
                                     };
 
             var restRequest = new RestRequest("job", Method.POST);
-            restRequest.AddParameter("query", "parameters", ParameterType.QueryString);
-            restRequest.AddParameter("also", "good", ParameterType.QueryString);
             restRequest.AddParameter("are", "post", ParameterType.GetOrPost);
             restRequest.AddParameter("parameters", "handled", ParameterType.GetOrPost);
 

@@ -34,21 +34,23 @@ describe('Auspice Bootstrap', function() {
       mkdirp('./test/keys/8008/8080', function(err) {
         keygen.createKey('./test/keys', 8008, 8080, 'bash-test-key', function(err) {
           keygen.createKey('./test/keys', 8008, 8080, 'dotnet-test-key', function(err) {
-            keygen.createKey('./test/keys', 8008, 8080, 'java-test-key', function(err) {
-              keygen.createKey('./test/keys', 8008, 8080, 'node-test-key', function(err) {
-                keygen.createKey('./test/keys', 8008, 8080, 'perl-test-key', function(err) {
-                  keygen.createKey('./test/keys', 8008, 8080, 'powershell-test-key', function(err) {
-                    keygen.createKey('./test/keys', 8008, 8080, 'python-test-key', function(err) {
-                      keygen.createKey('./test/keys', 8008, 8080, 'ruby-test-key', function(err) {
-                        keygen.createKey('./test/keys', 8008, 8080, 'golang-test-key', function(err) {
-                          keygen.createKey('./test/keys', 8008, 8080, 'mocha-test-key', function(err) {
-                            keygen.createKey('./test/keys', 8008, 8080, 'allowedsymbols-test-key', 'abc.def-ghi_jkl=', function(err) {
-                              keygen.createKey('./test/keys', 8008, 8080, 'base64-test-key', 'helloworld========', function(err) {
-                                // Keys that are expected to be rejected
-                                keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) {
-                                  keygen.createKey('./test/keys', 8008, 8080, 'bytes-test-key', crypto.randomBytes(256), function(err) {
-                                    request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
-                                    done(err);
+            keygen.createKey('./test/keys', 8008, 8080, 'restsharp-test-key', function(err) {
+              keygen.createKey('./test/keys', 8008, 8080, 'java-test-key', function(err) {
+                keygen.createKey('./test/keys', 8008, 8080, 'node-test-key', function(err) {
+                  keygen.createKey('./test/keys', 8008, 8080, 'perl-test-key', function(err) {
+                    keygen.createKey('./test/keys', 8008, 8080, 'powershell-test-key', function(err) {
+                      keygen.createKey('./test/keys', 8008, 8080, 'python-test-key', function(err) {
+                        keygen.createKey('./test/keys', 8008, 8080, 'ruby-test-key', function(err) {
+                          keygen.createKey('./test/keys', 8008, 8080, 'golang-test-key', function(err) {
+                            keygen.createKey('./test/keys', 8008, 8080, 'mocha-test-key', function(err) {
+                              keygen.createKey('./test/keys', 8008, 8080, 'allowedsymbols-test-key', 'abc.def-ghi_jkl=', function(err) {
+                                keygen.createKey('./test/keys', 8008, 8080, 'base64-test-key', 'helloworld========', function(err) {
+                                  // Keys that are expected to be rejected
+                                  keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) {
+                                    keygen.createKey('./test/keys', 8008, 8080, 'bytes-test-key', crypto.randomBytes(256), function(err) {
+                                      request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
+                                      done(err);
+                                    });
                                   });
                                 });
                               });
@@ -60,7 +62,7 @@ describe('Auspice Bootstrap', function() {
                   });
                 });
               });
-            });
+			});
           });
         });
       });
@@ -73,7 +75,7 @@ describe('Auspice Bootstrap', function() {
       if (err) done('Auspice startup failed: ' + err);
       exports.proxy = proxy;
       // Turn the proxy.keys object into an array to get its length
-      _.keys(exports.proxy.keys).length.should.be.exactly(12);
+      _.keys(exports.proxy.keys).length.should.be.exactly(13);
       done();
     });
   });

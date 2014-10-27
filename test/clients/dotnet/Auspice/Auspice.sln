@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{2B674BBD-25BD-4D4B-8C1C-5B6A71C80849}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestSharpClient", "RestSharpClient\RestSharpClient.csproj", "{C79C1140-9C4F-4AF0-B524-DF4687707065}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{2B674BBD-25BD-4D4B-8C1C-5B6A71C80849}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B674BBD-25BD-4D4B-8C1C-5B6A71C80849}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B674BBD-25BD-4D4B-8C1C-5B6A71C80849}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C79C1140-9C4F-4AF0-B524-DF4687707065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C79C1140-9C4F-4AF0-B524-DF4687707065}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C79C1140-9C4F-4AF0-B524-DF4687707065}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C79C1140-9C4F-4AF0-B524-DF4687707065}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

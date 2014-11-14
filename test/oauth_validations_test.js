@@ -194,6 +194,7 @@ describe('Auspice request validation', function() {
     var res = create_res(done, 500, 'Internal error');
 
     var req = {};
+    req.whitelist_passed = true;
     req.headers = {'host':'localhost'};
     req.method = 'GET';
     req.url = '/livecheck';

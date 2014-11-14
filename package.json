@@ -20,11 +20,20 @@
     "underscore": "1.6.0"
   },
   "devDependencies": {
+    "benchmark": "^1.0.0",
     "body-parser": "1.0.2",
     "compression": "1.0.6",
     "express": "4.0.0",
+    "grunt": "^0.4.5",
+    "grunt-benchmark": "^0.3.0",
+    "grunt-cli": "^0.1.13",
+    "grunt-env": "^0.4.2",
+    "grunt-istanbul": "^0.3.0",
+    "grunt-mocha-test": "^0.12.2",
+    "grunt-nodemon": "^0.3.0",
     "istanbul": "0.2.11",
     "method-override": "1.0.2",
+    "microtime": "^1.0.1",
     "mocha": "^1.21.4",
     "multer": "0.1.0",
     "oauth": "0.9.11",
@@ -34,10 +43,11 @@
     "xunit-file": "0.0.5"
   },
   "scripts": {
-    "run_auspice_unix": "LOG4JS_CONFIG=./test/resources/test_log4js.json AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8000 AUSPICE_VERSION=0.2.0 AUSPICE_KEYSTORE=/var/vistaprint/auspice/ node .",
-    "run_auspice_win": "LOG4JS_CONFIG=./test/resources/test_log4js.json AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8000 AUSPICE_VERSION=0.2.0 AUSPICE_KEYSTORE=c:\\keystore\\ node .",
+    "run_auspice_unix": "node_modules/.bin/grunt",
+    "run_auspice_win": "node_modules/.bin/grunt",
     "test_unix": "REQUIRED_URIS=/getProducts,/uploads,/multipart,/chunked,/compressed,/job,/live,/health,/transactions REQUIRED_HOSTS=localhost AUSPICE_SERVICE_NAME=jobsservice AUSPICE_PROXY_PORT=8008 AUSPICE_VERSION=tst LOG4JS_CONFIG=./test/resources/test_log4js.json LOG4JS_DISABLE_LOGSTASH=true XUNIT_FILE=\"reports/TESTS-xunit.xml\" node_modules/.bin/istanbul cover --root . -x node_modules -x test --dir ./reports ./node_modules/.bin/_mocha -- --reporter xunit-file -t 10000 test",
-    "test_win": "SET REQUIRED_URIS=/getProducts,/uploads,/multipart,/chunked,/compressed,/job,/live,/health,/transactions&SET REQUIRED_HOSTS=localhost&SET AUSPICE_SERVICE_NAME=jobsservice&SET AUSPICE_PROXY_PORT=8008&SET AUSPICE_VERSION=tst&SET LOG4JS_CONFIG=test\\resources\\test_log4js.json&SET LOG4JS_DISABLE_LOGSTASH=true&SET XUNIT_FILE=reports\\TESTS-xunit.xml& .\\node_modules\\.bin\\istanbul.cmd cover --root . -x node_modules -x test --dir reports .\\node_modules\\mocha\\bin\\_mocha -- --reporter xunit-file -t 10000 test"
+    "test_win": "SET REQUIRED_URIS=/getProducts,/uploads,/multipart,/chunked,/compressed,/job,/live,/health,/transactions&SET REQUIRED_HOSTS=localhost&SET AUSPICE_SERVICE_NAME=jobsservice&SET AUSPICE_PROXY_PORT=8008&SET AUSPICE_VERSION=tst&SET LOG4JS_CONFIG=test\\resources\\test_log4js.json&SET LOG4JS_DISABLE_LOGSTASH=true&SET XUNIT_FILE=reports\\TESTS-xunit.xml& .\\node_modules\\.bin\\istanbul.cmd cover --root . -x node_modules -x test --dir reports .\\node_modules\\mocha\\bin\\_mocha -- --reporter xunit-file -t 10000 test",
+    "run_benchmarks": "node_modules/.bin/grunt benchmark"
   },
   "licenses": [
     {

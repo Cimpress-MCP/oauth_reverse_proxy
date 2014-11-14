@@ -65,6 +65,25 @@ describe('Auspice Bootstrap', function() {
 			});
           });
         });
+        
+        fs.writeFile('./test/keys/8008/8080/config.json', JSON.stringify({
+          whitelist: {
+              paths: [
+              {
+                  path: "/livecheck",
+                  methods: "GET"
+              },
+              {
+                  path: "/whitelist/[\\d]+",
+                  methods: ["PUT","GET"]
+              },
+              {
+                  path: "/things/[\\w]+/details",
+                  methods: ["PUT"]
+              }]
+          }
+        }));
+        
       });
     });
   });

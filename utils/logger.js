@@ -1,88 +1,22 @@
-var log4js = require('log4js');
-var sprintf = require('./sprintf.js').sprintf;
+var util = require('util');
 
-// Allow an environment variable to override our default location for log4js config
+var bunyan = require('bunyan');
+
+// Create a default logger to use if all else fails.
+module.exports = bunyan.createLogger({name: 'auspice'});
+
+// Init the logger with a configuration object
 /* istanbul ignore next */
-var config_file = process.env.LOG4JS_CONFIG || 'vistaprint_log4js.json';
+module.exports.init = function(config) {
 
-log4js.configure(config_file);
+  // If no logger config is provided, there's nothing more to do.  We'll just continue using the
+  // default logger.
+  if (!config.logger) return;
 
-/* istanbul ignore next */
-if (!process.env.LOG4JS_DISABLE_LOGSTASH) {
-  var logstash_appender = require('./logstash_appender.js').configure({
-    type: "logstash_appender",
-    host: "localhost",
-    port: 5140,
-    fields: {
-      hostname: require('os').hostname(),
-      service_name: process.env.AUSPICE_SERVICE_NAME,
-      auspice_version: process.env.AUSPICE_VERSION,
-      source: "auspice"
-    }
+  config.logger.streams.forEach(function(stream) {
+    if (stream.stream === "process.stdout") stream.stream = process.stdout;
+    else if (stream.stream === "process.stderr") stream.stream = process.stderr;
   });
 
-  log4js.addAppender(logstash_appender);
-}
-
-/**
- * Wraps log4js loggers and provides sprintf capabilities for each of the standard log levels.
- * This allows for an arbitrary number of command line parameters composed into the log messaage,
- * but composition only happens if the current log level is enabled.
- *
- * getLogger expects a categoryName.  Typically this is the name of the module in which the logger
- * is requested.
- *
- * config_file is an optional parameter which clears all appenders and replaces them with the
- * configuration found in the provided file.  If this string is blank, log4js will search for a
- * log4js.json somewhere in the require paths.
- */
- /* istanbul ignore next */
-exports.getLogger = function(categoryName, config_file) {
-  if (config_file !== undefined) {
-    log4js.clearAppenders();
-    log4js.configure(config_file);
-  }
-
-  var _logger = log4js.getLogger(categoryName || '[default]');
-
-  // Note: With each of the logging functions, if called with one argument we will force the argument
-  // through a %s format.  This avoids nasty bugs if the argument happens to contain % characters, which
-  // will be incorrectly interpreted as the start of a format specifier.
-  var adjustArguments = function(arguments) {
-    if (arguments.length === 1) {
-      return ["%s", arguments[0]];
-    } else {
-      return arguments;
-    }
-  };
-
-  return {
-    trace: function() {
-      if(_logger.isTraceEnabled()) _logger.trace(sprintf.apply(this, adjustArguments(arguments)));
-    },
-
-    debug: function() {
-      if(_logger.isDebugEnabled()) _logger.debug(sprintf.apply(this, adjustArguments(arguments)));
-    },
-
-    info: function() {
-      if(_logger.isInfoEnabled()) _logger.info(sprintf.apply(this, adjustArguments(arguments)));
-    },
-
-    warn: function() {
-      if(_logger.isWarnEnabled()) _logger.warn(sprintf.apply(this, adjustArguments(arguments)));
-    },
-
-    error: function() {
-      if(_logger.isErrorEnabled()) _logger.error(sprintf.apply(this, adjustArguments(arguments)));
-    },
-
-    fatal: function() {
-      var message = sprintf.apply(this, adjustArguments(arguments));
-
-      // FIXME: Create a similar escalation mechanism for FATALs
-      // require('../ot/stat_collector.js').sendErrorMessage(require('../config.js').getState().site.id, message);
-      if(_logger.isFatalEnabled()) _logger.fatal(message);
-    }
-  };
+  module.exports = bunyan.createLogger(config.logger);
 };

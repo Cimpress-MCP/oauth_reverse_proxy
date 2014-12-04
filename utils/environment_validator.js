@@ -1,5 +1,5 @@
 var fs = require('fs');
-var logger = require('../utils/logger.js').getLogger('environment_validator');
+var logger = require('../utils/logger.js');
 
 // Delay the startup failure to give log messages an opportunity to reach the logstash agent.
 var fail_startup = function(exit_code) {

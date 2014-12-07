@@ -9,7 +9,7 @@ if (process.env.AUSPICE_HOME) {
 }
 
 var auspice = require('./lib');
-var logger = require('./utils/logger.js');
+var logger = require('./lib/logger.js');
 
 /**
  * The config path can be provided as an environemnt variable.  If not rpvoided, we chose
@@ -30,7 +30,7 @@ auspice.init(config_path, function(err, proxy) {
   // If we caught a fatal error creating the proxies, log it and pause briefly before exiting
   // to give Bunyan a chance to flush this error message.
   if (err) {
-    logger.fatal("Failed to create proxy due to %s", err);
+    logger.fatal("Failed to create proxy due to %s:\n", err, err.stack);
     setTimeout(function() {
       process.exit(1);
     }, 2000);

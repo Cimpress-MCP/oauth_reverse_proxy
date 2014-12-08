@@ -121,7 +121,7 @@ describe('Auspice OAuth validations', function() {
 // of specific use cases that might be difficult to achieve by sending actual requests.
 describe('Auspice request validation', function() {
 
-  var authenticator = require('../lib/authenticator.js');
+  var authenticator = require('../lib/proxy/authenticator.js');
 
   // The request validator function used in the connect workflow for node-http-proxy.
   var request_validator = authenticator.requestValidator();

@@ -4,7 +4,7 @@ var _ = require('underscore');
 var crypto = require('crypto');
 var fs = require('fs');
 
-var encoding = require('../../utils/encoding.js');
+var encoding = require('../../lib/encoding.js');
 
 var querystring = require('querystring');
 var request = require('request');

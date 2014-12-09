@@ -1,7 +1,7 @@
 {
-  "name": "auspice",
-  "description": "Authenticating service proxy",
-  "version": "0.0.1",
+  "name": "oauth_reverse_proxy",
+  "description": "Authenticating proxy",
+  "version": "0.9.0",
   "contributors": [
     {
       "name": "Ryan Breen",
@@ -16,7 +16,6 @@
     "http-proxy": "1.1.2",
     "mkdirp": "0.5.0",
     "node-uuid": "1.4.1",
-    "node-windows": "0.1.5",
     "underscore": "1.6.0"
   },
   "devDependencies": {

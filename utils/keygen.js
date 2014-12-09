@@ -3,7 +3,7 @@ var path = require('path');
 var uuid = require('node-uuid');
 var fs = require('fs');
 
-var sprintf = require('./sprintf.js').sprintf;
+var sprintf = require('../lib/sprintf.js').sprintf;
 
 function createKeystorePath(root_dir, from_port, to_port) {
   return sprintf('%s%s%s%s%s', root_dir, path.sep, from_port, path.sep, to_port);

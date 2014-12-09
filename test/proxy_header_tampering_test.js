@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var job_server = require('./server/test_server.js').JobServer;
 
-var header_modifier = require('../lib/header_modifier.js');
+var header_modifier = require('../lib/proxy/header_modifier.js');
 
 // All the messy business of creating and sending requests (both authenticated and unauthenticated)
 // lives in request_sender.
@@ -66,7 +66,7 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
       ['x-forwarded-for', '127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
-      ['via', '1.1 localhost (Auspice v' + process.env.AUSPICE_VERSION + ')']
+      ['via', '1.1 localhost (Auspice vtst)']
     ];
 
     it("should add x-forwarded-* and via headers to proxied " + verb + " requests", function(done) {
@@ -88,7 +88,7 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
       ['x-forwarded-for', '127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
-      ['via', '1.1 localhost (Auspice v' + process.env.AUSPICE_VERSION + ')']
+      ['via', '1.1 localhost (Auspice vtst)']
     ];
 
     it("should add x-forwarded-* and via headers to proxied " + verb + " requests", function(done) {
@@ -110,7 +110,7 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
       ['x-forwarded-for', '127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
-      ['via', '1.1 localhost (Auspice v' + process.env.AUSPICE_VERSION + ')']
+      ['via', '1.1 localhost (Auspice vtst)']
     ];
 
     it("should add x-forwarded-* and via headers to proxied " + verb + " requests", function(done) {

@@ -8,21 +8,29 @@ if (process.env.AUSPICE_HOME) {
   process.chdir(process.env.AUSPICE_HOME);
 }
 
-// Including this module validates that the environment variables are correctly configured.
-// Any failure will terminate this process with an error.
-if (!require('./utils/environment_validator.js')) {
-  return logger.fatal("Unable to load Auspice due to missing environment variables.");
+var auspice = require('./lib');
+var logger = require('./lib/logger.js');
+
+/**
+ * The config path can be provided as an environemnt variable.  If not rpvoided, we chose
+ * sane defaults for Windows and non-Windows.
+ */
+var config_path = process.env.AUSPICE_CONFIG_PATH;
+if (!config_path) {
+  var os = require('os').type().toLowerCase();
+  if (os.indexOf('windows') !== -1 || os.indexOf('cygwin') !== -1) {
+    config_path = "C:\\ProgramData\\auspice\\config.d\\";
+  } else {
+    config_path = "/etc/auspice.d/";
+  }
 }
 
-var auspice = require('./lib');
-var logger = require('./utils/logger.js').getLogger('auspice');
-
 // Create an auspice instance at our configured root dir.
-auspice.init(process.env.AUSPICE_KEYSTORE, function(err, proxy) {
-  // If we caught a fatal error creating the proxy, log it and pause briefly before exiting
-  // to give logstash a chance to flush this error message.
+auspice.init(config_path, function(err, proxy) {
+  // If we caught a fatal error creating the proxies, log it and pause briefly before exiting
+  // to give Bunyan a chance to flush this error message.
   if (err) {
-    logger.fatal("Failed to create proxy due to " + err);
+    logger.fatal("Failed to create proxy due to %s:\n", err, err.stack);
     setTimeout(function() {
       process.exit(1);
     }, 2000);

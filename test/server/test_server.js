@@ -13,7 +13,7 @@ app.POST = app.post;
 app.PUT = app.put;
 app.DELETE = app.delete;
 
-const CONSUMER_KEY_HEADER = require('../../lib/authenticator.js').CONSUMER_KEY_HEADER;
+const CONSUMER_KEY_HEADER = require('../../lib/proxy/authenticator.js').CONSUMER_KEY_HEADER;
 
 // The job server represents a simple RESTful server we might expect to see behind Auspice.
 function JobServer() {

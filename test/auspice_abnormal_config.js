@@ -5,7 +5,7 @@ var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
 
 var auspice = require('../lib');
-var proxy_class = require('../lib/proxy.js').AuthenticatingProxy;
+var Proxy = require('../lib/proxy');
 
 // Start every test with an empty keys directory.
 var slate_cleaner = function(done) {
@@ -30,53 +30,24 @@ describe('Auspice config validation', function() {
   // kill it with fire.
   after(slate_cleaner);
 
-  it ('should reject an attempt to init Auspice with an unset keystore_dir parameter', function(done) {
+  it ('should reject an attempt to init Auspice with an unset config_dir parameter', function(done) {
     auspice.init(null, function(err, proxy) {
       err.should.equal('Failed to open directory ' + null);
       done();
     });
   });
 
-  it ('should reject an attempt to init Auspice with a keystore_dir referencing a nonexistent directory', function(done) {
+  it ('should reject an attempt to init Auspice with a config_dir referencing a nonexistent directory', function(done) {
     auspice.init('./test/keys', function(err, proxy) {
       err.should.equal('Failed to open directory ./test/keys');
       done();
     });
   });
 
-  it ('should reject an attempt to init Auspice with a keystore_dir referencing a non-directory inode', function(done) {
+  it ('should reject an attempt to init Auspice with a config_dir referencing a non-directory inode', function(done) {
     auspice.init('./test/auspice_abnormal_config.js', function(err, proxy) {
-      err.should.equal('Failed to open directory ./test/auspice_abnormal_config.js');
+      err.should.equal('Auspice config dir is not a directory');
       done();
-    });
-  });
-
-  it ('should reject an attempt to init Auspice with a missing from_port directory', function(done) {
-    mkdirp('./test/keys', function() {
-      auspice.init('./test/keys', function(err, proxy) {
-        err.should.startWith('Unable to load from_port path');
-        done();
-      });
-    });
-  });
-
-  it ('should reject an attempt to init Auspice with a missing to_port directory', function(done) {
-    mkdirp('./test/keys/8008/', function() {
-      auspice.init('./test/keys', function(err, proxy) {
-        err.should.equal('No proxy created.  Auspice startup aborted.');
-        done();
-      });
-    });
-  });
-
-  it ('should reject an attempt to init Auspice with a non-existent to_port directory', function(done) {
-    mkdirp('./test/keys/8008/aabb', function() {
-      mkdirp('./test/keys/8008/blart', function() {
-        auspice.init('./test/keys', function(err, proxy) {
-          err.should.equal('No proxy created.  Auspice startup aborted.');
-          done();
-        });
-      });
     });
   });
 });
@@ -91,10 +62,13 @@ describe('Proxy config validation', function() {
   // kill it with fire.
   after(slate_cleaner);
 
+  // TODO: Add tests for all other properties of ProxyConfig
+  // TODO: Validate that a proxy is not created when ProxyConfig is not valid
+
   it ('should reject an attempt to init a proxy with an unreadable to_port directory', function(done) {
     mkdirp('./test/keys/8008/', function() {
       fs.writeFile('./test/keys/8008/8080', 'Das ist nicht ein Directory', function(err) {
-        var proxy = new proxy_class('8008', '8080', './test/keys/8008/8080');
+        var proxy = new Proxy({'from_port': 8008, 'to_port': 8080, 'oauth_secret_dir': './test/keys/8008/8080'});
         proxy.start(function(err) {
           err.should.startWith('Failed to read key directory ');
           done();

@@ -90,11 +90,16 @@ describe('Auspice Bootstrap', function() {
 
   // Test that the proxy starts and loads all the keys created in the before function.
   it ('should start cleanly', function(done) {
-    auspice.init('./test/keys', function(err, proxy) {
+    auspice.init('./test/config.d', function(err, proxies) {
       if (err) done('Auspice startup failed: ' + err);
-      exports.proxy = proxy;
+      exports.proxy = proxies["jobs_service.json"];
+
+      if (typeof exports.proxy === 'string') {
+        should.fail(exports.proxy);
+      }
+
       // Turn the proxy.keys object into an array to get its length
-      _.keys(exports.proxy.keys).length.should.be.exactly(13);
+      exports.proxy.keys.count.should.be.exactly(13);
       done();
     });
   });

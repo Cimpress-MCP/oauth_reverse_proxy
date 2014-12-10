@@ -8,4 +8,4 @@ npm install
 
 #### build status
 
-![Travis Build](https://travis-ci.org/ryanbreen/oauth_reverse_proxy.svg)
+![Travis Build](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy.svg)

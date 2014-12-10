@@ -35,7 +35,7 @@
   },
   "scripts": {
     "run_auspice": "node .",
-    "test_unix": "./node_modules/.bin/_mocha --reporter spec -t 10000 test | bunyan",
+    "test": "./node_modules/.bin/_mocha --reporter spec -t 10000 test | bunyan",
     "test_win": ".\\node_modules\\mocha\\bin\\_mocha --reporter spec -t 10000 test",
     "cov_unix": "XUNIT_FILE=\"reports/TESTS-xunit.xml\" node_modules/.bin/istanbul cover --root . -x node_modules -x test --dir ./reports ./node_modules/.bin/_mocha -- --reporter xunit-file -t 10000 test",
     "cov_win": "SET XUNIT_FILE=reports\\TESTS-xunit.xml& .\\node_modules\\.bin\\istanbul.cmd cover --root . -x node_modules -x test --dir reports .\\node_modules\\mocha\\bin\\_mocha -- --reporter xunit-file -t 10000 test"

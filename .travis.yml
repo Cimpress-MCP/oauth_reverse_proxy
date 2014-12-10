@@ -9,7 +9,7 @@ before_script:
 - # Install python dep
 - sudo pip install requests-oauth
 - # Install bunyan globally
-- sudo npm install -g bunyan
+- npm install -g bunyan
 deploy:
   provider: npm
   email: ryan@ryanbreen.com

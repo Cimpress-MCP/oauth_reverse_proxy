@@ -1,12 +1,11 @@
 {
   "name": "oauth_reverse_proxy",
-  "description": "Authenticating proxy",
+  "description": "An OAuth 1.0a authenticating reverse proxy",
   "version": "0.9.0",
   "contributors": [
     {
       "name": "Ryan Breen",
-      "email": "rbreen@vistaprint.com",
-      "web": ""
+      "email": "rbreen@cimpress.com"
     }
   ],
   "dependencies": {
@@ -41,8 +40,8 @@
   },
   "licenses": [
     {
-      "name": "proprietary",
-      "url": ""
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
     }
   ]
 }

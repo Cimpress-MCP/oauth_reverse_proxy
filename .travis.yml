@@ -1,14 +1,13 @@
 language: node_js
 before_script:
-- curl -LO http://xrl.us/cpanm
-- chmod +x cpanm
-- ./cpanm Net::OAuth
+- sudo curl -LO http://xrl.us/cpanm
+- sudo chmod +x cpanm
+- sudo ./cpanm Net::OAuth
 - cd test/clients/ruby
 - bundle install
+- cd ../../../
 - sudo pip install requests-oauth
 - npm install -g bunyan
-script:
-- npm test
 deploy:
   provider: npm
   email: ryan@ryanbreen.com

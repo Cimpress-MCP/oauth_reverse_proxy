@@ -7,6 +7,8 @@ before_script:
 - bundle install
 - sudo pip install requests-oauth
 - npm install -g bunyan
+script:
+- npm test
 deploy:
   provider: npm
   email: ryan@ryanbreen.com

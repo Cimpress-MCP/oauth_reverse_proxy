@@ -7,7 +7,7 @@ before_script:
 - cd test/clients/ruby
 - bundle install
 - # Install python dep
-- pip install requests-oauth
+- sudo pip install requests-oauth
 deploy:
   provider: npm
   email: ryan@ryanbreen.com

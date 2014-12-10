@@ -1,14 +1,11 @@
 language: node_js
-before_install:
-- # Install perl node oauth
+before_script:
 - curl -LO http://xrl.us/cpanm
 - chmod +x cpanm
-- # Install ruby gem
+- ./cpanm Net::OAuth
 - cd test/clients/ruby
 - bundle install
-- # Install python dep
 - sudo pip install requests-oauth
-- # Install bunyan globally
 - npm install -g bunyan
 deploy:
   provider: npm

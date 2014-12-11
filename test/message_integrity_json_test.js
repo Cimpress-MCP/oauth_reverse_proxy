@@ -13,12 +13,12 @@ var job_server = test_server.JobServer;
 var request_sender = require('./utils/request_sender.js');
 var validation_tools = require('./utils/validation_tools.js');
 
-// All tests must require auspice_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auspice_bootstrap_test.js');
+require('./auth_proxy_bootstrap_test.js');
 
-// Validate that JSON requests and responses are properly routed through Auspice.
-describe('Auspice message integrity: JSON', function() {
+// Validate that JSON requests and responses are properly routed through oauth_reverse_proxy.
+describe('oauth_reverse_proxy message integrity: JSON', function() {
 
   ['POST', 'PUT'].forEach(function(verb) {
 

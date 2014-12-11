@@ -7,15 +7,15 @@ var job_server = require('./server/test_server.js').JobServer;
 var request_sender = require('./utils/request_sender.js');
 var validation_tools = require('./utils/validation_tools.js');
 
-// All tests must require auspice_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auspice_bootstrap_test.js');
+require('./auth_proxy_bootstrap_test.js');
 
-// This is a set of tests to validate that Auspice does not tamper with the request or response
+// This is a set of tests to validate that oauth_reverse_proxy does not tamper with the request or response
 // headers or other components of the messages that transit through the proxy.  Unlike many of
 // the other test suites, this requires that we send two requests (one authenticated and one
 // unauthenticated) to validate that there are no unexpected differences in content.
-describe('Auspice message integrity: headers', function() {
+describe('oauth_reverse_proxy message integrity: headers', function() {
 
   // Run the message integrity validations once for each verb.
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {

@@ -2,17 +2,17 @@ var should = require('should');
 var fs = require('fs');
 var request_sender = require('./utils/request_sender.js');
 
-// All tests must require auspice_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auspice_bootstrap_test.js');
+require('./auth_proxy_bootstrap_test.js');
 
 // This is a set of tests for handling whitelisted URLs.  As part of the bootstrap, we create a whitelist configuration
 // that allows /livecheck paths through the proxy unauthenticated if the verb is GET.  
 // All other verbs and other URLs using the GET verb (for example, /healthcheck) are rejected in this configuration.
 // As are all other routes off of /livecheck (e.g. /livecheck/DeleteEverything) are also rejected in this configuration.
 // This is to prevent a crafty/lazy developer from using the /livecheck route as a way to tunnel information to their 
-// underlying service without authenticating.  Auspice is, after all, a tool meant to enforce developer inconvenience.
-describe('Auspice configurable whitelist exemptions', function() {
+// underlying service without authenticating.  oauth_reverse_proxy is, after all, a tool meant to enforce developer inconvenience.
+describe('oauth_reverse_proxy configurable whitelist exemptions', function() {
 
   // Create a test case sending a url and expecting a given response.
   var create_livecheck_test = function(verb, url, expected_status_code) {

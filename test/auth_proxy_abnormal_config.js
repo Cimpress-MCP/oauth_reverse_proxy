@@ -4,7 +4,7 @@ var _ = require('underscore');
 var mkdirp = require('mkdirp');
 var rimraf = require('rimraf');
 
-var auspice = require('../lib');
+var oauth_reverse_proxy = require('../lib');
 var Proxy = require('../lib/proxy');
 
 // Start every test with an empty keys directory.
@@ -20,33 +20,33 @@ var slate_cleaner = function(done) {
   }
 };
 
-// Attempt to initiate Auspice with various forms of broken config.
-describe('Auspice config validation', function() {
+// Attempt to initiate oauth_reverse_proxy with various forms of broken config.
+describe('oauth_reverse_proxy config validation', function() {
 
-  // Before attempting to start Auspice, clean the malformed directories we need for test purposes.
+  // Before attempting to start oauth_reverse_proxy, clean the malformed directories we need for test purposes.
   beforeEach(slate_cleaner);
 
   // After we're done with all these tests and we've butchered our keys directory to a fair-thee-well,
   // kill it with fire.
   after(slate_cleaner);
 
-  it ('should reject an attempt to init Auspice with an unset config_dir parameter', function(done) {
-    auspice.init(null, function(err, proxy) {
+  it ('should reject an attempt to init oauth_reverse_proxy with an unset config_dir parameter', function(done) {
+    oauth_reverse_proxy.init(null, function(err, proxy) {
       err.should.equal('Failed to open directory ' + null);
       done();
     });
   });
 
-  it ('should reject an attempt to init Auspice with a config_dir referencing a nonexistent directory', function(done) {
-    auspice.init('./test/keys', function(err, proxy) {
+  it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a nonexistent directory', function(done) {
+    oauth_reverse_proxy.init('./test/keys', function(err, proxy) {
       err.should.equal('Failed to open directory ./test/keys');
       done();
     });
   });
 
-  it ('should reject an attempt to init Auspice with a config_dir referencing a non-directory inode', function(done) {
-    auspice.init('./test/auspice_abnormal_config.js', function(err, proxy) {
-      err.should.equal('Auspice config dir is not a directory');
+  it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a non-directory inode', function(done) {
+    oauth_reverse_proxy.init('./test/auth_proxy_abnormal_config.js', function(err, proxy) {
+      err.should.equal('oauth_reverse_proxy config dir is not a directory');
       done();
     });
   });
@@ -55,7 +55,7 @@ describe('Auspice config validation', function() {
 // Attempt to initiate a proxy with various forms of broken key directories.
 describe('Proxy config validation', function() {
 
-  // Before attempting to start Auspice, clean the malformed directories we need for test purposes.
+  // Before attempting to start oauth-reverse_proxy, clean the malformed directories we need for test purposes.
   beforeEach(slate_cleaner);
 
   // After we're done with all these tests and we've butchered our keys directory to a fair-thee-well,

@@ -2,15 +2,15 @@ var should = require('should');
 
 var request_sender = require('./utils/request_sender.js');
 
-// All tests must require auspice_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auspice_bootstrap_test.js');
+require('./auth_proxy_bootstrap_test.js');
 
 // This is a set of tests for missing OAuth components, incorrectly specified OAuth parameters, etc.  These are
-// health tests for our OAuth validations: any spurious 200s returned here represent weaknesses in Auspice's security.
-describe('Auspice OAuth validations', function() {
+// health tests for our OAuth validations: any spurious 200s returned here represent weaknesses in oauth_reverse_proxy's security.
+describe('oauth_reverse_proxy OAuth validations', function() {
 
-  // Run these tests for each verb.  While verb handling inside of Auspice is consistent and these results should
+  // Run these tests for each verb.  While verb handling inside of oauth_reverse_proxy is consistent and these results should
   // always be the same, that may not always be the case.  This is a hedge against future stupidity.
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
 
@@ -119,7 +119,7 @@ describe('Auspice OAuth validations', function() {
 
 // Tests the validator's handling of specially formatted mock-requests, allowing us to get into the weeds
 // of specific use cases that might be difficult to achieve by sending actual requests.
-describe('Auspice request validation', function() {
+describe('oauth_reverse_proxy request validation', function() {
 
   var authenticator = require('../lib/proxy/authenticator.js');
 

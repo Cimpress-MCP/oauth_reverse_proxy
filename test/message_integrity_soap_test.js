@@ -9,12 +9,12 @@ var job_server = require('./server/test_server.js').JobServer;
 var request_sender = require('./utils/request_sender.js');
 var validation_tools = require('./utils/validation_tools.js');
 
-// All tests must require auspice_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auspice_bootstrap_test.js');
+require('./auth_proxy_bootstrap_test.js');
 
-// Tests that SOAP-style messages are handled by Auspice
-describe('Auspice message integrity: SOAP', function() {
+// Tests that SOAP-style messages are handled by oauth_reverse_proxy
+describe('oauth_reverse_proxy message integrity: SOAP', function() {
 
   // Test SOAP-ish messages
   it ('should handle a SOAP request', function(done) {

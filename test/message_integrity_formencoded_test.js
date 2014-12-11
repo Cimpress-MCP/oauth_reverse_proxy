@@ -12,12 +12,12 @@ var job_server = require('./server/test_server.js').JobServer;
 var request_sender = require('./utils/request_sender.js');
 var validation_tools = require('./utils/validation_tools.js');
 
-// All tests must require auspice_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auspice_bootstrap_test.js');
+require('./auth_proxy_bootstrap_test.js');
 
-// Tests that basic, formencoded POSTs and PUTs are handled correctly by Auspice.
-describe('Auspice message integrity: formencoded', function() {
+// Tests that basic, formencoded POSTs and PUTs are handled correctly by oauth_reverse_proxy.
+describe('oauth_reverse_proxy message integrity: formencoded', function() {
 
   // Validate that a basic POST or PUT works.  Loop over each verb, running the common tests between them.
   ['POST', 'PUT'].forEach(function(verb) {
@@ -29,7 +29,7 @@ describe('Auspice message integrity: formencoded', function() {
 
     it ("should accept a properly signed " + verb + " with params", function(done) {
       job_server.once(verb + " /job", function(req, res) {
-        req.headers.should.have.property('x-vp-auspice-consumer-key', 'mocha-test-key');
+        req.headers.should.have.property('x-oauth-reverse-proxy-consumer-key', 'mocha-test-key');
         req.method.should.equal(verb);
         _.isEqual(req.body, {'submit':'ok'}).should.equal(true);
       });

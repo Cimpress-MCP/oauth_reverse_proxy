@@ -4,7 +4,7 @@ var should = require('should');
 var stream = require('stream');
 var util = require('util');
 
-exports.IGNORABLE_REQUEST_HEADERS = ['authorization', 'x-vp-auspice-consumer-key', 'content-type', 'via', 'x-vp-correlatorid'];
+exports.IGNORABLE_REQUEST_HEADERS = ['authorization', 'x-oauth-reverse-proxy-consumer-key', 'content-type', 'via', 'x-vp-correlatorid'];
 ['for', 'port', 'proto'].forEach(function(header) {
   exports.IGNORABLE_REQUEST_HEADERS.push('x-forwarded-' + header);
 });
@@ -54,7 +54,7 @@ exports.createResponseValidator = function(expected_status_code, done) {
     if (err) return done(err);
     response.statusCode.should.equal(expected_status_code);
     // Validate that all responses have a connection header of keep-alive.  For performance reasons,
-    // Auspice should never be disabling keep-alives.
+    // oauth_reverse_proxy should never be disabling keep-alives.
     response.headers.connection.should.equal('keep-alive');
     // We know that all requests to the JobServer should return {"status":"ok"}, so add that validation.
     if (expected_status_code === 200 && response.request.path.indexOf('/job') != -1) body.should.equal('{"status":"ok"}');

@@ -8,12 +8,12 @@ var header_modifier = require('../lib/proxy/header_modifier.js');
 // lives in request_sender.
 var request_sender = require('./utils/request_sender.js');
 
-// All tests must require auspice_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auspice_bootstrap_test.js');
+require('./auth_proxy_bootstrap_test.js');
 
-// This is a set of tests to validate that Auspice correctly adds the x-forwarded-* and via headers to the proxied request.
-describe('Auspice request header tampering: addition of x-forwarded-* and via', function() {
+// This is a set of tests to validate that oauth_reverse_proxy correctly adds the x-forwarded-* and via headers to the proxied request.
+describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-* and via', function() {
 
   it('should append correct headers for inbound HTTP connections', function(done) {
     // Validate that standard HTTP connection handling works.
@@ -31,7 +31,7 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
       stub_request.headers['x-forwarded-port'].should.equal('80');
       stub_request.headers['x-forwarded-for'].should.equal('10.10.10.1');
       stub_request.headers['x-forwarded-proto'].should.equal('http');
-      stub_request.headers['via'].should.equal('1.1 localhost (Auspice vtst)');
+      stub_request.headers['via'].should.equal('1.1 localhost (oauth_reverse_proxy vtst)');
       done();
     });
   });
@@ -53,7 +53,7 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
       stub_request.headers['x-forwarded-port'].should.equal('443');
       stub_request.headers['x-forwarded-for'].should.equal('10.10.10.1');
       stub_request.headers['x-forwarded-proto'].should.equal('https');
-      stub_request.headers['via'].should.equal('1.1 localhost (Auspice vtst)');
+      stub_request.headers['via'].should.equal('1.1 localhost (oauth_reverse_proxy vtst)');
       done();
     });
   });
@@ -66,7 +66,7 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
       ['x-forwarded-for', '127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
-      ['via', '1.1 localhost (Auspice vtst)']
+      ['via', '1.1 localhost (oauth_reverse_proxy vtst)']
     ];
 
     it("should add x-forwarded-* and via headers to proxied " + verb + " requests", function(done) {
@@ -88,7 +88,7 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
       ['x-forwarded-for', '127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
-      ['via', '1.1 localhost (Auspice vtst)']
+      ['via', '1.1 localhost (oauth_reverse_proxy vtst)']
     ];
 
     it("should add x-forwarded-* and via headers to proxied " + verb + " requests", function(done) {
@@ -110,7 +110,7 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
       ['x-forwarded-for', '127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
-      ['via', '1.1 localhost (Auspice vtst)']
+      ['via', '1.1 localhost (oauth_reverse_proxy vtst)']
     ];
 
     it("should add x-forwarded-* and via headers to proxied " + verb + " requests", function(done) {
@@ -132,7 +132,7 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
       ['x-forwarded-for', '10.10.56.32,127.0.0.1'],
       ['x-forwarded-port', '8888,8008'],
       ['x-forwarded-proto', 'https,http'],
-      ['via', '1.1 devlexicebun001,1.1 localhost (Auspice v' + process.env.AUSPICE_VERSION + ')']
+      ['via', '1.1 devlexicebun001,1.1 localhost (oauth_reverse_proxy vtst)']
     ];
 
     // The x-forwarded-proto header being HTTPs indicates to us that the original request was HTTPs and the only
@@ -161,8 +161,8 @@ describe('Auspice request header tampering: addition of x-forwarded-* and via', 
   });
 });
 
-// This is a set of tests to validate that Auspice correctly modifies the host header in the proxied request.
-describe('Auspice request header tampering: host', function() {
+// This is a set of tests to validate that oauth_reverse_proxy correctly modifies the host header in the proxied request.
+describe('oauth_reverse_proxy request header tampering: host', function() {
 
   // All of the below requests
   var stub_request;

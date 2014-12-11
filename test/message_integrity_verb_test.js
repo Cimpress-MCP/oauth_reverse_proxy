@@ -3,12 +3,12 @@
 var request_sender = require('./utils/request_sender.js');
 var validation_tools = require('./utils/validation_tools.js');
 
-// All tests must require auspice_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auspice_bootstrap_test.js');
+require('./auth_proxy_bootstrap_test.js');
 
-// Tests that verbs are handled correctly by Auspice
-describe('Auspice message integrity: verbs', function() {
+// Tests that verbs are handled correctly by oauth_reverse_proxy
+describe('oauth_reverse_proxy message integrity: verbs', function() {
 
   // GETs and DELETEs have the same URL format and do not expect input, so test them both in a loop.
   ['GET', 'DELETE'].forEach(function(verb) {

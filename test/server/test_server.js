@@ -15,7 +15,7 @@ app.DELETE = app.delete;
 
 const CONSUMER_KEY_HEADER = require('../../lib/proxy/authenticator.js').CONSUMER_KEY_HEADER;
 
-// The job server represents a simple RESTful server we might expect to see behind Auspice.
+// The job server represents they types of servers we might expect to see behind oauth_reverse_proxy.
 function JobServer() {
   var this_obj = this;
 

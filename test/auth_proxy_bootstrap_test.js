@@ -5,7 +5,7 @@ var rimraf = require('rimraf');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 
-var auspice = require('../lib');
+var oauth_reverse_proxy = require('../lib');
 var keygen = require('../utils/keygen.js');
 var request_sender = require('./utils/request_sender.js');
 
@@ -22,13 +22,13 @@ beforeEach(function() {
   if (job_server) job_server.removeAllListeners();
 });
 
-// Create an Auspice proxy, and validate that it works properly even if there is no server
+// Create an oauth_reverse_proxy, and validate that it works properly even if there is no server
 // running behind it.  Once this is done, start a server.  After the completion of this
 // test, the preconditions for all other test cases are in place.  Thus, every test case
-// must require auspice_bootstrap_test.
-describe('Auspice Bootstrap', function() {
+// must require auth_bootstrap_test.
+describe('oauth_reverse_proxy bootstrap', function() {
 
-  // Before starting Auspice, create the keys we need for test clients.
+  // Before starting our oauth_reverse_proxy, create the keys we need for test clients.
   before(function(done) {
     rimraf('./test/keys/8008/8080', function(err) {
       mkdirp('./test/keys/8008/8080', function(err) {
@@ -90,8 +90,8 @@ describe('Auspice Bootstrap', function() {
 
   // Test that the proxy starts and loads all the keys created in the before function.
   it ('should start cleanly', function(done) {
-    auspice.init('./test/config.d', function(err, proxies) {
-      if (err) done('Auspice startup failed: ' + err);
+    oauth_reverse_proxy.init('./test/config.d', function(err, proxies) {
+      if (err) done('oauth_reverse_proxy startup failed: ' + err);
       exports.proxy = proxies["jobs_service.json"];
 
       if (typeof exports.proxy === 'string') {

@@ -1,4 +1,7 @@
 language: node_js
+env:
+  global:
+    secure: h8myQFUZqVexi+BnkHHe+ehcO+J0qKPKpGHwlIGTVqoVTUbEijMDyhNUbin5SROpibpg2cY/NtscpNNppdd9OMz+TnNveK1oDce0uwRGpzdqBy8XF0zqfj5BvxIWIZ5ix2zvXYXmsMyV5XMaR7fQDlKe8w7Uds8hADpZoVAeE1w=
 before_script:
 - sudo curl -LO http://xrl.us/cpanm
 - sudo chmod +x cpanm

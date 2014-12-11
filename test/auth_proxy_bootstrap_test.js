@@ -62,28 +62,9 @@ describe('oauth_reverse_proxy bootstrap', function() {
                   });
                 });
               });
-			});
+            });
           });
-        });
-        
-        fs.writeFile('./test/keys/8008/8080/config.json', JSON.stringify({
-          whitelist: {
-              paths: [
-              {
-                  path: "/livecheck",
-                  methods: "GET"
-              },
-              {
-                  path: "/whitelist/[\\d]+",
-                  methods: ["PUT","GET"]
-              },
-              {
-                  path: "/things/[\\w]+/details",
-                  methods: ["PUT"]
-              }]
-          }
-        }));
-        
+        });        
       });
     });
   });
@@ -92,6 +73,7 @@ describe('oauth_reverse_proxy bootstrap', function() {
   it ('should start cleanly', function(done) {
     oauth_reverse_proxy.init('./test/config.d', function(err, proxies) {
       if (err) done('oauth_reverse_proxy startup failed: ' + err);
+      exports.proxies = proxies;
       exports.proxy = proxies["jobs_service.json"];
 
       if (typeof exports.proxy === 'string') {
@@ -101,6 +83,21 @@ describe('oauth_reverse_proxy bootstrap', function() {
       // Turn the proxy.keys object into an array to get its length
       exports.proxy.keys.count.should.be.exactly(13);
       done();
+    });
+  });
+
+  // Validate that none of the busted config files were loaded.
+  [
+    'unnamed_service.json',
+    'no_from_port_service.json', 'no_to_port_service.json',
+    'equal_ports_service.json',
+    'nonnumeric_from_port_service.json', 'nonnumeric_to_port_service.json', 
+    'negative_from_port_service.json', 'negative_to_port_service.json',
+    'giant_from_port_service.json', 'giant_to_port_service.json'
+  ].forEach(function(invalid_config_file) {
+    it ('should reject invalid proxy config file ' + invalid_config_file, function() {
+      var msg = exports.proxies[invalid_config_file];
+      (typeof msg).should.equal('string');
     });
   });
 

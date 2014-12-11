@@ -6,6 +6,7 @@ var rimraf = require('rimraf');
 
 var oauth_reverse_proxy = require('../lib');
 var Proxy = require('../lib/proxy');
+var ProxyConfig = require('../lib/proxy/config.js');
 
 // Start every test with an empty keys directory.
 var slate_cleaner = function(done) {
@@ -62,9 +63,6 @@ describe('Proxy config validation', function() {
   // kill it with fire.
   after(slate_cleaner);
 
-  // TODO: Add tests for all other properties of ProxyConfig
-  // TODO: Validate that a proxy is not created when ProxyConfig is not valid
-
   it ('should reject an attempt to init a proxy with an unreadable to_port directory', function(done) {
     mkdirp('./test/keys/8008/', function() {
       fs.writeFile('./test/keys/8008/8080', 'Das ist nicht ein Directory', function(err) {
@@ -75,5 +73,26 @@ describe('Proxy config validation', function() {
         });
       });
     });
+  });
+
+  // Validate all forms of proxy config error.
+  [
+    { 'filename': 'unnamed_service.json', 'expected_error': 'Proxy configuration lacks service_name'},
+    { 'filename': 'no_from_port_service.json', 'expected_error': 'Proxy configuration lacks from_port'},
+    { 'filename': 'no_to_port_service.json', 'expected_error': 'Proxy configuration lacks to_port'},
+    { 'filename': 'equal_ports_service.json', 'expected_error': 'from_port and to_port can not be identical'},
+    { 'filename': 'nonnumeric_from_port_service.json', 'expected_error': 'from_port must be a number'},
+    { 'filename': 'nonnumeric_to_port_service.json', 'expected_error': 'to_port must be a number'},
+    { 'filename': 'negative_from_port_service.json', 'expected_error': 'from_port must be a valid port number'},
+    { 'filename': 'negative_to_port_service.json', 'expected_error': 'to_port must be a valid port number'},
+    { 'filename': 'giant_from_port_service.json', 'expected_error': 'from_port must be a valid port number'},
+    { 'filename': 'giant_to_port_service.json', 'expected_error': 'to_port must be a valid port number'}
+  ].forEach(function(validation) {
+    it ('should reject a proxy config with error: ' + validation.expected_error, function() {
+      var config_json = JSON.parse(fs.readFileSync('./test/config.d/' + validation.filename, {'encoding':'utf8'}));
+      var proxy_config = new ProxyConfig(config_json);
+      proxy_config.isInvalid().should.equal(validation.expected_error);
+    });
+
   });
 });

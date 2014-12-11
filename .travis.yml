@@ -12,10 +12,10 @@ before_script:
 - sudo pip install requests-oauth
 - npm install -g bunyan
 - cp sendToCoveralls.js node_modules/coveralls/lib/
+script:
+- npm run coveralls
 deploy:
   provider: npm
   email: ryan@ryanbreen.com
   api_key:
     secure: HhcCSWt/gIavho8apRa3+8UWgAesoJ1o2dvbhROviIZ+XNYBm5qCo1dfTH9d5hhaOVVVXe7rKLcqwru57fahXefU7gzPu78FuBQA5ipQnwQCZg8tLPVrq9FRGYUXOd/e/Al7NB9yVLaP6ji4KHC0lNUsEGMeo9mrH0hpKy9mc+k=
-after_success:
-- node_modules/coveralls/bin/coveralls.js < reports/lcov.info

@@ -21,6 +21,7 @@
     "benchmark": "^1.0.0",
     "body-parser": "1.0.2",
     "compression": "1.0.6",
+    "coveralls": "^2.11.2",
     "express": "4.0.0",
     "istanbul": "0.2.11",
     "method-override": "1.0.2",
@@ -34,9 +35,8 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/_mocha --reporter spec -t 10000 test | bunyan",
-    "test_win": ".\\node_modules\\mocha\\bin\\_mocha --reporter spec -t 10000 test",
-    "cov": "XUNIT_FILE=\"reports/TESTS-xunit.xml\" node_modules/.bin/istanbul cover --root . -x node_modules -x test --dir ./reports ./node_modules/.bin/_mocha -- --reporter xunit-file -t 10000 test",
-    "cov_win": "SET XUNIT_FILE=reports\\TESTS-xunit.xml& .\\node_modules\\.bin\\istanbul.cmd cover --root . -x node_modules -x test --dir reports .\\node_modules\\mocha\\bin\\_mocha -- --reporter xunit-file -t 10000 test"
+    "cov": "`npm bin`/istanbul cover --root . -x node_modules -x test --dir ./reports `npm bin`/_mocha -- --reporter spec -t 10000 test",
+    "coveralls": "npm run cov && node_modules/coveralls/bin/coveralls.js < reports/lcov.info"
   },
   "licenses": [
     {

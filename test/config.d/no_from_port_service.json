@@ -1,0 +1,9 @@
+{
+	"service_name": "no_from_port_service",
+	"to_port": 8080,
+	"oauth_secret_dir": "./test/keys/8008/8080/",
+	"required_uris": [
+		"/getProducts","/uploads","/multipart","/chunked","/compressed","/job","/live","/health","/transactions"
+	],
+	"required_hosts": [ "localhost" ] 
+}

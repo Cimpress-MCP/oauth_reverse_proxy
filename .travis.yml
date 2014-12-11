@@ -11,6 +11,7 @@ before_script:
 - cd ../../../
 - sudo pip install requests-oauth
 - npm install -g bunyan
+- cp sendToCoveralls.js node_modules/coveralls/lib/
 deploy:
   provider: npm
   email: ryan@ryanbreen.com

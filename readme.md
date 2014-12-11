@@ -9,3 +9,7 @@ npm install
 #### build status
 
 ![Travis Build](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy.svg)
+
+#### coverage
+
+[![Coverage Status](https://img.shields.io/coveralls/Cimpress-MCP/oauth_reverse_proxy.svg)](https://coveralls.io/r/Cimpress-MCP/oauth_reverse_proxy?branch=master)

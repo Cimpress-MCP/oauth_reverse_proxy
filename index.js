@@ -9,7 +9,7 @@ if (process.env.OAUTH_REVERSE_PROXY_HOME) {
 }
 
 var oauth_reverse_proxy = require('./lib');
-var logger = require('./lib/logger.js');
+var logger = require('./lib/logger.js').getLogger();
 
 /**
  * The config path can be provided as an environemnt variable.  If not rpvoided, we chose

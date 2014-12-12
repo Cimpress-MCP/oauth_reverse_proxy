@@ -1,5 +1,5 @@
-{
-	"whitelist": [{
+[
+	{
 		"methods": ["GET","POST"],
 		"path": "/livecheck"
 	},{
@@ -8,5 +8,5 @@
 	},{
 		"methods": ["DELETE","POST"],
 		"path": "/v2/another/route"
-	}]
-}
+	}
+]

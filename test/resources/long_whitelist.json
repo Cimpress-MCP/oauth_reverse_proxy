@@ -1,5 +1,4 @@
-{
-	"whitelist": [{
+[{
 		"path": "/livecheck"
 	},
 	{
@@ -43,5 +42,5 @@
 	{
 		"path": "/things/\\d+/s",
 		"methods": ["PUT"]
-	}]
-}
+	}
+]

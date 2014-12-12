@@ -1,1 +1,0 @@
-0.8.*  # The '*' character is replaced by the build number

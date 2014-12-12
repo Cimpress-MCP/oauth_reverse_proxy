@@ -35,6 +35,12 @@
 		"methods": ["PUT"]
 	},
 	{
+		"invalid": "but ignored"
+	},
+	{
+		"methods": ["GET"]
+	},
+	{
 		"path": "/things/\\d+/s",
 		"methods": ["PUT"]
 	}]

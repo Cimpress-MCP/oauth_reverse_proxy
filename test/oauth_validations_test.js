@@ -1,5 +1,6 @@
 var should = require('should');
 
+var authenticator = require('../lib/proxy/authenticator.js');
 var request_sender = require('./utils/request_sender.js');
 
 // All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
@@ -121,13 +122,17 @@ describe('oauth_reverse_proxy OAuth validations', function() {
 // of specific use cases that might be difficult to achieve by sending actual requests.
 describe('oauth_reverse_proxy request validation', function() {
 
-  var authenticator = require('../lib/proxy/authenticator.js');
+  // Create a stub proxy to pass into our validator functions.  This needs to expose a logger and a set of keys.
+  var stub_proxy = {
+    keys: {'mock_key':'mock_secret'},
+    logger : require('../lib/logger.js').getLogger({'service_name': 'oauth_reverse_proxy request validation test'})
+  };
 
   // The request validator function used in the connect workflow for node-http-proxy.
-  var request_validator = authenticator.requestValidator();
+  var request_validator = authenticator.requestValidator(stub_proxy);
 
   // The oauth validator function used in the connect workflow for node-http-proxy.
-  var oauth_validator = authenticator.oauthValidator({'mock_key':'mock_secret'});
+  var oauth_validator = authenticator.oauthValidator(stub_proxy);
 
   // Create a mock response that can be used to validate that the correct failure states are registered.
   var create_res = function(done, expected_code, expected_message) {
@@ -161,17 +166,6 @@ describe('oauth_reverse_proxy request validation', function() {
 
     var req = {};
     req.headers = {'host':'localhost'};
-
-    // Attempt to validate a hopelessly flawed request.
-    request_validator(req, res, null);
-  });
-
-  it ('should reject a request with no url even though that should never ever happen', function(done) {
-    var res = create_res(done, 400, 'Invalid request');
-
-    var req = {};
-    req.headers = {'host':'localhost'};
-    req.method = 'GET';
 
     // Attempt to validate a hopelessly flawed request.
     request_validator(req, res, null);

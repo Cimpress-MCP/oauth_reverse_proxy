@@ -1,67 +1,9 @@
-var Whitelist = require('../../lib/whitelist.js').Whitelist
+var fs = require('fs');
 
-var config_short = {
-	whitelist: {
-        methods: ["GET"],
-		paths: [
-		{
-			path: "/livecheck"
-		},
-		{
-			path: "/resources/item",
-			methods: "PUT"
-		},
-		{
-			path: "/v2/another/route",
-			methods: ["DELETE","POST"]
-		}]
-	}
-}
+var Whitelist = require('../../lib/proxy/whitelist.js');
 
-var config_long = {
-	whitelist: {
-		paths: [
-		{
-			path: "/livecheck"
-		},
-		{
-			path: "/resources/item",
-			methods: "PUT"
-		},
-		{
-			path: "/v2/another/route",
-			methods: ["DELETE","POST"]
-		},
-		{
-			path: "/things/details",
-			methods: ["PUT"]
-		},
-		{
-			path: "/things/etails",
-			methods: ["PUT"]
-		},
-		{
-			path: "/things/tails",
-			methods: ["PUT"]
-		},
-		{
-			path: "/things/ails",
-			methods: ["PUT"]
-		},
-		{
-			path: "/things/ils",
-			methods: ["PUT"]
-		},
-		{
-			path: "/things/ls",
-			methods: ["PUT"]
-		},
-		{
-			path: "/things/[\\d]/s",
-			methods: ["PUT"]
-		}]
-	}
-}
+var config_short = JSON.parse(fs.readFileSync('./test/resources/short_whitelist.json', {'encoding':'utf8'}));
+var config_long = JSON.parse(fs.readFileSync('./test/resources/long_whitelist.json', {'encoding':'utf8'}));
 
 var req_simple = { method: "GET",
     parsed_url: {

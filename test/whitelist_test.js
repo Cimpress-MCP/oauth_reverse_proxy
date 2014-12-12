@@ -2,6 +2,8 @@ var should = require('should');
 var fs = require('fs');
 var request_sender = require('./utils/request_sender.js');
 
+var Whitelist = require('../lib/proxy/whitelist.js');
+
 // All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
 require('./auth_proxy_bootstrap_test.js');
@@ -27,10 +29,42 @@ describe('oauth_reverse_proxy configurable whitelist exemptions', function() {
    'http://localhost:8008/liveCheck', 'http://localhost:8008/livecheck/CrashProduction'].forEach(function(url) {
      // Create unit tests to validate that we accept all GETs and reject everything else.
      ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
-       if (verb === 'GET' && url.toLowerCase() === 'http://localhost:8008/livecheck' )
+       if (verb === 'GET' && (url.toLowerCase() === 'http://localhost:8008/livecheck' || url.toLowerCase() === 'http://localhost:8008/healthcheck') )
          it ("should allow GET " + url + " through without authentication", create_livecheck_test(verb, url, 200));
       else
         it ("should reject " + verb + "s to " + url + " URLs that lack authentication", create_livecheck_test(verb, url, 400));
     });
   });
+
+  var config_short = JSON.parse(fs.readFileSync('./test/resources/short_whitelist.json', {'encoding':'utf8'}));
+  var config_long = JSON.parse(fs.readFileSync('./test/resources/long_whitelist.json', {'encoding':'utf8'}));
+
+  it ("should support blanket method matching", function() {
+    var whitelist_short = new Whitelist(config_short);
+    whitelist_short.applyWhitelist({
+      method: "GET",
+      parsed_url: {
+        pathname: "/livecheck"
+      }
+    }).should.equal(true);
+  });
+
+  it ("should support path matching", function() {
+    var whitelist_short = new Whitelist(config_short);
+    whitelist_short.applyWhitelist({
+      method: "POST",
+      parsed_url: {
+        pathname: "/livecheck"
+      }
+    }).should.equal(true);
+
+    var whitelist_long = new Whitelist(config_long);
+    whitelist_long.applyWhitelist({
+      method: "PUT",
+      parsed_url: {
+        pathname: "/things/123/s"
+      }
+    }).should.equal(true);
+  });
+
 });

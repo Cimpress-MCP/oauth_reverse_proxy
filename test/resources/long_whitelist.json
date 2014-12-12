@@ -1,0 +1,41 @@
+{
+	"whitelist": [{
+		"path": "/livecheck"
+	},
+	{
+		"path": "/resources/item",
+		"methods": [ "PUT" ]
+	},
+	{
+		"path": "/v2/another/route",
+		"methods": ["DELETE","POST"]
+	},
+	{
+		"path": "/things/details",
+		"methods": ["PUT"]
+	},
+	{
+		"path": "/things/etails",
+		"methods": ["PUT"]
+	},
+	{
+		"path": "/things/tails",
+		"methods": ["PUT"]
+	},
+	{
+		"path": "/things/ails",
+		"methods": ["PUT"]
+	},
+	{
+		"path": "/things/ils",
+		"methods": ["PUT"]
+	},
+	{
+		"path": "/things/ls",
+		"methods": ["PUT"]
+	},
+	{
+		"path": "/things/\\d+/s",
+		"methods": ["PUT"]
+	}]
+}

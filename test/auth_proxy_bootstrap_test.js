@@ -88,7 +88,7 @@ describe('oauth_reverse_proxy bootstrap', function() {
 
   // Validate that none of the busted config files were loaded.
   [
-    'unnamed_service.json',
+    '1999_called_service.xml', 'unnamed_service.json',
     'no_from_port_service.json', 'no_to_port_service.json',
     'equal_ports_service.json',
     'nonnumeric_from_port_service.json', 'nonnumeric_to_port_service.json', 

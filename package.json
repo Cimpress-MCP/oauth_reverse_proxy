@@ -1,7 +1,7 @@
 {
   "name": "oauth_reverse_proxy",
   "description": "An OAuth 1.0a authenticating reverse proxy",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "contributors": [
     {
       "name": "Ryan Breen",

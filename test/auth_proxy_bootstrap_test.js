@@ -64,7 +64,7 @@ describe('oauth_reverse_proxy bootstrap', function() {
               });
             });
           });
-        });        
+        });
       });
     });
   });
@@ -91,7 +91,7 @@ describe('oauth_reverse_proxy bootstrap', function() {
     '1999_called_service.xml', 'unnamed_service.json',
     'no_from_port_service.json', 'no_to_port_service.json',
     'equal_ports_service.json',
-    'nonnumeric_from_port_service.json', 'nonnumeric_to_port_service.json', 
+    'nonnumeric_from_port_service.json', 'nonnumeric_to_port_service.json',
     'negative_from_port_service.json', 'negative_to_port_service.json',
     'giant_from_port_service.json', 'giant_to_port_service.json'
   ].forEach(function(invalid_config_file) {

@@ -6,5 +6,5 @@
 	"required_uris": [
 		"/getProducts","/uploads","/multipart","/chunked","/compressed","/job","/live","/health","/transactions"
 	],
-	"required_hosts": [ "localhost" ] 
+	"required_hosts": [ "localhost" ]
 }

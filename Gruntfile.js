@@ -22,14 +22,14 @@ module.exports = function(grunt){
             }
         }
     });
-    
-    grunt.loadNpmTasks('grunt-benchmark');    
+
+    grunt.loadNpmTasks('grunt-benchmark');
     grunt.loadNpmTasks('grunt-env');
     grunt.loadNpmTasks('grunt-nodemon');
-    
+
     grunt.registerTask('default', function() {
         grunt.task.run('env:common');
-       
+
         if(/^win/.test(process.platform)) {
             grunt.task.run('env:win');
             grunt.task.run('nodemon');

@@ -25,7 +25,7 @@ function JobServer() {
       console.log('%s with key %s', verb, req.headers[CONSUMER_KEY_HEADER]);
       this_obj.emit(verb + " /job", req, res);
       res.send({'status':'ok'});
-    });    
+    });
   });
 
   app.get("/livecheck", function(req, res) {
@@ -135,7 +135,7 @@ function JobServer() {
       };
       poll_file();
     });
-  });  
+  });
 }
 
 // Configure JobServer as an event emitter and export a new instance.

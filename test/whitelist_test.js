@@ -9,10 +9,10 @@ var Whitelist = require('../lib/proxy/whitelist.js');
 require('./auth_proxy_bootstrap_test.js');
 
 // This is a set of tests for handling whitelisted URLs.  As part of the bootstrap, we create a whitelist configuration
-// that allows /livecheck paths through the proxy unauthenticated if the verb is GET.  
+// that allows /livecheck paths through the proxy unauthenticated if the verb is GET.
 // All other verbs and other URLs using the GET verb (for example, /healthcheck) are rejected in this configuration.
 // As are all other routes off of /livecheck (e.g. /livecheck/DeleteEverything) are also rejected in this configuration.
-// This is to prevent a crafty/lazy developer from using the /livecheck route as a way to tunnel information to their 
+// This is to prevent a crafty/lazy developer from using the /livecheck route as a way to tunnel information to their
 // underlying service without authenticating.  oauth_reverse_proxy is, after all, a tool meant to enforce developer inconvenience.
 describe('oauth_reverse_proxy configurable whitelist exemptions', function() {
 

@@ -24,7 +24,7 @@ module.exports = {
     name: "Whitelist Parsing",
     tests: {
         'Blanket method matching': function(){
-            whitelist_short.applyWhitelist({ 
+            whitelist_short.applyWhitelist({
                 method: "GET",
                 parsed_url: {
                         pathname: "/livecheck"
@@ -32,7 +32,7 @@ module.exports = {
             });
         },
         'Path matching on a short list': function(){
-            whitelist_short.applyWhitelist({ 
+            whitelist_short.applyWhitelist({
                 method: "POST",
                 parsed_url: {
                     pathname: "/livecheck"
@@ -40,7 +40,7 @@ module.exports = {
             });
         },
         'Path matching on a long list': function(){
-            whitelist_long.applyWhitelist({ 
+            whitelist_long.applyWhitelist({
                 method: "PUT",
                 parsed_url: {
                     pathname: "/things/123/s"

@@ -1,13 +1,17 @@
 {
   "name": "oauth_reverse_proxy",
   "description": "An OAuth 1.0a authenticating reverse proxy",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "contributors": [
     {
       "name": "Ryan Breen",
       "email": "rbreen@cimpress.com"
     }
   ],
+  "repository" : {
+    "type": "git",
+    "url": "git://github.com/Cimpress-MCP/oauth_reverse_proxy.git"
+  },
   "dependencies": {
     "bunyan": "^1.2.3",
     "connect": "2.14.4",

@@ -8,8 +8,9 @@ before_script:
 - cd ../../../
 - sudo pip install requests-oauth
 - npm install -g bunyan
+- npm install -g grunt grunt-cli
 script:
-- `npm bin`/grunt benchmark
+- grunt benchmark
 - npm run coveralls
 deploy:
   provider: npm

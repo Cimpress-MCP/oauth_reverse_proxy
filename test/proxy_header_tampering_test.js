@@ -19,7 +19,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
     // Validate that standard HTTP connection handling works.
     var stub_request = {
       headers: {
-        host: 'prdlexbun001.vistaprint.svc'
+        host: 'test.cimpress.com'
       },
       connection: {
         remoteAddress: '10.10.10.1'
@@ -40,7 +40,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
     // Validate that SSL-specific handling works.  HTTPs connections must have the connection.pair set to be a realistic test.
     var stub_request = {
       headers: {
-        host: 'prdlexbun001.vistaprint.svc'
+        host: 'test.cimpress.com'
       },
       connection: {
         remoteAddress: '10.10.10.1',
@@ -63,7 +63,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
 
     var expected_headers = [
       ['host', 'localhost:8080'],
-      ['x-forwarded-for', '127.0.0.1'],
+      ['x-forwarded-for', '::ffff:127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
       ['via', '1.1 localhost (oauth_reverse_proxy vtst)']
@@ -85,7 +85,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
 
     var expected_headers = [
       ['host', 'localhost:8080'],
-      ['x-forwarded-for', '127.0.0.1'],
+      ['x-forwarded-for', '::ffff:127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
       ['via', '1.1 localhost (oauth_reverse_proxy vtst)']
@@ -107,7 +107,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
 
     var expected_headers = [
       ['host', 'localhost:8080'],
-      ['x-forwarded-for', '127.0.0.1'],
+      ['x-forwarded-for', '::ffff:127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
       ['via', '1.1 localhost (oauth_reverse_proxy vtst)']
@@ -169,7 +169,7 @@ describe('oauth_reverse_proxy request header tampering: host', function() {
   beforeEach(function() {
     stub_request = {
       headers: {
-        host: 'prdlexbun001.vistaprint.svc:8000'
+        host: 'test.cimpress.com:8000'
       }
     };
   });
@@ -177,7 +177,7 @@ describe('oauth_reverse_proxy request header tampering: host', function() {
   it('should support modifying a host header from a custom port to another custom port', function(done) {
     var host_header_modifier = header_modifier.modifyHostHeaders(8000, 8888);
     host_header_modifier(stub_request, null, function() {
-      stub_request.headers.host.should.equal('prdlexbun001.vistaprint.svc:8888');
+      stub_request.headers.host.should.equal('test.cimpress.com:8888');
       done();
     });
   });
@@ -185,7 +185,7 @@ describe('oauth_reverse_proxy request header tampering: host', function() {
   it('should support modifying the host header even when the from port isn\'t present in the original host header', function(done) {
     var host_header_modifier = header_modifier.modifyHostHeaders(4000, 8888);
     host_header_modifier(stub_request, null, function() {
-      stub_request.headers.host.should.equal('prdlexbun001.vistaprint.svc:8888');
+      stub_request.headers.host.should.equal('test.cimpress.com:8888');
       done();
     });
   });
@@ -194,16 +194,16 @@ describe('oauth_reverse_proxy request header tampering: host', function() {
     it("should support modifying a host header from a custom port to a standard port (" + port + ")", function(done) {
       var host_header_modifier = header_modifier.modifyHostHeaders(8000, port);
       host_header_modifier(stub_request, null, function() {
-        stub_request.headers.host.should.equal('prdlexbun001.vistaprint.svc');
+        stub_request.headers.host.should.equal('test.cimpress.com');
         done();
       });
     });
 
     it("should support modifying a host header from a standard port (" + port + ") to a custom port", function(done) {
-      stub_request.headers.host = 'prdlexbun001.vistaprint.svc';
+      stub_request.headers.host = 'test.cimpress.com';
       var host_header_modifier = header_modifier.modifyHostHeaders(port, 8000);
       host_header_modifier(stub_request, null, function() {
-        stub_request.headers.host.should.equal('prdlexbun001.vistaprint.svc:8000');
+        stub_request.headers.host.should.equal('test.cimpress.com:8000');
         done();
       });
     });
@@ -211,7 +211,7 @@ describe('oauth_reverse_proxy request header tampering: host', function() {
     it("should support modifying to standard port " + port + " even when the from port isn\'t present in the original host header", function(done) {
       var host_header_modifier = header_modifier.modifyHostHeaders(4000, port);
       host_header_modifier(stub_request, null, function() {
-        stub_request.headers.host.should.equal('prdlexbun001.vistaprint.svc');
+        stub_request.headers.host.should.equal('test.cimpress.com');
         done();
       });
     });

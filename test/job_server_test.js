@@ -27,6 +27,13 @@ describe('Job Server', function() {
     });
   });
 
+  // Run tests for unauthenticated requests on IPv6
+  ['GET', 'DELETE'].forEach(function(verb) {
+    it ('should return a valid response to an IPv6 ' + verb, function(done) {
+      request_sender.sendRequest(verb, 'http://[::]:8080/job/unauthenticated_uri', null, 200, done);
+    });
+  });
+
   // Run tessts for unauthenticated POSTs and PUTs
   ['PUT', 'POST'].forEach(function(verb) {
     it ('should return a valid response to formencoded ' + verb, function(done) {

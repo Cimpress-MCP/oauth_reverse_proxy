@@ -148,7 +148,7 @@ exports.init = function(port, cb) {
   // If we're already initted, drop out here.
   if (initted) return cb();
   initted = true;
-  app.listen(port, 'localhost', function(err) {
+  app.listen(port, '::', function(err) {
     cb(err);
   });
 };

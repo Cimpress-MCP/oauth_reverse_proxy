@@ -18,10 +18,21 @@ describe('oauth_reverse_proxy message integrity: verbs', function() {
       request_sender.sendSimpleAuthenticatedRequest(verb, 200, done);
     });
 
+    // Validate that a basic GET or DELETE over IPv6 works.
+    it ("should accept a properly signed " + verb + " over IPv6", function(done) {
+      request_sender.sendAuthenticatedRequest(verb, 'http://[::1]:8008/job/12345', {hostname: '[::1]'}, 200, done);
+    });
+
     // Validate that a GET or DELETE with query parameters works.
     it ("should accept a properly signed " + verb + " with query", function(done) {
       request_sender.params.push(['query', 'ok']);
       request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/job/12345?query=ok', null, 200, done);
+    });
+
+    // Validate that a GET or DELETE over IPv6 with query parameters works.
+    it ("should accept a properly signed " + verb + " over IPv6 with query", function(done) {
+      request_sender.params.push(['query', 'ok']);
+      request_sender.sendAuthenticatedRequest(verb, 'http://[::1]:8008/job/12345?query=ok', {hostname: '[::1]'}, 200, done);
     });
 
     // Validate that a GET or DELETE with unsigned query parameters fails due to signature mismatch.

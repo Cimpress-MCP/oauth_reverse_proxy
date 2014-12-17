@@ -18,16 +18,16 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
 
 ###### Configuration Format
 
-{
-    "service_name": "jobsservice",
-    "from_port": 8008,
-    "to_port": 8080,
-    "oauth_secret_dir": "./test/keys/8008/8080/",
-    "required_uris": [
-        "/getProducts","/uploads","/multipart","/chunked","/compressed","/job","/live","/health","/transactions"
-    ],
-    "required_hosts": [ "localhost", "::1" ]
-}
+    {
+        "service_name": "jobsservice",
+        "from_port": 8008,
+        "to_port": 8080,
+        "oauth_secret_dir": "./test/keys/8008/8080/",
+        "required_uris": [
+            "/getProducts","/uploads","/multipart","/chunked","/compressed","/job","/live","/health","/transactions"
+        ],
+        "required_hosts": [ "localhost", "::1" ]
+    }
 
 
 #### build status

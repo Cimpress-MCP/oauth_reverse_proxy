@@ -10,7 +10,7 @@ oauth_reverse_proxy is an authenticating service proxy that fronts any web serve
 
 A few key features and design principles:
 
-* Faithfully implements the OAuth spec: This means that any client OAuth library you wish to use will work fine with `oauth_reverse_proxy`.  The (test/clients)[test/cilents] directory has sample code in 9 languages.
+* Faithfully implements the OAuth spec: This means that any client OAuth library you wish to use will work fine with `oauth_reverse_proxy`.  The [test/clients](test/cilents) directory has sample code in 9 languages.
 * Built to perform: A single node can authenticate around 10k requests per second on reasonable hardware.
 
 ##### A Note About the Security Model

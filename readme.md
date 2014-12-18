@@ -21,7 +21,7 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
 
 ##### Configuration
 
-`oauth_reverse_proxy` looks for configuration files in either the location specified in the `OAUTH_REVERSE_PROXY_CONFIG_PATH` environment variable.  Each json file in that directory will be treated as the description of a proxy to run.
+`oauth_reverse_proxy` looks for configuration files in either the location specified in the `OAUTH_REVERSE_PROXY_CONFIG_PATH` environment variable.  Each json file in that directory will be treated as the description of a proxy to run.  Config files are only loaded on start.  Invalid proxy config files are ignored and logged; they do not cause a total failure of `oauth_reverse_proxy`.
 
 ###### Configuration Format
 

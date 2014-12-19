@@ -63,7 +63,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
 
     var expected_headers = [
       ['host', 'localhost:8080'],
-      ['x-forwarded-for', '::ffff:127.0.0.1'],
+      ['x-forwarded-for', '127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
       ['via', '1.1 localhost (oauth_reverse_proxy vtst)']
@@ -85,7 +85,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
 
     var expected_headers = [
       ['host', 'localhost:8080'],
-      ['x-forwarded-for', '::ffff:127.0.0.1'],
+      ['x-forwarded-for', '127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
       ['via', '1.1 localhost (oauth_reverse_proxy vtst)']
@@ -107,7 +107,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
 
     var expected_headers = [
       ['host', 'localhost:8080'],
-      ['x-forwarded-for', '::ffff:127.0.0.1'],
+      ['x-forwarded-for', '127.0.0.1'],
       ['x-forwarded-port', '8008'],
       ['x-forwarded-proto', 'http'],
       ['via', '1.1 localhost (oauth_reverse_proxy vtst)']

@@ -36,6 +36,9 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
         "required_hosts": [ "localhost", "::1" ]
     }
 
+The following fields are required in a proxy configuration file:
+
+***service_name*** - This should be the name of the service for which we are proxying.  This is used for logging to separate log lines from multiple proxies running within the same process.
 
 #### build status
 

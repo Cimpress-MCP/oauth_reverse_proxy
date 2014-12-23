@@ -38,7 +38,10 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
 
 The following fields are required in a proxy configuration file:
 
-***service_name*** - This should be the name of the service for which we are proxying.  This is used for logging to separate log lines from multiple proxies running within the same process.
+**service_name** - The name of the service for which we are proxying.  This is used for logging to separate log lines from multiple proxies running within the same process.
+**from_port** - The port this proxy will open to the outside world.  All inbound traffic to your service should be directed to this port to ensure that only authenticated requests reach your application.
+**to_port** - The port to which this proxy will route authenticated traffic.  This should be a port exposed by your application on the localhost interface so that unauthenticated traffic can not reach your application.
+**oauth_secret_dir** - The directory in which consumer key / consumer secret pairs live.  The name of each file in this directory is the consumer key, and the trimmed contents are the consumer secret.
 
 #### build status
 

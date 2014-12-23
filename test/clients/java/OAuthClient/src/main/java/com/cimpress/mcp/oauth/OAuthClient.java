@@ -32,7 +32,7 @@ public class OAuthClient {
 		
 		HttpPost request = new HttpPost(url.toURI());
 		List<NameValuePair> params = new LinkedList<NameValuePair>();
-		// TODO: The below line doesn't work because Java SignPost can't handle query and post
+		// NOTE: The below line doesn't work because Java SignPost can't handle query and post
 		// params with the same name.
 		// params.add(new BasicNameValuePair("this", "post"));
 		params.add(new BasicNameValuePair("post", "happy"));

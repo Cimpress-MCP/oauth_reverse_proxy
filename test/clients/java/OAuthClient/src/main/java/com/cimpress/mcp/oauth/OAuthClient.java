@@ -1,4 +1,4 @@
-package com.vistaprint.auspice;
+package com.cimpress.mcp.oauth;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +18,7 @@ import org.apache.http.message.BasicNameValuePair;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 
-public class Client {
+public class OAuthClient {
 	private static final String CONSUMER_KEY = "java-test-key";
 
 	public static void main(String[] args) throws Exception {

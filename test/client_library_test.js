@@ -37,8 +37,8 @@ describe('Client library tests', function() {
 
   it ('should support requests from java', function(done) {
     var javaTest = create_client_test('POST',
-      'java -cp target/AuspiceClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.vistaprint.auspice.Client',
-      'test/clients/java/AuspiceClient', 'java-test-key')
+      'java -cp target/OAuthClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.cimpress.mcp.oauth.OAuthClient',
+      'test/clients/java/OAuthClient', 'java-test-key')
     javaTest(done);
   });
 

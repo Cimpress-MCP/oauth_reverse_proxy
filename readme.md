@@ -33,7 +33,7 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
         "required_uris": [
             "/getProducts","/uploads","/multipart","/chunked","/compressed","/job","/live","/health","/transactions"
         ],
-        "required_hosts": [ "localhost", "::1" ]
+        "required_hosts": [ "myapp.company.com" ]
     }
 
 The following fields are required in a proxy configuration file:
@@ -45,6 +45,12 @@ The following fields are required in a proxy configuration file:
 **to_port** - The port to which this proxy will route authenticated traffic.  This should be a port exposed by your application on the localhost interface so that unauthenticated traffic can not reach your application.
 
 **oauth_secret_dir** - The directory in which consumer key / consumer secret pairs live.  The name of each file in this directory is the consumer key, and the trimmed contents are the consumer secret.
+
+The following fields are optional:
+
+**required_uris** - Sometimes you may have a situation where `oauth_reverse_proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the requested route.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a URI in this list.  This is to prevent client applications from authenticating against your proxy but accessing routes that shouldn't be accessible by this proxy.  The entries in `require_uris` are substrings, not regexes, and they are only considered to match if they match from the start of the route.
+
+**required_hosts** - Sometimes you may have a situation where `oauth_reverse_proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the `Host` header.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a host in this list.  This is to prevent client applications from authenticating against your proxy but accessing hosts that shouldn't be accessible by this proxy.  The entries in `require_hosts` must exactly match the `Host` header of the inbound request, or the request will be rejected..
 
 #### build status
 

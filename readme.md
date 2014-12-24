@@ -31,9 +31,9 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
         "to_port": 8080,
         "oauth_secret_dir": "./test/keys/8008/8080/",
         "required_uris": [
-            "/getProducts","/uploads","/multipart","/chunked","/compressed","/job","/live","/health","/transactions"
+            "/job"
         ],
-        "required_hosts": [ "myapp.company.com" ]
+        "required_hosts": [ "api.cimpress.com" ]
     }
 
 The following fields are required in a proxy configuration file:

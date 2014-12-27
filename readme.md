@@ -33,7 +33,17 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
         "required_uris": [
             "/job"
         ],
-        "required_hosts": [ "api.cimpress.com" ]
+        "required_hosts": [ "api.cimpress.com" ],
+        "whitelist": [
+            {
+                "path": "/livecheck",
+                "methods": [ "GET" ]
+            },
+            {
+                "path": "/healthcheck",
+                "methods": [ "GET" ]
+            }
+        ]
     }
 
 The following fields are required in a proxy configuration file:
@@ -50,7 +60,11 @@ The following fields are optional:
 
 **required_uris** - Sometimes you may have a situation where `oauth_reverse_proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the requested route.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a URI in this list.  This is to prevent client applications from authenticating against your proxy but accessing routes that shouldn't be accessible by this proxy.  The entries in `require_uris` are substrings, not regexes, and they are only considered to match if they match from the start of the route.
 
-**required_hosts** - Sometimes you may have a situation where `oauth_reverse_proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the `Host` header.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a host in this list.  This is to prevent client applications from authenticating against your proxy but accessing hosts that shouldn't be accessible by this proxy.  The entries in `require_hosts` must exactly match the `Host` header of the inbound request, or the request will be rejected..
+**required_hosts** - Sometimes you may have a situation where `oauth_reverse_proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the `Host` header.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a host in this list.  This is to prevent client applications from authenticating against your proxy but accessing hosts that shouldn't be accessible by this proxy.  The entries in `require_hosts` must exactly match the `Host` header of the inbound request, or the request will be rejected.
+
+**required_hosts** - Sometimes you may have a situation where `oauth_reverse_proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the `Host` header.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a host in this list.  This is to prevent client applications from authenticating against your proxy but accessing hosts that shouldn't be accessible by this proxy.  The entries in `require_hosts` must exactly match the `Host` header of the inbound request, or the request will be rejected.
+
+**whitelist** - Whitelist is an array of whitelist config objects.
 
 #### build status
 

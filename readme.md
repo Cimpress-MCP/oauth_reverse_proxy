@@ -1,5 +1,9 @@
 oauth_reverse_proxy is an authenticating service proxy that fronts any web server and enforces that callers present the correct OAuth credentials.  
 
+##### Motivation
+
+Authenticaton for web applications, particularly applications created for machine-to-machine use, is often an afterthought or implemented in an insecure or incompatible fashion.  We want a robust implementation of OAuth that can run on Windows or Unix systems in front of any HTTP-serving application and negotiated by clients written in any language.
+
 ##### Installation
 
 `npm install oauth_reverse_proxy`

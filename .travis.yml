@@ -15,5 +15,7 @@ script:
 deploy:
   provider: npm
   email: ryan@ryanbreen.com
+  on:
+    tags: true
   api_key:
     secure: HhcCSWt/gIavho8apRa3+8UWgAesoJ1o2dvbhROviIZ+XNYBm5qCo1dfTH9d5hhaOVVVXe7rKLcqwru57fahXefU7gzPu78FuBQA5ipQnwQCZg8tLPVrq9FRGYUXOd/e/Al7NB9yVLaP6ji4KHC0lNUsEGMeo9mrH0hpKy9mc+k=

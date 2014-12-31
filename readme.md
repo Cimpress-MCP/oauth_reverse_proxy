@@ -52,7 +52,7 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
 
 The following fields are required in a proxy configuration file:
 
-**service_name** - The name of the service for which we are proxying.  This is used for logging to separate log lines from multiple proxies running within the same process.
+**service_name** - The name of the service for which we are proxying.  This is used in logging to disambiguate messages for multiple proxies running within the same process.
 
 **from_port** - The port this proxy will open to the outside world.  All inbound traffic to your service should be directed to this port to ensure that only authenticated requests reach your application.
 

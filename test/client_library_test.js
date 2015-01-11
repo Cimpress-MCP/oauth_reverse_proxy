@@ -30,6 +30,8 @@ var create_client_test = function(verb, cmd, cwd, key) {
 // functionality to validate that requests can be sent through auth_proxy properly using various languages.
 describe('Client library tests', function() {
 
+  // TODO: Refactor these tests so they auto-detect if they can be run on the host system.
+
   it ('should support requests from Ruby clients', function(done) {
     var rubyTest = create_client_test('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
     rubyTest(done);

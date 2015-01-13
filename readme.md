@@ -70,6 +70,10 @@ The following fields are optional:
 
 Whitelist is an array of config objects, each defining a path regex and a set of methods.  For a request to be considered valid, it must match both components.  For example, a `path` of "/livecheck" and a `methods` array containing only "GET" would whitelist any `GET` request against the URL path `/livecheck`.  Keep in mind that the regex is interpreted as being between `^` and `$`, so the entire path must match this regex.  A request for `/livecheck/test/a` would be rejected.  If either path or method are omitted, it is assumed that all paths or methods match.
 
+#### Planned Features ####
+
+You can find the TODO list for upcoming features [here](todo.md).
+
 #### build status
 
 ![Travis Build](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy.svg)

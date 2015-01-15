@@ -81,7 +81,7 @@ describe('oauth_reverse_proxy bootstrap', function() {
       }
 
       // Turn the proxy.keys object into an array to get its length
-      exports.proxy.keys.count.should.be.exactly(13);
+      exports.proxy.keystore.count.should.be.exactly(13);
       done();
     });
   });

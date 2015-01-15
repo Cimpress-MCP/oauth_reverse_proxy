@@ -18,6 +18,7 @@ A few key features and design principles:
 * Built to perform: A single node can authenticate around 10k requests per second on reasonable hardware.
 * Flexible enough to front multiple services: If you run more than one HTTP server per system, as is common in the case of an nginx-fronted application, you can put an instance of `oauth_reverse_proxy` either in front of or behind nginx.  A single instance of `oauth_reverse_proxy` can bind a separate proxy to any number of inbound ports.
 * Supports configurable whitelisting: You likely have a load balancer that needs to perform health-checks against your application without performing authentication.  `oauth_reverse_proxy` supports regex-based whitelists, so you can configure an un-authenticated path through to only those routes.
+* Supports a quota per key, allowing you to define that a given key should only be allowed to make a certain number of hits per a given time interval.
 
 ##### A Note About the Security Model
 
@@ -47,7 +48,16 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
                 "path": "/healthcheck",
                 "methods": [ "GET" ]
             }
-        ]
+        ],
+        "quotas": {
+            "default_threshold": 10,
+            "interval": 60,
+            "thresholds" : [{
+                "privileged_consumer" : 1000
+            },{
+                "unprivileged_consumer" : 1
+            }]
+        }
     }
 
 The following fields are required in a proxy configuration file:
@@ -69,6 +79,14 @@ The following fields are optional:
 **whitelist** - Sometimes you might want certain routes to be accessible without authentication.  For example, if you expose a health check route to an upstream load balancer, it's unlikely that the load balancer will be able to authenticate those requests.  In these cases, you can whitelist those specific routes that should not require authentication, and `oauth_reverse_proxy` will pass any matching request through to your application.
 
 Whitelist is an array of config objects, each defining a path regex and a set of methods.  For a request to be considered valid, it must match both components.  For example, a `path` of "/livecheck" and a `methods` array containing only "GET" would whitelist any `GET` request against the URL path `/livecheck`.  Keep in mind that the regex is interpreted as being between `^` and `$`, so the entire path must match this regex.  A request for `/livecheck/test/a` would be rejected.  If either path or method are omitted, it is assumed that all paths or methods match.
+
+**quotas** The default behavior of `oauth_reverse_proxy` is to allow an unlimited number of requests per key, but sometimes you want to constrain the volume of requests that can be made by consumers.  The quotas object lets you define thresholds for an allowable volume of hits per key per unit time. 
+
+`interval` specifies the time interval for which quotas apply: an interval of 1 means our quotas are hits-per-second while an interval of 60 specifies hits-per-minute.
+
+The `default_threshold` parameter gives us a catch-all for any key that is not given a specific threshold.  If undefined, keys that lack specific thresholds are allowed to make an unbounded number of requests.  In the example above, keys lacking defined thresholds are allowed to make 10 requests per minute.
+
+The `thresholds` array contains 0 or more mappings from a consumer key name to the acceptable threshold for that key.  In the example above, the consumer_key "privileged_key" is allowed to make 1000 requests per second while "unprivileged_key" can only make 1 request per minute.
 
 #### Planned Features ####
 

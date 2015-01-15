@@ -2,7 +2,7 @@ var _ = require('underscore');
 
 var job_server = require('./server/test_server.js').JobServer;
 
-var header_modifier = require('../lib/proxy/header_modifier.js');
+var forward_header_mutator = require('../lib/proxy/mutators/forward_header_mutator.js')();
 
 // All the messy business of creating and sending requests (both authenticated and unauthenticated)
 // lives in request_sender.
@@ -26,8 +26,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
       }
     };
 
-    var xforwarder = header_modifier.applyXForwardedHeaders();
-    xforwarder(stub_request, null, function() {
+    forward_header_mutator(stub_request, null, function() {
       stub_request.headers['x-forwarded-port'].should.equal('80');
       stub_request.headers['x-forwarded-for'].should.equal('10.10.10.1');
       stub_request.headers['x-forwarded-proto'].should.equal('http');
@@ -48,8 +47,7 @@ describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-
       }
     };
 
-    var xforwarder = header_modifier.applyXForwardedHeaders();
-    xforwarder(stub_request, null, function() {
+    forward_header_mutator(stub_request, null, function() {
       stub_request.headers['x-forwarded-port'].should.equal('443');
       stub_request.headers['x-forwarded-for'].should.equal('10.10.10.1');
       stub_request.headers['x-forwarded-proto'].should.equal('https');
@@ -175,16 +173,16 @@ describe('oauth_reverse_proxy request header tampering: host', function() {
   });
 
   it('should support modifying a host header from a custom port to another custom port', function(done) {
-    var host_header_modifier = header_modifier.modifyHostHeaders(8000, 8888);
-    host_header_modifier(stub_request, null, function() {
+    var host_header_mutator = require('../lib/proxy/mutators/host_header_mutator.js')({config:{from_port: 8000, to_port: 8888}});
+    host_header_mutator(stub_request, null, function() {
       stub_request.headers.host.should.equal('test.cimpress.com:8888');
       done();
     });
   });
 
   it('should support modifying the host header even when the from port isn\'t present in the original host header', function(done) {
-    var host_header_modifier = header_modifier.modifyHostHeaders(4000, 8888);
-    host_header_modifier(stub_request, null, function() {
+    var host_header_mutator = require('../lib/proxy/mutators/host_header_mutator.js')({config:{from_port: 4000, to_port: 8888}});
+    host_header_mutator(stub_request, null, function() {
       stub_request.headers.host.should.equal('test.cimpress.com:8888');
       done();
     });
@@ -192,8 +190,8 @@ describe('oauth_reverse_proxy request header tampering: host', function() {
 
   [80, 443].forEach(function(port) {
     it("should support modifying a host header from a custom port to a standard port (" + port + ")", function(done) {
-      var host_header_modifier = header_modifier.modifyHostHeaders(8000, port);
-      host_header_modifier(stub_request, null, function() {
+      var host_header_mutator = require('../lib/proxy/mutators/host_header_mutator.js')({config:{from_port: 8000, to_port: port}});
+      host_header_mutator(stub_request, null, function() {
         stub_request.headers.host.should.equal('test.cimpress.com');
         done();
       });
@@ -201,16 +199,16 @@ describe('oauth_reverse_proxy request header tampering: host', function() {
 
     it("should support modifying a host header from a standard port (" + port + ") to a custom port", function(done) {
       stub_request.headers.host = 'test.cimpress.com';
-      var host_header_modifier = header_modifier.modifyHostHeaders(port, 8000);
-      host_header_modifier(stub_request, null, function() {
+      var host_header_mutator = require('../lib/proxy/mutators/host_header_mutator.js')({config:{from_port: port, to_port: 8000}});
+      host_header_mutator(stub_request, null, function() {
         stub_request.headers.host.should.equal('test.cimpress.com:8000');
         done();
       });
     });
 
     it("should support modifying to standard port " + port + " even when the from port isn\'t present in the original host header", function(done) {
-      var host_header_modifier = header_modifier.modifyHostHeaders(4000, port);
-      host_header_modifier(stub_request, null, function() {
+      var host_header_mutator = require('../lib/proxy/mutators/host_header_mutator.js')({config:{from_port: 4000, to_port: port}});
+      host_header_mutator(stub_request, null, function() {
         stub_request.headers.host.should.equal('test.cimpress.com');
         done();
       });

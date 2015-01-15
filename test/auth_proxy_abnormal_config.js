@@ -66,7 +66,7 @@ describe('Proxy config validation', function() {
   it ('should reject an attempt to init a proxy with an unreadable to_port directory', function(done) {
     mkdirp('./test/keys/8008/', function() {
       fs.writeFile('./test/keys/8008/8080', 'Das ist nicht ein Directory', function(err) {
-        var proxy = new Proxy({'from_port': 8008, 'to_port': 8080, 'oauth_secret_dir': './test/keys/8008/8080'});
+        var proxy = new Proxy(new ProxyConfig({'from_port': 8008, 'to_port': 8080, 'oauth_secret_dir': './test/keys/8008/8080'}));
         proxy.start(function(err) {
           err.should.startWith('Failed to read key directory ');
           done();

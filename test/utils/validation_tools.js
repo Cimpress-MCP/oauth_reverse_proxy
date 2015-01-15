@@ -52,7 +52,7 @@ module.exports.compareHeaders = function(auth, unauth, keys_to_ignore) {
 exports.createResponseValidator = function(expected_status_code, done) {
   return function(err, response, body) {
     if (err) return done(err);
-    response.statusCode.should.equal(expected_status_code);
+    if (expected_status_code) response.statusCode.should.equal(expected_status_code);
     // Validate that all responses have a connection header of keep-alive.  For performance reasons,
     // oauth_reverse_proxy should never be disabling keep-alives.
     response.headers.connection.should.equal('keep-alive');

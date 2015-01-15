@@ -1,5 +1,3 @@
-var authenticator = require('../../lib/proxy/authenticator.js');
-
 var proxy = {
   // no-op logging
   logger: {
@@ -14,12 +12,16 @@ var proxy = {
     }
   },
   config: {},
-  keys: {
-    'test-key': 'test-secret'
+  keystore: {
+    keys: {
+      'test-key': 'test-secret'
+    }
   }
 };
 
-var validator = authenticator.oauthValidator(proxy);
+var parse_url = require('../../lib/proxy/mutators/url_parser.js')(proxy);
+var collect_oauth_params = require('../../lib/proxy/mutators/oauth_param_collector.js')(proxy);
+var validate_oauth_signature = require('../../lib/proxy/validators/oauth_signature_validator.js')(proxy);
 
 var res = {
   send: function() {},
@@ -42,9 +44,9 @@ module.exports = {
         }
       };
 
-      // This will add parsed_url to req_to_auth
-      authenticator.urlParser()(req_to_auth, null, function() {});
-      validator(req_to_auth, res, function() {});
+      parse_url(req_to_auth, res, function() {});
+      collect_oauth_params(req_to_auth, res, function() {});
+      validate_oauth_signature(req_to_auth, res, function() {});
     }
   }
 }

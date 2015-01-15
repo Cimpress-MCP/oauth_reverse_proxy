@@ -1,6 +1,5 @@
 var should = require('should');
 
-var authenticator = require('../lib/proxy/authenticator.js');
 var request_sender = require('./utils/request_sender.js');
 
 // All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
@@ -124,15 +123,15 @@ describe('oauth_reverse_proxy request validation', function() {
 
   // Create a stub proxy to pass into our validator functions.  This needs to expose a logger and a set of keys.
   var stub_proxy = {
-    keys: {'mock_key':'mock_secret'},
+    keystore: { keys: {'mock_key':'mock_secret'} },
     logger : require('../lib/logger.js').getLogger({'service_name': 'oauth_reverse_proxy request validation test'})
   };
 
   // The request validator function used in the connect workflow for node-http-proxy.
-  var request_validator = authenticator.requestValidator(stub_proxy);
+  var request_validator = require('../lib/proxy/validators/request_sanity_validator.js')(stub_proxy);
 
   // The oauth validator function used in the connect workflow for node-http-proxy.
-  var oauth_validator = authenticator.oauthValidator(stub_proxy);
+  var oauth_validator = require('../lib/proxy/validators/oauth_signature_validator.js')(stub_proxy);
 
   // Create a mock response that can be used to validate that the correct failure states are registered.
   var create_res = function(done, expected_code, expected_message) {

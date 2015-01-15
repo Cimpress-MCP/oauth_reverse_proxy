@@ -12,9 +12,9 @@ describe('oauth_reverse_proxy key loader', function() {
       keygen.createKey('./test/keys', 8008, 8080, 'dynamic-key2', function(err) {
         if (err) done(err);
         var check_key = function() {
-          if (auth_proxy_bootstrap_test.proxy.keys['dynamic-key']) {
+          if (auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key']) {
             // Turn the proxy.keys object into an array to get its length
-            auth_proxy_bootstrap_test.proxy.keys.count.should.be.exactly(15);
+            auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(15);
             done();
           } else setTimeout(check_key, 50);
         };
@@ -28,10 +28,10 @@ describe('oauth_reverse_proxy key loader', function() {
     keygen.createKey('./test/keys', 8008, 8080, 'dynamic-key', 'happy-fun-key', function(err) {
       if (err) done(err);
       var check_key = function() {
-        if (auth_proxy_bootstrap_test.proxy.keys['dynamic-key'] === 'happy-fun-key') {
+        if (auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key'] === 'happy-fun-key') {
           // Turn the proxy.keys object into an array to get its length
-          auth_proxy_bootstrap_test.proxy.keys.count.should.be.exactly(15);
-          auth_proxy_bootstrap_test.proxy.keys['dynamic-key'].should.equal('happy-fun-key');
+          auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(15);
+          auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key'].should.equal('happy-fun-key');
           done();
         } else setTimeout(check_key, 50);
       };
@@ -45,10 +45,10 @@ describe('oauth_reverse_proxy key loader', function() {
       fs.unlink('./test/keys/8008/8080/dynamic-key2', function(err) {
         if (err) done(err);
         var check_key = function() {
-          if (auth_proxy_bootstrap_test.proxy.keys['dynamic-key']) setTimeout(check_key, 50);
+          if (auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key']) setTimeout(check_key, 50);
           else {
             // Turn the proxy.keys object into an array to get its length
-            auth_proxy_bootstrap_test.proxy.keys.count.should.be.exactly(13);
+            auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(13);
             done();
           }
         };

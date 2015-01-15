@@ -12,8 +12,10 @@ var proxy = {
     }
   },
   config: {},
-  keys: {
-    'test-key': 'test-secret'
+  keystore: {
+    keys: {
+      'test-key': 'test-secret'
+    }
   }
 };
 

@@ -123,7 +123,7 @@ describe('oauth_reverse_proxy request validation', function() {
 
   // Create a stub proxy to pass into our validator functions.  This needs to expose a logger and a set of keys.
   var stub_proxy = {
-    keys: {'mock_key':'mock_secret'},
+    keystore: { keys: {'mock_key':'mock_secret'} },
     logger : require('../lib/logger.js').getLogger({'service_name': 'oauth_reverse_proxy request validation test'})
   };
 

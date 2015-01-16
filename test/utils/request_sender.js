@@ -88,8 +88,7 @@ var prepare_auth_credentials = function(renderFn) {
 
   // Pull the secret corresponding to the key used in this request.  Most commonly, this will be mocha-test-key's
   // secret, but we have the option of using other keys for other tests (to validate that things like quotas work).
-  var secret = exports.keys[params[0][1]];
-  if (!secret) secret = 'bogus-secret'
+  var secret = exports.keys[params[0][1]] || 'bogus-secret';
   oauth_headers.push(['oauth_signature', signString(secret, signature_base)]);
   return renderFn();
 };

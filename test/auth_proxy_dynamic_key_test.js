@@ -14,7 +14,7 @@ describe('oauth_reverse_proxy key loader', function() {
         var check_key = function() {
           if (auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key']) {
             // Turn the proxy.keys object into an array to get its length
-            auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(15);
+            auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(16);
             done();
           } else setTimeout(check_key, 50);
         };
@@ -30,7 +30,7 @@ describe('oauth_reverse_proxy key loader', function() {
       var check_key = function() {
         if (auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key'].secret === 'happy-fun-key') {
           // Turn the proxy.keys object into an array to get its length
-          auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(15);
+          auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(16);
           done();
         } else setTimeout(check_key, 50);
       };
@@ -47,7 +47,7 @@ describe('oauth_reverse_proxy key loader', function() {
           if (auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key']) setTimeout(check_key, 50);
           else {
             // Turn the proxy.keys object into an array to get its length
-            auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(13);
+            auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(14);
             done();
           }
         };

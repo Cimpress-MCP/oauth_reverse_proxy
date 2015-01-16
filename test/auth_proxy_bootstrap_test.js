@@ -49,8 +49,11 @@ describe('oauth_reverse_proxy bootstrap', function() {
                                     // Keys that are expected to be rejected
                                     keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) {
                                       keygen.createKey('./test/keys', 8008, 8080, 'bytes-test-key', crypto.randomBytes(256), function(err) {
-                                        request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
-                                        request_sender.quota_secret = fs.readFileSync('./test/keys/8008/8080/quota-test-key') + '&';
+                                        // This is the secret we'll use for signing ad hoc requests for test cases.
+                                        request_sender.keys['mocha-test-key'] = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
+                                        // This is the secret we'll use for testing higher quotas.  This key is allowed to make 5 requests
+                                        // per second to the proxy defined in quota_service.json.
+                                        request_sender.keys['quota-test-key'] = fs.readFileSync('./test/keys/8008/8080/quota-test-key') + '&';
                                         done(err);
                                       });
                                     });

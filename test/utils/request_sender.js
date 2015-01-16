@@ -22,12 +22,7 @@ var zlib = require('zlib');
 
 var validation_tools = require('./validation_tools.js');
 
-// This is the secret we'll use for signing ad hoc requests for test cases.
-exports.mocha_secret;
-
-// This is the secret we'll use for testing higher quotas.  This key is allowed to make 5 requests
-// per second to the proxy defined in quota_service.json.
-exports.quota_secret;
+exports.keys = {};
 
 // Set and export constants for configuring the way auth credentials are delivered in our test
 // cases.  OAuth credentials can be delivered by Authorization header or Query-String, and, less
@@ -91,7 +86,10 @@ var prepare_auth_credentials = function(renderFn) {
   signature_components[2] = encoding.encodeData(renderParams(params, '&', param_renderer));
   var signature_base = signature_components.join('&');
 
-  var secret = params[0][1] === 'quota-test-key' ? exports.quota_secret : exports.mocha_secret;
+  // Pull the secret corresponding to the key used in this request.  Most commonly, this will be mocha-test-key's
+  // secret, but we have the option of using other keys for other tests (to validate that things like quotas work).
+  var secret = exports.keys[params[0][1]];
+  if (!secret) secret = 'bogus-secret'
   oauth_headers.push(['oauth_signature', signString(secret, signature_base)]);
   return renderFn();
 };

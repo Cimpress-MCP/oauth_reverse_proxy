@@ -5,6 +5,9 @@
 	"oauth_secret_dir": "./test/keys/8008/8080/",
 	"quotas" : {
 		"default_threshold": "1",
-		"interval": "1"
+		"interval": "1",
+		"thresholds" : {
+			"mocha-test-key" : 1
+		}
 	}
 }

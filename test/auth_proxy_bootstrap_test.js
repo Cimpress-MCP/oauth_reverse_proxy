@@ -50,6 +50,7 @@ describe('oauth_reverse_proxy bootstrap', function() {
                                     keygen.createKey('./test/keys', 8008, 8080, 'escapechars-test-key', ';!@#$%^', function(err) {
                                       keygen.createKey('./test/keys', 8008, 8080, 'bytes-test-key', crypto.randomBytes(256), function(err) {
                                         request_sender.mocha_secret = fs.readFileSync('./test/keys/8008/8080/mocha-test-key') + '&';
+                                        request_sender.quota_secret = fs.readFileSync('./test/keys/8008/8080/quota-test-key') + '&';
                                         done(err);
                                       });
                                     });

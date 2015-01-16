@@ -25,6 +25,10 @@ var validation_tools = require('./validation_tools.js');
 // This is the secret we'll use for signing ad hoc requests for test cases.
 exports.mocha_secret;
 
+// This is the secret we'll use for testing higher quotas.  This key is allowed to make 5 requests
+// per second to the proxy defined in quota_service.json.
+exports.quota_secret;
+
 // Set and export constants for configuring the way auth credentials are delivered in our test
 // cases.  OAuth credentials can be delivered by Authorization header or Query-String, and, less
 // standardly, in the body of a POST.  We want to test all 3 while defaulting to Auth header.
@@ -86,8 +90,9 @@ var prepare_auth_credentials = function(renderFn) {
   signature_components[1] = encoding.encodeData(signature_components[1]);
   signature_components[2] = encoding.encodeData(renderParams(params, '&', param_renderer));
   var signature_base = signature_components.join('&');
-  // console.log("signature_base:\n%s", signature_base);
-  oauth_headers.push(['oauth_signature', signString(exports.mocha_secret, signature_base)]);
+
+  var secret = params[0][1] === 'quota-test-key' ? exports.quota_secret : exports.mocha_secret;
+  oauth_headers.push(['oauth_signature', signString(secret, signature_base)]);
   return renderFn();
 };
 

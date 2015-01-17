@@ -7,7 +7,6 @@
 		"default_threshold": "1",
 		"interval": "1",
 		"thresholds" : {
-			"mocha-test-key" : 1,
 			"quota-test-key" : 5
 		}
 	}

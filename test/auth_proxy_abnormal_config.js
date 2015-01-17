@@ -77,9 +77,9 @@ describe('Proxy config validation', function() {
 
   // Validate all forms of proxy config error.
   [
-    { 'filename': 'unnamed_service.json', 'expected_error': 'Proxy configuration lacks service_name'},
-    { 'filename': 'no_from_port_service.json', 'expected_error': 'Proxy configuration lacks from_port'},
-    { 'filename': 'no_to_port_service.json', 'expected_error': 'Proxy configuration lacks to_port'},
+    { 'filename': 'unnamed_service.json', 'expected_error': 'proxy configuration lacks service_name'},
+    { 'filename': 'no_from_port_service.json', 'expected_error': 'proxy configuration lacks from_port'},
+    { 'filename': 'no_to_port_service.json', 'expected_error': 'proxy configuration lacks to_port'},
     { 'filename': 'equal_ports_service.json', 'expected_error': 'from_port and to_port can not be identical'},
     { 'filename': 'nonnumeric_from_port_service.json', 'expected_error': 'from_port must be a number'},
     { 'filename': 'nonnumeric_to_port_service.json', 'expected_error': 'to_port must be a number'},

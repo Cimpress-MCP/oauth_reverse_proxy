@@ -1,0 +1,13 @@
+{
+	"service_name": "quota_jobsservice",
+	"from_port": 8009,
+	"to_port": 8080,
+	"oauth_secret_dir": "./test/keys/8008/8080/",
+	"quotas" : {
+		"default_threshold": "1",
+		"interval": "1",
+		"thresholds" : {
+			"bogus-key" : 0
+		}
+	}
+}

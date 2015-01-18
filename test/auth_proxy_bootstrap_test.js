@@ -99,7 +99,10 @@ describe('oauth_reverse_proxy bootstrap', function() {
     'equal_ports_service.json',
     'nonnumeric_from_port_service.json', 'nonnumeric_to_port_service.json',
     'negative_from_port_service.json', 'negative_to_port_service.json',
-    'giant_from_port_service.json', 'giant_to_port_service.json'
+    'giant_from_port_service.json', 'giant_to_port_service.json',
+    'nonnumeric_quota_default_threshold_service.json', 'nonnumeric_quota_interval_service.json',
+    'nonnumeric_quota_key_threshold_service.json', 'nonpositive_quota_default_threshold_service.json',
+    'nonpositive_quota_key_threshold_service.json', 'subsecond_quota_interval_service.json'
   ].forEach(function(invalid_config_file) {
     it ('should reject invalid proxy config file ' + invalid_config_file, function() {
       var msg = exports.proxies[invalid_config_file];

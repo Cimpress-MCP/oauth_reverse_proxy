@@ -92,7 +92,11 @@ describe('Proxy config validation', function() {
     { 'filename': 'negative_from_port_service.json', 'expected_error': 'from_port must be a valid port number'},
     { 'filename': 'negative_to_port_service.json', 'expected_error': 'to_port must be a valid port number'},
     { 'filename': 'giant_from_port_service.json', 'expected_error': 'from_port must be a valid port number'},
-    { 'filename': 'giant_to_port_service.json', 'expected_error': 'to_port must be a valid port number'}
+    { 'filename': 'giant_to_port_service.json', 'expected_error': 'to_port must be a valid port number'},
+    { 'filename': 'no_ssl_cert_service.json', 'expected_error': 'no ssl cert file provided'},
+    { 'filename': 'no_ssl_key_service.json', 'expected_error': 'no ssl key file provided'},
+    { 'filename': 'invalid_ssl_cert_service.json', 'expected_error': 'https cert file ./test/resources/cert_oops.pem does not exist'},
+    { 'filename': 'invalid_ssl_key_service.json', 'expected_error': 'https key file ./test/resources/key_oops.pem does not exist'}
   ].forEach(function(validation) {
     it ('should reject a proxy config with error: ' + validation.expected_error, function() {
       var config_json = JSON.parse(fs.readFileSync('./test/config.d/' + validation.filename, {'encoding':'utf8'}));

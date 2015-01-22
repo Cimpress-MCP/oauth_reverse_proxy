@@ -1,0 +1,14 @@
+{
+	"service_name": "no_to_port_service",
+	"from_port": 8008,
+	"to_port": 8080,
+	"https": {
+		"key" : "./test/resources/key_oops.pem",
+		"cert" : "./test/resources/cert.pem"
+	},
+	"oauth_secret_dir": "./test/keys/8008/8080/",
+	"required_uris": [
+		"/getProducts","/uploads","/multipart","/chunked","/compressed","/job","/live","/health","/transactions"
+	],
+	"required_hosts": [ "localhost" ]
+}

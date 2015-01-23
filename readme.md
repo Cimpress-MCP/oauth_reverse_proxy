@@ -58,6 +58,10 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
             },{
                 "unprivileged_consumer" : 1
             }]
+        },
+        "https": {
+            "key": "/var/lib/ssl/key.pem",
+            "cert": "/var/lib/ssl/cert.pem"
         }
     }
 
@@ -88,6 +92,8 @@ Whitelist is an array of config objects, each defining a path regex and a set of
 The `default_threshold` parameter gives us a catch-all for any key that is not given a specific threshold.  If undefined, keys that lack specific thresholds are allowed to make an unbounded number of requests.  In the example above, keys lacking defined thresholds are allowed to make 10 requests per minute.
 
 The `thresholds` array contains 0 or more mappings from a consumer key name to the acceptable threshold for that key.  In the example above, the consumer_key "privileged_key" is allowed to make 1000 requests per second while "unprivileged_key" can only make 1 request per minute.
+
+**https** The default behavior of `oauth_reverse_proxy` is to listen on an HTTP socket.  If you wish to use HTTPS instead, you must specify an `https` object in the configuration for the proxy, providing a path to both a key and certificate pem file.
 
 #### Planned Features ####
 

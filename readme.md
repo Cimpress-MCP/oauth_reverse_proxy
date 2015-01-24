@@ -93,7 +93,7 @@ The `default_threshold` parameter gives us a catch-all for any key that is not g
 
 The `thresholds` array contains 0 or more mappings from a consumer key name to the acceptable threshold for that key.  In the example above, the consumer_key "privileged_key" is allowed to make 1000 requests per second while "unprivileged_key" can only make 1 request per minute.
 
-**https** The default behavior of `oauth_reverse_proxy` is to listen on an HTTP socket.  If you wish to use HTTPS instead, you must specify an `https` object in the configuration for the proxy, providing a path to both a key and certificate pem file.
+**https** The default behavior of `oauth_reverse_proxy` is to listen on an HTTP socket.  If you wish to use HTTPS instead, you must specify an `https` object in the configuration for the proxy, providing a path to both a key and certificate pem file.  Note that both a key and cert must be provided or the proxy will not be created.
 
 #### Planned Features ####
 

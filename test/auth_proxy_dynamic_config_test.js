@@ -28,7 +28,7 @@ var copy_file = function(source, target, cb) {
   }
 };
 
-describe('oauth_reverse_proxy key loader', function() {
+describe('oauth_reverse_proxy config loader', function() {
 
   it ('should support adding proxies dynamically', function(done) {
     copy_file('./test/resources/dynamic_config_service.orig.json', './test/config.d/dynamic_config_service.json', function(err) {
@@ -42,22 +42,18 @@ describe('oauth_reverse_proxy key loader', function() {
     });
   });
 
-/**
-  it ('should support updating keys dynamically', function(done) {
-    keygen.createKey('./test/keys', 8008, 8080, 'dynamic-key', 'happy-fun-key', function(err) {
-      if (err) done(err);
-      var check_key = function() {
-        if (auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key'].secret === 'happy-fun-key') {
-          // Turn the proxy.keys object into an array to get its length
-          auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(16);
-          done();
-        } else setTimeout(check_key, 50);
+  it ('should support updating proxies dynamically', function(done) {
+    copy_file('./test/resources/dynamic_config_service.next.json', './test/config.d/dynamic_config_service.json', function(err) {
+      if (err) return done(err);
+      var check_config = function() {
+        if (auth_proxy_bootstrap_test.proxies['dynamic_config_service.json'].config.from_port == 8011) {
+          request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 200, done);
+        } else setTimeout(check_config, 50);
       };
-
-      check_key();
+      check_config();
     });
   });
-
+/**
   it ('should support removing keys dynamically', function(done) {
     fs.unlink('./test/keys/8008/8080/dynamic-key', function(err) {
       fs.unlink('./test/keys/8008/8080/dynamic-key2', function(err) {

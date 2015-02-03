@@ -64,12 +64,13 @@ describe('oauth_reverse_proxy config loader', function() {
     fs.unlink('./test/config.d/dynamic_config_service.json', function(err) {
       if (err) done(err);
       var check_config = function() {
-      if (auth_proxy_bootstrap_test.proxies['dynamic_config_service.json'] === undefined) {
-        request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 500, function(err) {
-          err.message.should.equal('connect ECONNREFUSED');
-          done();
-        });
-      } else setTimeout(check_config, 50);
+        if (auth_proxy_bootstrap_test.proxies['dynamic_config_service.json'] === undefined) {
+          request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 500, function(err) {
+            err.message.should.equal('connect ECONNREFUSED');
+            done();
+          });
+        } else setTimeout(check_config, 50);
+      };
 
       check_config();
     });

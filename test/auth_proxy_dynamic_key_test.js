@@ -2,14 +2,13 @@ var fs = require('fs');
 var should = require('should');
 var _ = require('underscore');
 
-var keygen = require('../utils/keygen.js');
 var auth_proxy_bootstrap_test = require('./auth_proxy_bootstrap_test.js');
 
-describe('oauth_reverse_proxy key loader', function() {
+describe('oauth_reverse_proxy config loader', function() {
 
-  it ('should support adding keys dynamically', function(done) {
-    keygen.createKey('./test/keys', 8008, 8080, 'dynamic-key', function(err) {
-      keygen.createKey('./test/keys', 8008, 8080, 'dynamic-key2', function(err) {
+  it ('should support adding config dynamically', function(done) {
+    keygen.createKey('./test/config.d', 8008, 8080, 'dynamic-key', function(err) {
+      keygen.createKey('./test/config.d', 8008, 8080, 'dynamic-key2', function(err) {
         if (err) done(err);
         var check_key = function() {
           if (auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key']) {

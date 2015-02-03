@@ -59,23 +59,19 @@ describe('oauth_reverse_proxy config loader', function() {
       check_config();
     });
   });
-/**
-  it ('should support removing keys dynamically', function(done) {
-    fs.unlink('./test/keys/8008/8080/dynamic-key', function(err) {
-      fs.unlink('./test/keys/8008/8080/dynamic-key2', function(err) {
-        if (err) done(err);
-        var check_key = function() {
-          if (auth_proxy_bootstrap_test.proxy.keystore.keys['dynamic-key']) setTimeout(check_key, 50);
-          else {
-            // Turn the proxy.keys object into an array to get its length
-            auth_proxy_bootstrap_test.proxy.keystore.count.should.be.exactly(14);
-            done();
-          }
-        };
 
-        check_key();
-      });
+  it ('should support removing proxies dynamically', function(done) {
+    fs.unlink('./test/config.d/dynamic_config_service.json', function(err) {
+      if (err) done(err);
+      var check_config = function() {
+      if (auth_proxy_bootstrap_test.proxies['dynamic_config_service.json'] === undefined) {
+        request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 500, function(err) {
+          err.message.should.equal('connect ECONNREFUSED');
+          done();
+        });
+      } else setTimeout(check_config, 50);
+
+      check_config();
     });
   });
-**/
 });

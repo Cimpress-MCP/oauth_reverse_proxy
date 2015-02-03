@@ -31,25 +31,19 @@ describe('oauth_reverse_proxy config validation', function() {
   // kill it with fire.
   after(slate_cleaner);
 
-  it ('should reject an attempt to init oauth_reverse_proxy with an unset config_dir parameter', function(done) {
-    oauth_reverse_proxy.init(null, function(err, proxy) {
-      err.should.equal('Failed to open directory ' + null);
-      done();
-    });
+  it ('should reject an attempt to init oauth_reverse_proxy with an unset config_dir parameter', function() {
+    (function() { oauth_reverse_proxy.init(null, function() {}) }).
+      should.throw('config_directory invalid');
   });
 
-  it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a nonexistent directory', function(done) {
-    oauth_reverse_proxy.init('./test/keys', function(err, proxy) {
-      err.should.equal('Failed to open directory ./test/keys');
-      done();
-    });
+  it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a nonexistent directory', function() {
+    (function() { oauth_reverse_proxy.init('./test/keys', function() {}) }).
+      should.throw("ENOENT, no such file or directory './test/keys'");
   });
 
-  it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a non-directory inode', function(done) {
-    oauth_reverse_proxy.init('./test/auth_proxy_abnormal_config.js', function(err, proxy) {
-      err.should.equal('oauth_reverse_proxy config dir is not a directory');
-      done();
-    });
+  it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a non-directory inode', function() {
+    (function() { oauth_reverse_proxy.init('./test/auth_proxy_abnormal_config.js', function() {}) }).
+      should.throw("oauth_reverse_proxy config dir is not a directory");
   });
 });
 

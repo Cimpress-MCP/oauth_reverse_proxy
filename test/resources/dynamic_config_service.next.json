@@ -1,5 +1,5 @@
 {
-	"service_name": "jobsservice",
+	"service_name": "dynamic_jobsservice",
 	"from_port": 8011,
 	"to_port": 8080,
 	"oauth_secret_dir": "./test/keys/8008/8080/",

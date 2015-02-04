@@ -30,6 +30,7 @@ var copy_file = function(source, target, cb) {
 
 describe('oauth_reverse_proxy config loader', function() {
 
+  // Test that new proxies can be added to the system without restarting oauth_reverse_proxy.
   it ('should support adding proxies dynamically', function(done) {
     copy_file('./test/resources/dynamic_config_service.orig.json', './test/config.d/dynamic_config_service.json', function(err) {
       if (err) return done(err);
@@ -49,6 +50,10 @@ describe('oauth_reverse_proxy config loader', function() {
     });
   });
 
+  // Test that we can make changes to the proxies added in the previous test.  We want to validate that changing a
+  // running proxy works, whether or not we are changing the port on which the proxy runs.  By testing that a reconfigured
+  // proxy obeys the new configuration in the case where the proxy port doesn't change helps us validate that our proxy
+  // manager is correctly shutting down old instances of proxies before starting new ones.
   it ('should support updating proxies dynamically', function(done) {
     copy_file('./test/resources/dynamic_config_service.next.json', './test/config.d/dynamic_config_service.json', function(err) {
       if (err) return done(err);
@@ -78,19 +83,23 @@ describe('oauth_reverse_proxy config loader', function() {
     });
   });
 
+  // Test that we can remove the dynamically added proxies and that they will be correctly shut down.
   it ('should support removing proxies dynamically', function(done) {
     fs.unlink('./test/config.d/dynamic_config_service.json', function(err) {
       if (err) done(err);
-      var check_config = function() {
-        if (auth_proxy_bootstrap_test.proxies['dynamic_config_service.json'] === undefined) {
-          request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 500, function(err) {
-            err.message.should.equal('connect ECONNREFUSED');
-            done();
-          });
-        } else setTimeout(check_config, 50);
-      };
+      fs.unlink('./test/config.d/dynamic_whitelist_config_service.json', function(err) {
+        if (err) done(err);
+        var check_config = function() {
+          if (auth_proxy_bootstrap_test.proxies['dynamic_config_service.json'] === undefined) {
+            request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 500, function(err) {
+              err.message.should.equal('connect ECONNREFUSED');
+              done();
+            });
+          } else setTimeout(check_config, 50);
+        };
 
-      check_config();
+        check_config();
+      });
     });
   });
 });

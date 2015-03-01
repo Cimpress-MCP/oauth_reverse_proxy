@@ -27,7 +27,7 @@ var res = {
   send: function() {},
   end: function() {},
   writeHead: function() {}
-}
+};
 
 module.exports = {
   name: "Authentication",
@@ -49,4 +49,4 @@ module.exports = {
       validate_oauth_signature(req_to_auth, res, function() {});
     }
   }
-}
+};

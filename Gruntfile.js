@@ -12,7 +12,6 @@ module.exports = function(grunt){
         },
         benchmark: {
             all: {
-                src_back: ['test/benchmarks/benchmark_authenticator.js'],
                 src: ['test/benchmarks/*.js'],
                 dest: 'reports/benchmark-results.csv'
             }

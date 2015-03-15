@@ -4,7 +4,7 @@ var _ = require('underscore');
 // lives in request_sender.
 var request_sender = require('./utils/request_sender.js');
 
-// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server,
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
 require('./auth_proxy_bootstrap_test.js');
 

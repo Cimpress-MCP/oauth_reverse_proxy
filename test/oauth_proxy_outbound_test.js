@@ -44,6 +44,14 @@ describe('oauth_proxy outbound message integrity: verbs', function() {
         encodeURIComponent('http://[::1]:8008/job/12345?query=ok'),
         null, 200, done);
     });
+
+
+    // Validate that a basic GET or DELETE request works when signed using an oauth_proxy.
+    it ("should accept a properly signed basic " + verb + " request", function(done) {
+      request_sender.sendRequest(verb, 'http://localhost:8282/?oauth_proxy_consumer_key=mocha-test-key&oauth_proxy_url=' +
+        encodeURIComponent('https://localhost:8443/job/12345'),
+        null, 200, done);
+    });
   });
 
 });

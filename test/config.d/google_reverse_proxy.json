@@ -1,0 +1,7 @@
+{
+	"service_name": "google",
+	"from_port": 6006,
+	"to_port": 80,
+	"target_host": "www.google.com",
+	"oauth_secret_dir": "./test/keys/8008/8080/"
+}

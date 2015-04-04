@@ -4,9 +4,9 @@ var request_sender = require('./utils/request_sender.js');
 
 var Whitelist = require('../lib/proxy/whitelist.js');
 
-// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server,
+// All tests must require bootstrap_test since that creates our proxy, starts our job server,
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auth_proxy_bootstrap_test.js');
+require('./bootstrap_test.js');
 
 // This is a set of tests for handling whitelisted URLs.  As part of the bootstrap, we create a whitelist configuration
 // that allows /livecheck paths through the proxy unauthenticated if the verb is GET.

@@ -2,9 +2,9 @@ var should = require('should');
 
 var request_sender = require('./utils/request_sender.js');
 
-// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server,
+// All tests must require bootstrap_test since that creates our proxy, starts our job server,
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auth_proxy_bootstrap_test.js');
+require('./bootstrap_test.js');
 
 // This is a set of tests for missing OAuth components, incorrectly specified OAuth parameters, etc.  These are
 // health tests for our OAuth validations: any spurious 200s returned here represent weaknesses in oauth_reverse_proxy's security.

@@ -9,9 +9,9 @@ var test_server = require('./server/test_server.js');
 var job_server = test_server.JobServer;
 
 // Test the job server in isolation to make sure responses are handled as expected without oauth_reverse_proxy involved.
-describe('Job Server', function() {
+describe('sample job server', function() {
 
-  // Initiate the job server in case auth_proxy_bootstrap_test.js has not been required.  This is the only test
+  // Initiate the job server in case bootstrap_test.js has not been required.  This is the only test
   // case where it might be valid to start the job server without starting oauth_reverse_proxy: we are only testing the
   // functionality of the job server here.
   before(function(done) {

@@ -2,7 +2,7 @@ var fs = require('fs');
 var should = require('should');
 var _ = require('underscore');
 
-var auth_proxy_bootstrap_test = require('./auth_proxy_bootstrap_test.js');
+var bootstrap_test = require('./bootstrap_test.js');
 var request_sender = require('./utils/request_sender.js');
 
 var copy_file = function(source, target, cb) {
@@ -28,7 +28,7 @@ var copy_file = function(source, target, cb) {
   }
 };
 
-describe('oauth_reverse_proxy config loader', function() {
+describe('dynamic config loader', function() {
 
   // Test that new proxies can be added to the system without restarting oauth_reverse_proxy.
   it ('should support adding proxies dynamically', function(done) {
@@ -37,7 +37,7 @@ describe('oauth_reverse_proxy config loader', function() {
       copy_file('./test/resources/dynamic_whitelist_config_service.orig.json', './test/config.d/dynamic_whitelist_config_service.json', function(err) {
         if (err) return done(err);
         var check_config = function() {
-          if (auth_proxy_bootstrap_test.proxies['dynamic_config_service.json']) {
+          if (bootstrap_test.proxies['dynamic_config_service.json']) {
             request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8010/job/12345', null, 200, function(err) {
               if (err) return done(err);
 
@@ -62,7 +62,7 @@ describe('oauth_reverse_proxy config loader', function() {
         var check_config = function() {
           // We poll until the config for dynamic_config_service.json has been updated to listen on port 8011 instead of 8010.  This tells us that
           // the proxy manager has reloaded config.
-          if (auth_proxy_bootstrap_test.proxies['dynamic_config_service.json'].config.from_port == 8011) {
+          if (bootstrap_test.proxies['dynamic_config_service.json'].config.from_port == 8011) {
             request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 200, function(err) {
               if (err) return done(err);
               request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8010/job/12345', null, 500, function(err) {
@@ -90,7 +90,7 @@ describe('oauth_reverse_proxy config loader', function() {
       fs.unlink('./test/config.d/dynamic_whitelist_config_service.json', function(err) {
         if (err) done(err);
         var check_config = function() {
-          if (auth_proxy_bootstrap_test.proxies['dynamic_config_service.json'] === undefined) {
+          if (bootstrap_test.proxies['dynamic_config_service.json'] === undefined) {
             request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 500, function(err) {
               err.message.should.equal('connect ECONNREFUSED');
               done();

@@ -7,9 +7,9 @@ var validation_tools = require('./utils/validation_tools.js');
 var test_server = require('./server/test_server.js');
 var job_server = test_server.JobServer;
 
-// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server, and
+// All tests must require bootstrap_test since that creates our proxy, starts our job server, and
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auth_proxy_bootstrap_test.js');
+require('./bootstrap_test.js');
 
 // This is a set of tests to validate that OAuth credentials can be sent on the query string or even in
 // the body of POSTs and PUTs in addition to via the more traditional Authorization header.

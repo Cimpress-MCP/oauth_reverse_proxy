@@ -7,9 +7,9 @@ var job_server = require('./server/test_server.js').JobServer;
 var request_sender = require('./utils/request_sender.js');
 var validation_tools = require('./utils/validation_tools.js');
 
-// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server,
+// All tests must require bootstrap_test since that creates our proxy, starts our job server,
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auth_proxy_bootstrap_test.js');
+require('./bootstrap_test.js');
 
 // This is a set of tests to validate that oauth_reverse_proxy does not tamper with the request or response
 // headers or other components of the messages that transit through the proxy.  Unlike many of

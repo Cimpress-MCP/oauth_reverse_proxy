@@ -22,7 +22,7 @@ var slate_cleaner = function(done) {
 };
 
 // Attempt to initiate oauth_reverse_proxy with various forms of broken config.
-describe('oauth_reverse_proxy config validation', function() {
+describe('basic config validation', function() {
 
   // Before attempting to start oauth_reverse_proxy, clean the malformed directories we need for test purposes.
   beforeEach(slate_cleaner);
@@ -42,13 +42,13 @@ describe('oauth_reverse_proxy config validation', function() {
   });
 
   it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a non-directory inode', function() {
-    (function() { oauth_reverse_proxy.init('./test/auth_proxy_abnormal_config.js', function() {}) }).
+    (function() { oauth_reverse_proxy.init('./test/abnormal_config_test.js', function() {}) }).
       should.throw("oauth_reverse_proxy config dir is not a directory");
   });
 });
 
 // Attempt to initiate a proxy with various forms of broken key directories.
-describe('Proxy config validation', function() {
+describe('detailed config validation', function() {
 
   // Before attempting to start oauth-reverse_proxy, clean the malformed directories we need for test purposes.
   beforeEach(slate_cleaner);

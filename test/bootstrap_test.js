@@ -26,7 +26,7 @@ beforeEach(function() {
 // running behind it.  Once this is done, start a server.  After the completion of this
 // test, the preconditions for all other test cases are in place.  Thus, every test case
 // must require auth_bootstrap_test.
-describe('oauth_reverse_proxy bootstrap', function() {
+describe('bootstrapping', function() {
 
   // Before starting our oauth_reverse_proxy, create the keys we need for test clients.
   before(function(done) {

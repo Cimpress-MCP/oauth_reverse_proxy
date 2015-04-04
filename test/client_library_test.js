@@ -7,7 +7,7 @@ var os = require('os');
 
 var job_server = require('./server/test_server.js').JobServer;
 
-require('./auth_proxy_bootstrap_test.js');
+require('./bootstrap_test.js');
 
 // Creates a convenience function for running an external client and validating that the correct
 // key is passed to the job server and the correct content is written to disk.
@@ -28,7 +28,7 @@ var create_client_test = function(verb, cmd, cwd, key) {
 
 // These test clients are in the test/clients subdirectory.  Each one tests a limited amount of OAuth
 // functionality to validate that requests can be sent through auth_proxy properly using various languages.
-describe('Client library tests', function() {
+describe('OAuth-compliant server', function() {
 
   // TODO: Refactor these tests so they auto-detect if they can be run on the host system.  This would simplify
   // the platform-specific logic in here and allow for successful tests with less lengthy setup on CI.

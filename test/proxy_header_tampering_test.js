@@ -8,9 +8,9 @@ var forward_header_mutator = require('../lib/proxy/mutators/forward_header_mutat
 // lives in request_sender.
 var request_sender = require('./utils/request_sender.js');
 
-// All tests must require auth_proxy_bootstrap_test since that creates our proxy, starts our job server,
+// All tests must require bootstrap_test since that creates our proxy, starts our job server,
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
-require('./auth_proxy_bootstrap_test.js');
+require('./bootstrap_test.js');
 
 // This is a set of tests to validate that oauth_reverse_proxy correctly adds the x-forwarded-* and via headers to the proxied request.
 describe('oauth_reverse_proxy request header tampering: addition of x-forwarded-* and via', function() {

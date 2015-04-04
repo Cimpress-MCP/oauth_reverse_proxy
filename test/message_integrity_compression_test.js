@@ -10,29 +10,39 @@ var validation_tools = require('./utils/validation_tools.js');
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
 require('./bootstrap_test.js');
 
-// Tests that compressed response content is handled by oauth_reverse_proxy.
-describe('oauth_reverse_proxy message integrity: verbs', function() {
+// Run these tests in two modes, one where the outbound request is signed by the proxy and the other
+// where a signed request is sent to a reverse proxy.
+['oauth_proxy', 'oauth_reverse_proxy'].forEach(function(mode) {
+  // Tests that compressed response content is handled by oauth_reverse_proxy.
+  describe(mode + ' message integrity: compression', function() {
 
-  ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+    var sendFn = mode === 'oauth_reverse_proxy' ?
+      request_sender.sendAuthenticatedRequest :
+      request_sender.sendProxyAuthenticatedRequest;
 
-    // Validate that a response containing gzipped content is handled properly.
-    it ("should handle a gzipped response to a " + verb, function(done) {
-      request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/compressed_content', {headers:{'accept-encoding':'gzip'}}, 200,
-      function(err, res, body) {
-        res.headers['content-encoding'].should.equal('gzip');
-        body.should.equal(validation_tools.LOREM_IPSUM);
-        done();
+    ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+
+      // Validate that a response containing gzipped content is handled properly.
+      it ("should handle a gzipped response to a " + verb, function(done) {
+        sendFn(verb, 'http://localhost:8008/compressed_content', {headers:{'accept-encoding':'gzip'}}, 200,
+        function(err, res, body) {
+          res.headers['content-encoding'].should.equal('gzip');
+          body.should.equal(validation_tools.LOREM_IPSUM);
+          done();
+        });
       });
-    });
 
-    // Validate that a response containing deflated content is handled properly.
-    it ("should handle a gzipped response to a " + verb, function(done) {
-      request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/compressed_content', {headers:{'accept-encoding':'deflate'}}, 200,
-      function(err, res, body) {
-        res.headers['content-encoding'].should.equal('deflate');
-        body.should.equal(validation_tools.LOREM_IPSUM);
-        done();
+      // Validate that a response containing deflated content is handled properly.
+      it ("should handle a gzipped response to a " + verb, function(done) {
+        sendFn(verb, 'http://localhost:8008/compressed_content', {headers:{'accept-encoding':'deflate'}}, 200,
+        function(err, res, body) {
+          res.headers['content-encoding'].should.equal('deflate');
+          body.should.equal(validation_tools.LOREM_IPSUM);
+          done();
+        });
       });
     });
   });
+
 });
+

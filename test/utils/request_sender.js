@@ -185,6 +185,22 @@ exports.sendRequest = function(verb, url, options, expected_status_code, done) {
 // sendRequest that assumes you are only providing a verb, an expected status code, and a callback.
 exports.sendSimpleRequest = _.partial(exports.sendRequest, _, undefined, undefined, _, _);
 
+// Send the request through our outbound proxy to add the auth headers.  Note that in this case url
+// is the ultimate destination URL, not the URL of the authenticating proxy.  This method sends to
+// the authenticating proxy and wraps the target URL as a convenience.
+exports.sendProxyAuthenticatedRequest = function(verb, url, options, expected_status_code, done) {
+  if (!url) url = VERB_DEFAULT_ROUTES[verb];
+
+  return exports.sendRequest(verb,
+    'http://localhost:8282/?oauth_proxy_consumer_key=mocha-test-key&oauth_proxy_url=' + encodeURIComponent(url),
+    options, expected_status_code, done);
+};
+
+// Ok, now we're really going nuts with currying and partials.  This creates a prefilled version of
+// sendProxyAuthenticatedRequest that assumes you are only providing a verb, an expected status code,
+// and a callback.
+exports.sendSimpleProxyAuthenticatedRequest = _.partial(exports.sendProxyAuthenticatedRequest, _, undefined, undefined, _, _);
+
 // Convenience function for sending an authenticated request and expecting a certain response code.
 exports.sendAuthenticatedRequest = function(verb, url, options, expected_status_code, done) {
   if (!url) url = VERB_DEFAULT_ROUTES[verb];
@@ -209,7 +225,7 @@ exports.sendAuthenticatedRequest = function(verb, url, options, expected_status_
 };
 
 // Ok, now we're really going nuts with currying and partials.  This creates a prefilled version of
-// sendRequest that assumes you are only providing a verb, an expected status code, and a callback.
+// sendAuthenticatedRequest that assumes you are only providing a verb, an expected status code, and a callback.
 exports.sendSimpleAuthenticatedRequest = _.partial(exports.sendAuthenticatedRequest, _, undefined, undefined, _, _);
 
 // Called from beforeEach, resets the state of the request sender so that each unit test is clean.

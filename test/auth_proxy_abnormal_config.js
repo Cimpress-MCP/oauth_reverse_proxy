@@ -90,7 +90,8 @@ describe('Proxy config validation', function() {
     { 'filename': 'no_ssl_cert_service.json', 'expected_error': 'no ssl cert file provided'},
     { 'filename': 'no_ssl_key_service.json', 'expected_error': 'no ssl key file provided'},
     { 'filename': 'invalid_ssl_cert_service.json', 'expected_error': 'https cert file ./test/resources/cert_oops.pem does not exist'},
-    { 'filename': 'invalid_ssl_key_service.json', 'expected_error': 'https key file ./test/resources/key_oops.pem does not exist'}
+    { 'filename': 'invalid_ssl_key_service.json', 'expected_error': 'https key file ./test/resources/key_oops.pem does not exist'},
+    { 'filename': 'to_port_on_client_proxy_service.json', 'expected_error': 'proxy configuration has a to_port and shouldn\'t'}
   ].forEach(function(validation) {
     it ('should reject a proxy config with error: ' + validation.expected_error, function() {
       var config_json = JSON.parse(fs.readFileSync('./test/config.d/' + validation.filename, {'encoding':'utf8'}));

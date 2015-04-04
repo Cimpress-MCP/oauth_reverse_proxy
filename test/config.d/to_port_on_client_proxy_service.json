@@ -1,0 +1,7 @@
+{
+	"service_name": "to_port_client_proxy_service",
+	"mode": "proxy",
+	"from_port": 8282,
+	"to_port": 8383,
+	"oauth_secret_dir": "./test/keys/8008/8080/"
+}

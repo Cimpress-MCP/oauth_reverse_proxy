@@ -20,6 +20,11 @@ describe('oauth_proxy outbound message integrity: verbs', function() {
     // GETs and DELETEs have the same URL format and do not expect input, so test them both in a loop.
     ['GET', 'DELETE'].forEach(function(verb) {
 
+      it ('should gracefully handle ' + proto + ' ' +  verb + ' requests to offline hosts', function(done) {
+        request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8282/?oauth_proxy_consumer_key=mocha-test-key&oauth_proxy_url=' +
+          encodeURIComponent(sprintf('%s://localhost:50505/job/12345', proto)), null, 500, done);
+      });
+
       // Validate that a basic GET or DELETE request works when signed using an oauth_proxy.
       it ("should accept a properly signed basic " + verb + " request via " + proto, function(done) {
         request_sender.sendRequest(verb, 'http://localhost:8282/?oauth_proxy_consumer_key=mocha-test-key&oauth_proxy_url=' +

@@ -1,8 +1,8 @@
 language: node_js
 before_script:
-- sudo curl -LO http://xrl.us/cpanm
-- sudo chmod +x cpanm
-- sudo ./cpanm Net::OAuth || true
+- #sudo curl -LO http://xrl.us/cpanm
+- #sudo chmod +x cpanm
+- #sudo ./cpanm Net::OAuth || true
 - cd test/clients/ruby
 - bundle install
 - cd ../../../

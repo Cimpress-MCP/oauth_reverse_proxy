@@ -19,7 +19,8 @@ require('./bootstrap_test.js');
 // Run these tests in two modes, one where the outbound request is signed by the proxy and the other
 // where a signed request is sent to a reverse proxy.
 ['oauth_proxy', 'oauth_reverse_proxy'].forEach(function(mode) {
-  // Tests that compressed response content is handled by oauth_reverse_proxy.
+
+  // Tests that formencoded post and put content is handled by inbound and outbound proxies.
   describe(mode + ' message integrity: formencoded', function() {
 
     var sendFn = mode === 'oauth_reverse_proxy' ?

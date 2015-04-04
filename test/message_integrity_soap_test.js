@@ -13,68 +13,77 @@ var validation_tools = require('./utils/validation_tools.js');
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
 require('./bootstrap_test.js');
 
-// Tests that SOAP-style messages are handled by oauth_reverse_proxy
-describe('oauth_reverse_proxy message integrity: SOAP', function() {
+// Run these tests in two modes, one where the outbound request is signed by the proxy and the other
+// where a signed request is sent to a reverse proxy.
+['oauth_proxy', 'oauth_reverse_proxy'].forEach(function(mode) {
 
-  // Test SOAP-ish messages
-  it ('should handle a SOAP request', function(done) {
-    var unauthenticated_request;
-    var authenticated_request;
+  // Tests that SOAP-style messages are handled by oauth_reverse_proxy
+  describe(mode + ' message integrity: SOAP', function() {
 
-    // Set a job_server listener to grab the authenticated request when it hits the job server
-    job_server.once('POST /getProducts', function(req, res) {
-      authenticated_request = req;
-      req.body.should.equal(validation_tools.STOCK_XML_CONTENTS);
-    });
+    var sendFn = mode === 'oauth_reverse_proxy' ?
+      request_sender.sendAuthenticatedRequest :
+      request_sender.sendProxyAuthenticatedRequest;
 
-    var soap_headers = {headers:{'content-type':'application/soap+xml; charset=utf-8'}};
+    // Test SOAP-ish messages
+    it ('should handle a SOAP request', function(done) {
+      var unauthenticated_request;
+      var authenticated_request;
 
-    // Send an authenticated multipart POST
-    validation_tools.STOCK_XML_STREAM.pipe(
-      request_sender.sendAuthenticatedRequest('POST', 'http://localhost:8008/getProducts', soap_headers, 200, function(err, res, body) {
-
-      var authenticated_response = res;
-      var authenticated_response_body = body;
-
-      // Set a job_server listener to grab the unauthenticated request when it hits the job server
+      // Set a job_server listener to grab the authenticated request when it hits the job server
       job_server.once('POST /getProducts', function(req, res) {
-        unauthenticated_request = req;
+        authenticated_request = req;
         req.body.should.equal(validation_tools.STOCK_XML_CONTENTS);
       });
 
-      // Send an unauthenticated multipart POST or PUT
+      var soap_headers = {headers:{'content-type':'application/soap+xml; charset=utf-8'}};
+
+      // Send an authenticated multipart POST
       validation_tools.STOCK_XML_STREAM.pipe(
-        request_sender.sendRequest('POST', 'http://localhost:8080/getProducts', soap_headers, 200, function(err, res, body) {
+        sendFn('POST', 'http://localhost:8008/getProducts', soap_headers, 200, function(err, res, body) {
 
-        var unauthenticated_response = res;
-        var unauthenticated_response_body = body;
+        var authenticated_response = res;
+        var authenticated_response_body = body;
 
-        // Deep compare the objects after omitting the set of keys known a priori to differ when
-        // the proxy is used.
-        validation_tools.compareHeaders(
-          authenticated_request.headers,
-          unauthenticated_request.headers,
-          validation_tools.IGNORABLE_REQUEST_HEADERS
-        ).should.equal(true);
+        // Set a job_server listener to grab the unauthenticated request when it hits the job server
+        job_server.once('POST /getProducts', function(req, res) {
+          unauthenticated_request = req;
+          req.body.should.equal(validation_tools.STOCK_XML_CONTENTS);
+        });
 
-        // Validate that the request was sent multipart and chunked.
-        authenticated_request.headers['content-type'].should.equal('application/soap+xml; charset=utf-8');
-        authenticated_request.headers['transfer-encoding'].should.equal('chunked');
+        // Send an unauthenticated multipart POST or PUT
+        validation_tools.STOCK_XML_STREAM.pipe(
+          request_sender.sendRequest('POST', 'http://localhost:8080/getProducts', soap_headers, 200, function(err, res, body) {
 
-        // Now validate that the response headers and body are correct.  Note that we explicitly ignore
-        // last-modified and etag in the header comparison because it can differ by a second based on when the
-        // disk writes from multer quiesced.
-        validation_tools.compareHeaders(
-          authenticated_response.headers, unauthenticated_response.headers,
-          ['date', 'last-modified', 'etag']
-        ).should.equal(true);
+          var unauthenticated_response = res;
+          var unauthenticated_response_body = body;
 
-        // Compare the bodies, and make sure we got a large enough response to be plausible.
-        authenticated_response_body.should.equal(unauthenticated_response_body);
-        authenticated_response_body.length.should.be.greaterThan(500);
+          // Deep compare the objects after omitting the set of keys known a priori to differ when
+          // the proxy is used.
+          validation_tools.compareHeaders(
+            authenticated_request.headers,
+            unauthenticated_request.headers,
+            validation_tools.IGNORABLE_REQUEST_HEADERS
+          ).should.equal(true);
 
-        done();
+          // Validate that the request was sent multipart and chunked.
+          authenticated_request.headers['content-type'].should.equal('application/soap+xml; charset=utf-8');
+          authenticated_request.headers['transfer-encoding'].should.equal('chunked');
+
+          // Now validate that the response headers and body are correct.  Note that we explicitly ignore
+          // last-modified and etag in the header comparison because it can differ by a second based on when the
+          // disk writes from multer quiesced.
+          validation_tools.compareHeaders(
+            authenticated_response.headers, unauthenticated_response.headers,
+            ['date', 'last-modified', 'etag']
+          ).should.equal(true);
+
+          // Compare the bodies, and make sure we got a large enough response to be plausible.
+          authenticated_response_body.should.equal(unauthenticated_response_body);
+          authenticated_response_body.length.should.be.greaterThan(500);
+
+          done();
+        }));
       }));
-    }));
+    });
   });
 });

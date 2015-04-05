@@ -8,7 +8,7 @@ require('./bootstrap_test.js');
 
 // This is a set of tests for missing OAuth components, incorrectly specified OAuth parameters, etc.  These are
 // health tests for our OAuth validations: any spurious 200s returned here represent weaknesses in oauth_reverse_proxy's security.
-describe('oauth_reverse_proxy OAuth validations', function() {
+describe('OAuth validations', function() {
 
   // Run these tests for each verb.  While verb handling inside of oauth_reverse_proxy is consistent and these results should
   // always be the same, that may not always be the case.  This is a hedge against future stupidity.

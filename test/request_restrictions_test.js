@@ -10,14 +10,15 @@ require('./bootstrap_test.js');
 
 describe('Additional request restrictions', function() {
 
-  // Validate that a basic authenticated request works.  Loop over each verb, running the common tests between them.
+  // Validate that a request with an un-whitelisted URI receives a 401.
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
     it ('should reject ' + verb + ' on non-whitelisted URIs', function(done) {
       request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/funkypath', {}, 401, done);
     });
   });
 
-  // Validate that a basic authenticated request works.  Loop over each verb, running the common tests between them.
+  // Validate that a request with an un-whitelisted host receives a 401.
+  // TODO: Is this test really expressing the codepath we say it is?
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
     it ('should reject ' + verb + ' with non-whitelisted Host: headers', function(done) {
       request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8008/job', {'headers': {'host': 'funkhost.com'}}, 401, done);

@@ -5,8 +5,7 @@ var should = require('should');
 var request_sender = require('./utils/request_sender.js');
 var validation_tools = require('./utils/validation_tools.js');
 
-var test_server = require('./server/test_server.js');
-var job_server = test_server.JobServer;
+var job_server = require('./job_server');
 
 // Test the job server in isolation to make sure responses are handled as expected without oauth_reverse_proxy involved.
 describe('sample job server', function() {
@@ -15,7 +14,7 @@ describe('sample job server', function() {
   // case where it might be valid to start the job server without starting oauth_reverse_proxy: we are only testing the
   // functionality of the job server here.
   before(function(done) {
-   test_server.init(8080, function(err) {
+   job_server.init(8080, function(err) {
      done(err);
    });
   });

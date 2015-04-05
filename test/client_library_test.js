@@ -5,7 +5,7 @@ var _ = require('underscore');
 var exec = require('child_process').exec;
 var os = require('os');
 
-var job_server = require('./server/test_server.js').JobServer;
+var job_server = require('./job_server/');
 
 require('./bootstrap_test.js');
 

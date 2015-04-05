@@ -9,8 +9,7 @@ var oauth_reverse_proxy = require('../lib');
 var keygen = require('../utils/keygen.js');
 var request_sender = require('./utils/request_sender.js');
 
-var test_server = require('./server/test_server.js');
-var job_server = test_server.JobServer;
+var job_server = require('./job_server/');
 
 // Run the abnormal config test before initializing the rest of the test suite.
 require('./abnormal_config_test.js');
@@ -128,9 +127,9 @@ describe('bootstrapping', function() {
   });
 
   after(function(done) {
-    // Once all the integrity tests, which require an offline job server to be effective, are complete,
+    // Once all the integrity tests (which require an offline job server to be effective) are complete,
     // start the job_server;
-    test_server.init(8080, function(err) {
+    job_server.init(8080, function(err) {
       done(err);
     });
   });

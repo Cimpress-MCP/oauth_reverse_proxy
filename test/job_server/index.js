@@ -140,11 +140,11 @@ function JobServer() {
 
 // Configure JobServer as an event emitter and export a new instance.
 util.inherits(JobServer, require('events').EventEmitter);
-exports.JobServer = new JobServer();
+module.exports = new JobServer();
 
 // Init the test server, if necessary.
 var initted = false;
-exports.init = function(port, cb) {
+module.exports.init = function(port, cb) {
   // If we're already initted, drop out here.
   if (initted) return cb();
   initted = true;

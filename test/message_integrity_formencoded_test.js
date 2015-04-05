@@ -5,7 +5,7 @@ var path = require('path');
 var request_sender = require('./utils/request_sender.js');
 var validation_tools = require('./utils/validation_tools.js');
 
-var job_server = require('./server/test_server.js').JobServer;
+var job_server = require('./job_server/');
 
 // All the messy business of creating and sending requests (both authenticated and unauthenticated)
 // lives in request_sender.

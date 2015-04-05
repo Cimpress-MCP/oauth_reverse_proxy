@@ -2,7 +2,7 @@ var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
 
-var job_server = require('./server/test_server.js').JobServer;
+var job_server = require('./job_server/');
 
 // All the messy business of creating and sending requests (both authenticated and unauthenticated)
 // lives in request_sender.

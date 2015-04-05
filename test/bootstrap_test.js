@@ -12,6 +12,9 @@ var request_sender = require('./utils/request_sender.js');
 var test_server = require('./server/test_server.js');
 var job_server = test_server.JobServer;
 
+// Run the abnormal config test before initializing the rest of the test suite.
+require('./abnormal_config_test.js');
+
 // These cleanup operations need to run before each test to make sure the state of the
 // suite is consistent.  Placed here, they will be run before all suites and tests.
 beforeEach(function() {

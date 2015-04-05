@@ -28,7 +28,7 @@ var create_client_test = function(verb, cmd, cwd, key) {
 
 // These test clients are in the test/clients subdirectory.  Each one tests a limited amount of OAuth
 // functionality to validate that requests can be sent through auth_proxy properly using various languages.
-describe('OAuth-compliant server', function() {
+describe('An OAuth-compliant reverse proxy', function() {
 
   // TODO: Refactor these tests so they auto-detect if they can be run on the host system.  This would simplify
   // the platform-specific logic in here and allow for successful tests with less lengthy setup on CI.

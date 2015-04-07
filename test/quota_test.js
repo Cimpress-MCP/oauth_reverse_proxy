@@ -7,7 +7,7 @@ var validation_tools = require('./utils/validation_tools.js');
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
 require('./bootstrap_test.js');
 
-// Tests that verbs are handled correctly by oauth_reverse_proxy
+// Tests that inbound request quotas are properly honored.
 describe('quotas', function() {
 
   // THe quota wait interval is 1s, so we should wait for 1s between tests to make sure we have a clean slate

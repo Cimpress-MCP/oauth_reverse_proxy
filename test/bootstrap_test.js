@@ -122,6 +122,11 @@ describe('bootstrapping', function() {
     request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8008/livecheck', null, 500, done);
   });
 
+  it ('should gracefully handle proxy requests targeted at offline hosts', function(done) {
+    request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8282/?oauth_proxy_consumer_key=mocha-test-key&oauth_proxy_url=' +
+        encodeURIComponent('http://localhost:50505/job/12345'), null, 500, done);
+  });
+
   it ("should gracefully handle authenticated GET requests to offline hosts", function(done) {
     request_sender.sendSimpleAuthenticatedRequest('GET', 500, done);
   });

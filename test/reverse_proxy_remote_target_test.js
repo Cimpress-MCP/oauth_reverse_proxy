@@ -11,7 +11,7 @@ var validation_tools = require('./utils/validation_tools.js');
 // and registers a beforeEach to keep the request_sender and job_server clean between test runs.
 require('./bootstrap_test.js');
 
-// Tests that verbs are handled correctly by oauth_reverse_proxy
+// Tests that the reverse proxy can send to a non-localhost target if so configured.
 describe('oauth_reverse_proxy: remote target host', function() {
 
   // Validate that a GET for a Google query works

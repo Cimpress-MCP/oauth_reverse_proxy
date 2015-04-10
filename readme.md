@@ -1,4 +1,4 @@
-oauth_[|reverse_]proxy is an authenticating service proxy that fronts any web server and enforces that callers present the correct OAuth credentials.  
+oauth_[|reverse_]proxy is both a proxy that can sign outbound traffic as well as a reverse proxy capable of enforcing that callers present the correct OAuth credentials.
 
 ##### Motivation
 

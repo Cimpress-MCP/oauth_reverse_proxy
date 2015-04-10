@@ -14,7 +14,7 @@ Authenticaton for web applications, particularly applications created for machin
 
 A few key features and design principles:
 
-* Faithfully implements the OAuth spec: This means that any client OAuth 1.0a library you wish to use will work fine with `oauth_[|reverse_]proxy`'s reverse proxy, and it means that traffic signed by `oauth_[|reverse_]proxy`'s proxy will work with any OAuth 1.0a-compatible server.  The [test/clients](https://github.com/Cimpress-MCP/oauth_reverse_proxy/tree/master/test/clients) directory has sample code in 9 languages, and more test clients are always welcome.
+* Faithfully implements the OAuth spec: This means that any client OAuth 1.0a library you wish to use will work fine with `oauth_[|reverse_]proxy`'s reverse proxy, and it means that traffic signed by `oauth_[|reverse_]proxy`'s proxy will work with any OAuth 1.0a-compatible server.  The [test/clients](https://github.com/Cimpress-MCP/oauth_reverse_proxy/tree/master/test/clients) directory has sample code in 9 languages, and more test clients are always welcome.  Test servers are coming soon.
 * Built to perform: A single node can authenticate around 10k requests per second on reasonable hardware.
 * Supports inbound requests sent over http and https.
 * Is flexible enough to front multiple services: If you run more than one HTTP server per system, as is common in the case of an nginx-fronted application, you can put an instance of `oauth_[|reverse_]proxy` either in front of or behind nginx.  A single instance of `oauth_[|reverse_]proxy` can bind separate proxies or reverse proxies to any number of inbound ports.

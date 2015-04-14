@@ -27,7 +27,7 @@ describe('quotas', function() {
 
     var res_handler = function(err, res, body) {
       if (res.statusCode === 200) success_seen = true;
-      if (res.statusCode === 401) error_seen = true;
+      if (res.statusCode === 429) error_seen = true;
 
       if (success_seen && error_seen) done();
     };
@@ -45,7 +45,7 @@ describe('quotas', function() {
 
     var res_handler = function(err, res, body) {
       if (res.statusCode === 200) successes_seen++;
-      if (res.statusCode === 401) error_seen = true;
+      if (res.statusCode === 429) error_seen = true;
 
       if ((successes_seen === 5) && error_seen) done();
     };

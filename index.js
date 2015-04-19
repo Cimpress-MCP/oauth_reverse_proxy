@@ -1,7 +1,7 @@
 var oauth_reverse_proxy = require('./lib');
 
 /**
- * The config path can be provided as an environemnt variable.  If not provided,
+ * The config path can be provided as an environment variable.  If not provided,
  * we choose sane defaults for Windows and non-Windows.
  */
 var config_dir = process.env.OAUTH_REVERSE_PROXY_CONFIG_DIR;

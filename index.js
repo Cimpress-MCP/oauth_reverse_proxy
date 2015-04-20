@@ -37,8 +37,8 @@ try {
 
 // Create an oauth_reverse_proxy instance at our configured root dir.
 oauth_reverse_proxy.init(config_dir, function(err, proxy) {
-  // If we caught a fatal error creating the proxies, log it and pause briefly before exiting
-  // to give Bunyan a chance to flush this error message.
+  // If we caught a fatal error creating the proxies, log it and pause briefly before
+  // exiting to give Bunyan a chance to flush this error message.
   if (err) {
     logger.fatal("Failed to create proxy due to %s:\n", err, err.stack);
     setTimeout(function() {

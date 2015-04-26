@@ -1,6 +1,6 @@
 {
   "name": "oauth_reverse_proxy",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "dependencies": {
     "bunyan": {
       "version": "1.3.5",

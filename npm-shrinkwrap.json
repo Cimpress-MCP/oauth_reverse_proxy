@@ -1,24 +1,12 @@
 {
   "name": "oauth_reverse_proxy",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "dependencies": {
     "bunyan": {
-      "version": "1.3.5",
-      "from": "bunyan@1.3.5",
-      "resolved": "https://registry.npmjs.org/bunyan/-/bunyan-1.3.5.tgz",
+      "version": "1.3.4",
+      "from": "bunyan@1.3.4",
+      "resolved": "https://registry.npmjs.org/bunyan/-/bunyan-1.3.4.tgz",
       "dependencies": {
-        "dtrace-provider": {
-          "version": "0.4.0",
-          "from": "dtrace-provider@~0.4",
-          "resolved": "https://registry.npmjs.org/dtrace-provider/-/dtrace-provider-0.4.0.tgz",
-          "dependencies": {
-            "nan": {
-              "version": "1.5.3",
-              "from": "nan@~1.5.1",
-              "resolved": "https://registry.npmjs.org/nan/-/nan-1.5.3.tgz"
-            }
-          }
-        },
         "mv": {
           "version": "2.0.3",
           "from": "mv@~2",
@@ -32,9 +20,9 @@
           }
         },
         "safe-json-stringify": {
-          "version": "1.0.3",
+          "version": "1.0.1",
           "from": "safe-json-stringify@~1",
-          "resolved": "https://registry.npmjs.org/safe-json-stringify/-/safe-json-stringify-1.0.3.tgz"
+          "resolved": "https://registry.npmjs.org/safe-json-stringify/-/safe-json-stringify-1.0.1.tgz"
         }
       }
     },

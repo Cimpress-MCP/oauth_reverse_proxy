@@ -31,7 +31,7 @@ if (!log_dir) {
 try {
   var logger = require('./lib/logger.js').setLogDir(log_dir);
 } catch(e) {
-  console.err("Failed to initialize logger pointing at %s", log_dir);
+  console.error("Failed to initialize logger pointing at %s", log_dir);
   process.exit(1);
 }
 

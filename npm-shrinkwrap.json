@@ -1,6 +1,6 @@
 {
   "name": "oauth_reverse_proxy",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "from": "oauth_reverse_proxy@1.5.3",
   "resolved": "https://registry.npmjs.org/oauth_reverse_proxy/-/oauth_reverse_proxy-1.5.3.tgz",
   "dependencies": {

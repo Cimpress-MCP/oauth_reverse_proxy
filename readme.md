@@ -70,7 +70,7 @@ The following fields are required in a proxy configuration file:
 
 **service_name** - The name of the service for which we are proxying.  This is used in logging to disambiguate messages for multiple proxies running within the same process.
 
-**from_port** - The port this proxy will open to the outside world.  All inbound traffic to your service should be directed to this port to ensure that only authenticated requests reach your application.  Note that only one proxy can be bound to any given `from_port`.
+**from_port** - The port this proxy will open to the outside world.  In the case of a reverse proxy, all inbound traffic to your service should be directed to this port to ensure that only authenticated requests reach your application.  Note that only one proxy can be bound to any given `from_port`.
 
 **to_port** - The port to which this proxy will route authenticated traffic.  This should be a port exposed by your application on the localhost interface so that unauthenticated traffic can not reach your application.  Unlike `from_port`, multiple proxies can forward traffic to the same `to_port`.  This may be useful if you wish to expose your proxy over both HTTP and HTTPS.
 

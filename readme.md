@@ -76,7 +76,7 @@ The following fields are required in a proxy configuration file:
 
 The following field is required in a reverse proxy configuration file but not in a proxy configuration file:
 
-**to_port** - The port to which this proxy will route authenticated traffic.  This should be a port exposed by your application on the localhost interface so that unauthenticated traffic can not reach your application.  Unlike `from_port`, multiple proxies can forward traffic to the same `to_port`.  This may be useful if you wish to expose your proxy over both HTTP and HTTPS.
+**to_port** - The port to which this reverse proxy will route authenticated traffic.  If your proxy and your application run on the same machine, this should be a port exposed by your application only on the localhost interface so that unauthenticated traffic can not reach your application.  Unlike `from_port`, multiple proxies can forward traffic to the same `to_port`.  This may be useful if you wish to expose your proxy over both HTTP and HTTPS.
 
 The following fields are optional:
 

@@ -72,9 +72,11 @@ The following fields are required in a proxy configuration file:
 
 **from_port** - The port this proxy will open to the outside world.  In the case of a reverse proxy, all inbound traffic to your service should be directed to this port to ensure that only authenticated requests reach your application.  Note that only one proxy can be bound to any given `from_port`.
 
-**to_port** - The port to which this proxy will route authenticated traffic.  This should be a port exposed by your application on the localhost interface so that unauthenticated traffic can not reach your application.  Unlike `from_port`, multiple proxies can forward traffic to the same `to_port`.  This may be useful if you wish to expose your proxy over both HTTP and HTTPS.
-
 **oauth_secret_dir** - The directory in which consumer key / consumer secret pairs live.  The name of each file in this directory is the consumer key, and the trimmed contents are the consumer secret.  Consumer secrets must satisfy this regular expression: `/^[-_.=a-zA-Z0-9]+$/`.  That is, the consumer secret must be alphanumeric or contain the characters `-`, `_`, `.`, or `=`.  Any secret that does not match this pattern will not be loaded by `oauth_[|reverse_]proxy`.  A warning will be logged, but proxy startup will continue normally.
+
+The following field is required in a reverse proxy configuration file but not in a proxy configuration file:
+
+**to_port** - The port to which this proxy will route authenticated traffic.  This should be a port exposed by your application on the localhost interface so that unauthenticated traffic can not reach your application.  Unlike `from_port`, multiple proxies can forward traffic to the same `to_port`.  This may be useful if you wish to expose your proxy over both HTTP and HTTPS.
 
 The following fields are optional:
 

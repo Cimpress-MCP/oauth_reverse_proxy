@@ -78,7 +78,11 @@ The following field is required in a reverse proxy configuration file but not in
 
 **to_port** - The port to which this reverse proxy will route authenticated traffic.  If your proxy and your application run on the same machine, this should be a port exposed by your application only on the localhost interface so that unauthenticated traffic can not reach your application.  Unlike `from_port`, multiple proxies can forward traffic to the same `to_port`.  This may be useful if you wish to expose your proxy over both HTTP and HTTPS.
 
-The following fields are optional:
+The following fields are optional for a reverse proxy:
+
+**target_host** - By default, a reverse proxy will redirect traffic to the configured `to_port` on localhost.  To support deployment models where `oauth_reverse_proxy` is on a different system than your application, this parameter configures the host to which proxied traffic should be directed.
+
+The following fields are optional for a proxy or reverse proxy:
 
 **required_uris** - Sometimes you may have a situation where `oauth_[|reverse_]proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the requested route.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a URI in this list.  This is to prevent client applications from authenticating against your proxy but accessing routes that shouldn't be accessible by this proxy.  The entries in `require_uris` are substrings, not regexes, and they are only considered to match if they match from the start of the route.
 

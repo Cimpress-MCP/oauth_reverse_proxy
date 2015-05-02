@@ -82,6 +82,8 @@ The following fields are optional for a reverse proxy:
 
 **target_host** - By default, a reverse proxy will redirect traffic to the configured `to_port` on localhost.  To support deployment models where `oauth_reverse_proxy` is on a different system than your application, this parameter configures the host to which proxied traffic should be directed.
 
+**to_port_is_https** - If the port to which you are proxying traffic is serving https traffic but is not port 443, you need to set this parameter to `true` so that the reverse proxy knows how to open the connection.  The default is `false`.
+
 The following fields are optional for a proxy or reverse proxy:
 
 **required_uris** - Sometimes you may have a situation where `oauth_[|reverse_]proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the requested route.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a URI in this list.  This is to prevent client applications from authenticating against your proxy but accessing routes that shouldn't be accessible by this proxy.  The entries in `require_uris` are substrings, not regexes, and they are only considered to match if they match from the start of the route.

@@ -20,6 +20,12 @@ var url_utils = require('url');
 var util = require('util');
 var zlib = require('zlib');
 
+var module_tag = {
+  module: require('../../lib/logger.js').getModulePath(__filename)
+};
+
+var logger = require('../../lib/logger.js').getLogger();
+
 var validation_tools = require('./validation_tools.js');
 
 exports.keys = {};
@@ -54,7 +60,8 @@ var oauth_header_renderer = function(key, value) {
 
 // Params for signing have the form oauth_version=1.0
 var param_renderer = function(key, value) {
-  return key + '=' + value;
+  if (value) return key + '=' + value;
+  return key;
 };
 
 // Given an array of parameters of type [ [key, value], [key2, value2] ], return a rendered string separated
@@ -85,6 +92,7 @@ var prepare_auth_credentials = function(renderFn) {
   signature_components[1] = encoding.encodeData(signature_components[1]);
   signature_components[2] = encoding.encodeData(renderParams(params, '&', param_renderer));
   var signature_base = signature_components.join('&');
+  logger.debug(module_tag, "Signature base: %s", signature_base);
 
   // Pull the secret corresponding to the key used in this request.  Most commonly, this will be mocha-test-key's
   // secret, but we have the option of using other keys for other tests (to validate that things like quotas work).

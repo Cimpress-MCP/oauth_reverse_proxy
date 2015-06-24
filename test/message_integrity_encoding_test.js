@@ -22,9 +22,9 @@ require('./bootstrap_test.js');
       request_sender.sendSimpleAuthenticatedRequest :
       request_sender.sendSimpleProxyAuthenticatedRequest;
 
-    // We want to test that giant query strings aren't allowed for any verb, so loop over them all
+    // We want to test that escape characters are acceptable in multiple verbs' query strings, so loop over GET and DELETE
     ['GET', 'DELETE'].forEach(function(verb) {
-      // Validate that a GET or DELETE with query parameters works.
+      // Validate that a GET or DELETE with weird query parameters works.
       it ("should accept a properly signed " + verb + " with a funky query", function(done) {
         request_sender.params.push(['qamper&and', "%%%%froody%%%%"]);
         request_sender.params.push(['query', 'funky town']);
@@ -39,11 +39,10 @@ require('./bootstrap_test.js');
       });
     });
 
-    // We want to test that giant query strings aren't allowed for any verb, so loop over them all
+    // We want to test that escape characters in the path are acceptable for all verbs, so loop over each.
     ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
-      // Validate that a GET or DELETE with query parameters works.
+      // Validate that a verb requesting a URI with an escape character in the path works.
       it ("should accept a properly signed " + verb + " with a funky path", function(done) {
-        //sendFn(verb, 'http://localhost:8008/{wonky path}/is&wonky', null, 200, done);
         sendFn(verb, 'http://localhost:8008/%7bwonky%20path%7d/is&wonky', null, 200, done);
       });
     });

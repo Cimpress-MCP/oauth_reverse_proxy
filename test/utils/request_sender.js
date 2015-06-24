@@ -60,8 +60,7 @@ var oauth_header_renderer = function(key, value) {
 
 // Params for signing have the form oauth_version=1.0
 var param_renderer = function(key, value) {
-  if (value) return key + '=' + value;
-  return key;
+  return key + '=' + value;
 };
 
 // Given an array of parameters of type [ [key, value], [key2, value2] ], return a rendered string separated

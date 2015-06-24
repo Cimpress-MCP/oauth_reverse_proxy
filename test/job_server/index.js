@@ -42,7 +42,17 @@ function JobServer() {
     res.send({'status':'ok'});
   });
 
-  // /transactions simulates an endpoint that might return a large, chunked response.
+  // wonky looking path to test encoding
+  ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
+    app[verb]('/%7bwonky%20path%7d/is&wonky', function(req, res, next) {
+      res.setHeader('Content-Type', 'application/json');
+      console.log('%s /{wonky path}/is&wonky with key %s', verb.toUpperCase(), req.headers[CONSUMER_KEY_HEADER]);
+      this_obj.emit(verb + ' /{wonky path}/is&wonky', req, res);
+      res.send({'status':'ok'});
+    });
+  });
+
+  // /compressed_content returns gziped content
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
     app[verb]('/compressed_content', function(req, res, next) {
 

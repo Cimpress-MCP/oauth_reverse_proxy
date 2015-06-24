@@ -220,7 +220,7 @@ exports.sendAuthenticatedRequest = function(verb, url, options, expected_status_
 
   signature_components[0] = options.method;
   var proto = options.protocol || 'http:';
-  signature_components[1] = proto + '//' + options.hostname + ':' + options.port + options.pathname;
+  signature_components[1] = proto + '//' + options.hostname + ':' + options.port + encoding.decodeData(options.pathname);
 
   // We don't technically need to reset the options value, but it does make it more clear that
   // we may be modifying options in populateTransport.

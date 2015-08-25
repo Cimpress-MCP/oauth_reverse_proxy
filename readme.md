@@ -1,3 +1,7 @@
+# oauth_reverse_proxy
+
+[![Build Status](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy.svg?branch=master)](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy) [![Coverage Status](https://img.shields.io/coveralls/Cimpress-MCP/oauth_reverse_proxy.svg)](https://coveralls.io/r/Cimpress-MCP/oauth_reverse_proxy?branch=master)
+
 oauth_[|reverse_]proxy is both a proxy that can sign outbound traffic as well as a reverse proxy capable of enforcing that callers present the correct OAuth credentials.
 
 ##### Motivation
@@ -68,52 +72,32 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
 
 The following fields are required in a proxy configuration file:
 
-**service_name** - The name of the service for which we are proxying.  This is used in logging to disambiguate messages for multiple proxies running within the same process.
-
-**from_port** - The port this proxy will open to the outside world.  In the case of a reverse proxy, all inbound traffic to your service should be directed to this port to ensure that only authenticated requests reach your application.  Note that only one proxy can be bound to any given `from_port`.
-
-**oauth_secret_dir** - The directory in which consumer key / consumer secret pairs live.  The name of each file in this directory is the consumer key, and the trimmed contents are the consumer secret.  Consumer secrets must satisfy this regular expression: `/^[-_.=a-zA-Z0-9]+$/`.  That is, the consumer secret must be alphanumeric or contain the characters `-`, `_`, `.`, or `=`.  Any secret that does not match this pattern will not be loaded by `oauth_[|reverse_]proxy`.  A warning will be logged, but proxy startup will continue normally.
+- **service_name** - The name of the service for which we are proxying.  This is used in logging to disambiguate messages for multiple proxies running within the same process.
+- **from_port** - The port this proxy will open to the outside world.  In the case of a reverse proxy, all inbound traffic to your service should be directed to this port to ensure that only authenticated requests reach your application.  Note that only one proxy can be bound to any given `from_port`.
+- **oauth_secret_dir** - The directory in which consumer key / consumer secret pairs live.  The name of each file in this directory is the consumer key, and the trimmed contents are the consumer secret.  Consumer secrets must satisfy this regular expression: `/^[-_.=a-zA-Z0-9]+$/`.  That is, the consumer secret must be alphanumeric or contain the characters `-`, `_`, `.`, or `=`.  Any secret that does not match this pattern will not be loaded by `oauth_[|reverse_]proxy`.  A warning will be logged, but proxy startup will continue normally.
 
 The following field is required in a reverse proxy configuration file but not in a proxy configuration file:
 
-**to_port** - The port to which this reverse proxy will route authenticated traffic.  If your proxy and your application run on the same machine, this should be a port exposed by your application only on the localhost interface so that unauthenticated traffic can not reach your application.  Unlike `from_port`, multiple proxies can forward traffic to the same `to_port`.  This may be useful if you wish to expose your proxy over both HTTP and HTTPS.
+- **to_port** - The port to which this reverse proxy will route authenticated traffic.  If your proxy and your application run on the same machine, this should be a port exposed by your application only on the localhost interface so that unauthenticated traffic can not reach your application.  Unlike `from_port`, multiple proxies can forward traffic to the same `to_port`.  This may be useful if you wish to expose your proxy over both HTTP and HTTPS.
 
 The following fields are optional for a reverse proxy:
 
-**target_host** - By default, a reverse proxy will redirect traffic to the configured `to_port` on localhost.  To support deployment models where `oauth_reverse_proxy` is on a different system than your application, this parameter configures the host to which proxied traffic should be directed.
-
-**to_port_is_https** - If the port to which you are proxying traffic is serving https traffic but is not port 443, you need to set this parameter to `true` so that the reverse proxy knows how to open the connection.  The default is `false`.
-
-**validate_target_cert** - If the target host is https, this configuration tells the reverse proxy to forward traffic only if the target host presents a valid certificate.  The default is `true`.
+- **target_host** (optional) - By default, a reverse proxy will redirect traffic to the configured `to_port` on localhost.  To support deployment models where `oauth_reverse_proxy` is on a different system than your application, this parameter configures the host to which proxied traffic should be directed.
+- **to_port_is_https** (optional) - If the port to which you are proxying traffic is serving https traffic but is not port 443, you need to set this parameter to `true` so that the reverse proxy knows how to open the connection.  The default is `false`.
+- **validate_target_cert** (optional) - If the target host is https, this configuration tells the reverse proxy to forward traffic only if the target host presents a valid certificate.  The default is `true`.
 
 The following fields are optional for a proxy or reverse proxy:
 
-**required_uris** - Sometimes you may have a situation where `oauth_[|reverse_]proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the requested route.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a URI in this list.  This is to prevent client applications from authenticating against your proxy but accessing routes that shouldn't be accessible by this proxy.  The entries in `require_uris` are substrings, not regexes, and they are only considered to match if they match from the start of the route.
-
-**required_hosts** - Sometimes you may have a situation where `oauth_[|reverse_]proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the `Host` header.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a host in this list.  This is to prevent client applications from authenticating against your proxy but accessing hosts that shouldn't be accessible by this proxy.  The entries in `require_hosts` must exactly match the `Host` header of the inbound request, or the request will be rejected.
-
-**whitelist** - Sometimes you might want certain routes to be accessible without authentication.  For example, if you expose a health check route to an upstream load balancer, it's unlikely that the load balancer will be able to authenticate those requests.  In these cases, you can whitelist those specific routes that should not require authentication, and `oauth_[|reverse_]proxy` will pass any matching request through to your application.
-
-Whitelist is an array of config objects, each defining a path regex and a set of methods.  For a request to be considered valid, it must match both components.  For example, a `path` of "/livecheck" and a `methods` array containing only "GET" would whitelist any `GET` request against the URL path `/livecheck`.  Keep in mind that the regex is interpreted as being between `^` and `$`, so the entire path must match this regex.  A request for `/livecheck/test/a` would be rejected.  If either path or method are omitted, it is assumed that all paths or methods match.
-
-**quotas** The default behavior of `oauth_[|reverse_]proxy` is to allow an unlimited number of requests per key, but sometimes you want to constrain the volume of requests that can be made by consumers.  The quotas object lets you define thresholds for an allowable volume of hits per key per unit time. 
-
-`interval` specifies the time interval for which quotas apply: an interval of 1 means our quotas are hits-per-second while an interval of 60 specifies hits-per-minute.
-
-The `default_threshold` parameter gives us a catch-all for any key that is not given a specific threshold.  If undefined, keys that lack specific thresholds are allowed to make an unbounded number of requests.  In the example above, keys lacking defined thresholds are allowed to make 10 requests per minute.
-
-The `thresholds` array contains 0 or more mappings from a consumer key name to the acceptable threshold for that key.  In the example above, the consumer_key "privileged_key" is allowed to make 1000 requests per second while "unprivileged_key" can only make 1 request per minute.
-
-**https** The default behavior of `oauth_[|reverse_]proxy` is to listen on an HTTP socket.  If you wish to use HTTPS instead, you must specify an `https` object in the configuration for the proxy, providing a path to both a key and certificate pem file.  Note that both a key and cert must be provided or the proxy will not be created.
+- **required_uris** (optional) - Sometimes you may have a situation where `oauth_[|reverse_]proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the requested route.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a URI in this list.  This is to prevent client applications from authenticating against your proxy but accessing routes that shouldn't be accessible by this proxy.  The entries in `require_uris` are substrings, not regexes, and they are only considered to match if they match from the start of the route.
+- **required_hosts** (optional) - Sometimes you may have a situation where `oauth_[|reverse_]proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the `Host` header.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a host in this list.  This is to prevent client applications from authenticating against your proxy but accessing hosts that shouldn't be accessible by this proxy.  The entries in `require_hosts` must exactly match the `Host` header of the inbound request, or the request will be rejected.
+- **whitelist** (optional) - Sometimes you might want certain routes to be accessible without authentication.  For example, if you expose a health check route to an upstream load balancer, it's unlikely that the load balancer will be able to authenticate those requests.  In these cases, you can whitelist those specific routes that should not require authentication, and `oauth_[|reverse_]proxy` will pass any matching request through to your application.
+    - Whitelist is an array of config objects, each defining a path regex and a set of methods.  For a request to be considered valid, it must match both components.  For example, a `path` of "/livecheck" and a `methods` array containing only "GET" would whitelist any `GET` request against the URL path `/livecheck`.  Keep in mind that the regex is interpreted as being between `^` and `$`, so the entire path must match this regex.  A request for `/livecheck/test/a` would be rejected.  If either path or method are omitted, it is assumed that all paths or methods match.
+- **quotas** (optional) - The default behavior of `oauth_[|reverse_]proxy` is to allow an unlimited number of requests per key, but sometimes you want to constrain the volume of requests that can be made by consumers.  The quotas object lets you define thresholds for an allowable volume of hits per key per unit time. 
+    - `interval` specifies the time interval for which quotas apply: an interval of 1 means our quotas are hits-per-second while an interval of 60 specifies hits-per-minute.
+    - The `default_threshold` parameter gives us a catch-all for any key that is not given a specific threshold.  If undefined, keys that lack specific thresholds are allowed to make an unbounded number of requests.  In the example above, keys lacking defined thresholds are allowed to make 10 requests per minute.
+    - The `thresholds` array contains 0 or more mappings from a consumer key name to the acceptable threshold for that key.  In the example above, the consumer_key "privileged_key" is allowed to make 1000 requests per second while "unprivileged_key" can only make 1 request per minute.
+- **https** (optional) - The default behavior of `oauth_[|reverse_]proxy` is to listen on an HTTP socket.  If you wish to use HTTPS instead, you must specify an `https` object in the configuration for the proxy, providing a path to both a key and certificate pem file.  Note that both a key and cert must be provided or the proxy will not be created.
 
 #### Planned Features ####
 
 You can find the TODO list for upcoming features [here](todo.md).
-
-#### build status
-
-![Travis Build](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy.svg)
-
-#### coverage
-
-[![Coverage Status](https://img.shields.io/coveralls/Cimpress-MCP/oauth_reverse_proxy.svg)](https://coveralls.io/r/Cimpress-MCP/oauth_reverse_proxy?branch=master)

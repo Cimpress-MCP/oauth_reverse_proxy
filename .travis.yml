@@ -1,17 +1,17 @@
 language: node_js
 before_script:
-- #sudo curl -LO http://xrl.us/cpanm
-- #sudo chmod +x cpanm
-- #sudo ./cpanm Net::OAuth || true
-- cd test/clients/ruby
-- bundle install
-- cd ../../../
-- sudo pip install requests-oauth
-- npm install -g bunyan
-- npm install -g grunt grunt-cli
+  - #sudo curl -LO http://xrl.us/cpanm
+  - #sudo chmod +x cpanm
+  - #sudo ./cpanm Net::OAuth || true
+  - cd test/clients/ruby
+  - bundle install
+  - cd ../../../
+  - sudo pip install requests-oauth
+  - npm install -g bunyan
+  - npm install -g grunt grunt-cli
 script:
-- grunt benchmark || true
-- npm run coveralls
+  - grunt benchmark || true
+  - npm run coveralls
 deploy:
   provider: npm
   email: ryan@ryanbreen.com

@@ -23,7 +23,7 @@ exports.createKey = function(root_dir, from_port, to_port, key_id, secret, cb) {
     /* istanbul ignore if */
     if (err) return cb(err);
 
-    var keyfile = keystore_path + path.sep + key_id;
+    var keyfile = path.join(keystore_path, key_id);
     fs.writeFile(keyfile, secret, function(err) {
       return cb(err);
     });

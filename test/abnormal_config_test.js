@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path');
 var should = require('should');
 var _ = require('underscore');
 var mkdirp = require('mkdirp');
@@ -6,6 +7,7 @@ var rimraf = require('rimraf');
 
 var oauth_reverse_proxy = require('../lib');
 var Proxy = require('../lib/proxy');
+var ProxyManager = require('../lib/proxy_manager.js');
 var ProxyConfig = require('../lib/proxy/config.js');
 
 // Start every test with an empty keys directory.
@@ -33,17 +35,37 @@ describe('basic config validation', function() {
 
   it ('should reject an attempt to init oauth_reverse_proxy with an unset config_dir parameter', function() {
     (function() { oauth_reverse_proxy.init(null, function() {}) }).
-      should.throw('config_directory invalid');
+    should.throw('config_directory invalid');
   });
 
   it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a nonexistent directory', function() {
     (function() { oauth_reverse_proxy.init('./test/keys', function() {}) }).
-      should.throw("ENOENT, no such file or directory './test/keys'");
+    should.throw("ENOENT, no such file or directory './test/keys'");
   });
 
   it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a non-directory inode', function() {
     (function() { oauth_reverse_proxy.init('./test/abnormal_config_test.js', function() {}) }).
-      should.throw("oauth_reverse_proxy config dir is not a directory");
+    should.throw("oauth_reverse_proxy config dir is not a directory");
+  });
+
+  it ('should not load any config file that has a filename beginning with a dot', function(done) {
+    var config_dir = './test/config.d/';
+    var config = JSON.parse(fs.readFileSync(path.join(config_dir, '.dotfile.json'), {'encoding': 'utf8'}));
+    var pm = ProxyManager;
+    pm.init('./test/config.d', function() {
+      pm.proxies.should.not.containDeep(config.service_name);
+      done();
+    });
+  });
+
+  it ('should not load any config file that has a filename not ending in \'json\' or \'xml\'', function(done) {
+    var config_dir = './test/config.d/';
+    var config = JSON.parse(fs.readFileSync(path.join(config_dir, 'invalid_file_extension.md'), {'encoding': 'utf8'}));
+    var pm = ProxyManager;
+    pm.init('./test/config.d', function() {
+      pm.proxies.should.not.containDeep(config.service_name);
+      done();
+    });
   });
 });
 
@@ -94,7 +116,7 @@ describe('detailed config validation', function() {
     { 'filename': 'to_port_on_client_proxy_service.json', 'expected_error': 'proxy configuration has a to_port and shouldn\'t'}
   ].forEach(function(validation) {
     it ('should reject a proxy config with error: ' + validation.expected_error, function() {
-      var config_json = JSON.parse(fs.readFileSync('./test/config.d/' + validation.filename, {'encoding':'utf8'}));
+      var config_json = JSON.parse(fs.readFileSync(path.join('./test/config.d/', validation.filename), {'encoding': 'utf8'}));
       var proxy_config = new ProxyConfig(config_json);
       proxy_config.isInvalid().should.equal(validation.expected_error);
     });

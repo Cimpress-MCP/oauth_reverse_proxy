@@ -1,3 +1,4 @@
+var path = require('path');
 var oauth_reverse_proxy = require('./lib');
 
 /**
@@ -13,6 +14,7 @@ if (!config_dir) {
     config_dir = "/etc/oauth_reverse_proxy.d/";
   }
 }
+config_dir = path.resolve(config_dir);
 
 /**
  * The logging directory can be provided as an environment variable.  If not provided,
@@ -27,6 +29,7 @@ if (!log_dir) {
     log_dir = "/var/log/oauth_reverse_proxy/";
   }
 }
+log_dir = path.resolve(log_dir);
 
 try {
   var logger = require('./lib/logger.js').setLogDir(log_dir);
@@ -40,7 +43,7 @@ oauth_reverse_proxy.init(config_dir, function(err, proxy) {
   // If we caught a fatal error creating the proxies, log it and pause briefly before
   // exiting to give Bunyan a chance to flush this error message.
   if (err) {
-    logger.fatal("Failed to create proxy due to %s:\n", err, err.stack);
+    logger.fatal("Failed to create proxy:\n", err, err.stack);
     setTimeout(function() {
       process.exit(2);
     }, 2000);

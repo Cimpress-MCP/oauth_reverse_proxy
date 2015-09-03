@@ -98,7 +98,7 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
         }
     }
 
-Proxy configuration files can be JSON or XML. The following fields are required in a proxy configuration file:
+Proxy configuration files must be JSON, must have a filename ending with `.json`, and cannot have a filename beginning with a dot. All other files will be ignored. The following fields are required in a proxy configuration file:
 
 - **service_name** - The name of the service for which we are proxying.  This is used in logging to disambiguate messages for multiple proxies running within the same process.
 - **from_port** - The port this proxy will open to the outside world.  In the case of a reverse proxy, all inbound traffic to your service should be directed to this port to ensure that only authenticated requests reach your application.  Note that only one proxy can be bound to any given `from_port`.

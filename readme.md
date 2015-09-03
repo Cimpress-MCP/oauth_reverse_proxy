@@ -2,15 +2,43 @@
 
 [![Build Status](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy.svg?branch=master)](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy) [![Coverage Status](https://img.shields.io/coveralls/Cimpress-MCP/oauth_reverse_proxy.svg)](https://coveralls.io/r/Cimpress-MCP/oauth_reverse_proxy?branch=master)
 
-oauth_[|reverse_]proxy is both a proxy that can sign outbound traffic as well as a reverse proxy capable of enforcing that callers present the correct OAuth credentials.
+Layer to add authentication to APIs by checking caller credentials, reverse-proxying inbound traffic to your API, and then signing outbound traffic back to callers.
 
 ##### Motivation
 
-Authenticaton for web applications, particularly applications created for machine-to-machine use, is often an afterthought or implemented in an insecure or incompatible fashion.  We want a robust implementation of OAuth that can run on Windows or Unix systems in front of any HTTP-serving application and support clients written in any language.  These are two-party connections, so we can use the simplest form of OAuth: zero-legged OAuth 1.0a.
+Authentication for web applications, particularly applications created for machine-to-machine use, is often an afterthought or implemented in an insecure or incompatible fashion.  We want a robust implementation of OAuth that can run on Windows or Unix systems in front of any HTTP-serving application and support clients written in any language.  These are two-party connections, so we can use the simplest form of OAuth: zero-legged OAuth 1.0a.
 
 ##### Installation
 
-`npm install oauth_reverse_proxy`
+Since this project is published with [npm](https://www.npmjs.com), the installation and run commands are the same on Windows, OS X, and Linux. Here's a full bash example that includes configuration:
+
+```bash
+# Install the versioned node package from the public npm repo
+$ npm install oauth_reverse_proxy
+
+# Make a config file for each API
+# NOTE default config dir on linux is '/etc/oauth_reverse_proxy.d/'
+$ ls $OAUTH_REVERSE_PROXY_CONFIG_DIR
+api_1.json	api_2.json
+
+# Make a directory of keys for each API, and generate keys
+# NOTE the location of keystore directories comes from api configuration files
+$ sudo mkdir /etc/api_1_keystore # api_1.json configured to use this dir
+$ uuidgen | sudo tee /etc/api_1_keystore/example_key
+$ sudo mkdir /etc/api_2_keystore # api_2.json configured to use this dir
+$ uuidgen | sudo tee /etc/api_2_keystore/example_key
+
+# Run the application
+$ npm start
+
+# Optional: run the application in PM2 instead, which makes it a system service
+$ npm install -g pm2
+$ pm2 start index.js --name "oauth_reverse_proxy" --no-daemon
+
+# Optional: view proxy logs
+# NOTE default log dir on linux is '/var/log/oauth_reverse_proxy/proxy.log'
+$ cat $OAUTH_REVERSE_PROXY_LOG_DIR/proxy.log
+```
 
 ##### Description
 
@@ -32,7 +60,7 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
 
 ##### Configuration
 
-`oauth_[|reverse_]proxy` looks for configuration files in either the location specified in the `OAUTH_REVERSE_PROXY_CONFIG_PATH` environment variable or in a sane default location (on Unix, that's `/etc/oauth_reverse_proxy.d`, on Windows, it's `C:\ProgramData\oauth_reverse_proxy\config.d\`).  Each json file in that directory will be treated as the description of a proxy to run.  Config files are only loaded on start.  Invalid proxy config files are ignored and logged; they do not cause a total failure of `oauth_[|reverse_]proxy`.
+`oauth_[|reverse_]proxy` looks for configuration files in either the location specified in the `OAUTH_REVERSE_PROXY_CONFIG_DIR` environment variable or in a sane default location (on Unix, that's `/etc/oauth_reverse_proxy.d`, on Windows, it's `C:\ProgramData\oauth_reverse_proxy\config.d\`).  Each json file in that directory will be treated as the description of a proxy to run.  Config files are only loaded on start.  Invalid proxy config files are ignored and logged; they do not cause a total failure of `oauth_[|reverse_]proxy`.
 
 ###### Configuration Format
 
@@ -70,7 +98,7 @@ Zero-legged OAuth 1.0a is built on the assumption that a service provider can se
         }
     }
 
-The following fields are required in a proxy configuration file:
+Proxy configuration files can be JSON or XML. The following fields are required in a proxy configuration file:
 
 - **service_name** - The name of the service for which we are proxying.  This is used in logging to disambiguate messages for multiple proxies running within the same process.
 - **from_port** - The port this proxy will open to the outside world.  In the case of a reverse proxy, all inbound traffic to your service should be directed to this port to ensure that only authenticated requests reach your application.  Note that only one proxy can be bound to any given `from_port`.
@@ -92,7 +120,7 @@ The following fields are optional for a proxy or reverse proxy:
 - **required_hosts** (optional) - Sometimes you may have a situation where `oauth_[|reverse_]proxy` is sitting in front of another reverse proxy that is deferring to different systems based on the `Host` header.  In these cases, you may wish to configure your proxy to only allow access to the routes that match a host in this list.  This is to prevent client applications from authenticating against your proxy but accessing hosts that shouldn't be accessible by this proxy.  The entries in `require_hosts` must exactly match the `Host` header of the inbound request, or the request will be rejected.
 - **whitelist** (optional) - Sometimes you might want certain routes to be accessible without authentication.  For example, if you expose a health check route to an upstream load balancer, it's unlikely that the load balancer will be able to authenticate those requests.  In these cases, you can whitelist those specific routes that should not require authentication, and `oauth_[|reverse_]proxy` will pass any matching request through to your application.
     - Whitelist is an array of config objects, each defining a path regex and a set of methods.  For a request to be considered valid, it must match both components.  For example, a `path` of "/livecheck" and a `methods` array containing only "GET" would whitelist any `GET` request against the URL path `/livecheck`.  Keep in mind that the regex is interpreted as being between `^` and `$`, so the entire path must match this regex.  A request for `/livecheck/test/a` would be rejected.  If either path or method are omitted, it is assumed that all paths or methods match.
-- **quotas** (optional) - The default behavior of `oauth_[|reverse_]proxy` is to allow an unlimited number of requests per key, but sometimes you want to constrain the volume of requests that can be made by consumers.  The quotas object lets you define thresholds for an allowable volume of hits per key per unit time. 
+- **quotas** (optional) - The default behavior of `oauth_[|reverse_]proxy` is to allow an unlimited number of requests per key, but sometimes you want to constrain the volume of requests that can be made by consumers.  The quotas object lets you define thresholds for an allowable volume of hits per key per unit time.
     - `interval` specifies the time interval for which quotas apply: an interval of 1 means our quotas are hits-per-second while an interval of 60 specifies hits-per-minute.
     - The `default_threshold` parameter gives us a catch-all for any key that is not given a specific threshold.  If undefined, keys that lack specific thresholds are allowed to make an unbounded number of requests.  In the example above, keys lacking defined thresholds are allowed to make 10 requests per minute.
     - The `thresholds` array contains 0 or more mappings from a consumer key name to the acceptable threshold for that key.  In the example above, the consumer_key "privileged_key" is allowed to make 1000 requests per second while "unprivileged_key" can only make 1 request per minute.

@@ -1,6 +1,9 @@
 # oauth_reverse_proxy
 
-[![Build Status](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy.svg?branch=master)](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy) [![Coverage Status](https://img.shields.io/coveralls/Cimpress-MCP/oauth_reverse_proxy.svg)](https://coveralls.io/r/Cimpress-MCP/oauth_reverse_proxy?branch=master)
+[![npm version](https://badge.fury.io/js/oauth_reverse_proxy.svg)](http://badge.fury.io/js/oauth_reverse_proxy)
+[![Build Status](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy.svg?branch=master)](https://travis-ci.org/Cimpress-MCP/oauth_reverse_proxy)
+[![Coverage Status](https://img.shields.io/coveralls/Cimpress-MCP/oauth_reverse_proxy.svg)](https://coveralls.io/r/Cimpress-MCP/oauth_reverse_proxy?branch=master)
+[![Dependency Status](https://img.shields.io/david/Cimpress-MCP/oauth_reverse_proxy.svg)](https://david-dm.org/Cimpress-MCP/oauth_reverse_proxy)
 
 Layer to add authentication to APIs by checking caller credentials, reverse-proxying inbound traffic to your API, and then signing outbound traffic back to callers.
 
@@ -10,7 +13,7 @@ Authentication for web applications, particularly applications created for machi
 
 ##### Installation
 
-Since this project is published with [npm](https://www.npmjs.com), the installation and run commands are the same on Windows, OS X, and Linux. Here's a full bash example that includes configuration:
+Since this project is published with [npm](https://www.npmjs.com/package/oauth_reverse_proxy), the installation and run commands are the same on Windows, OS X, and Linux. Here's a full bash example that includes configuration:
 
 ```bash
 # Install the versioned node package from the public npm repo

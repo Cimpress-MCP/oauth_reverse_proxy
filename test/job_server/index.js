@@ -2,7 +2,9 @@ var express = require('express');
 var app = express();
 var fs = require('fs');
 var util = require('util');
-app.use(require ('body-parser')());
+var body_parser = require('body-parser');
+
+app.use(body_parser.json());
 app.use(require ('multer')());
 
 var compress = require('compression');

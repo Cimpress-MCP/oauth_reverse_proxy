@@ -1,4 +1,6 @@
 language: node_js
+node_js:
+  - 0.12.7
 before_script:
   - #sudo curl -LO http://xrl.us/cpanm
   - #sudo chmod +x cpanm

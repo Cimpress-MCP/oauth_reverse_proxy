@@ -16,6 +16,7 @@ before_script:
   - pip install requests-oauth  --user `whoami`
 script:
   - npm run test
+after_success:
   - npm run coveralls
 deploy:
   provider: npm

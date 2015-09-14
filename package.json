@@ -44,7 +44,7 @@
     "xunit-file": "^0.0.7"
   },
   "scripts": {
-    "test": "mocha --reporter spec -t 10000 test | bunyan",
+    "test": "mocha --reporter spec -t 10000 test",
     "cov": "`npm bin`/istanbul cover --root . -x node_modules -x test --dir ./reports `npm bin`/_mocha -- --reporter spec -t 10000 test | bunyan",
     "coveralls": "npm run cov && node_modules/coveralls/bin/coveralls.js < reports/lcov.info"
   },

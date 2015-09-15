@@ -98,7 +98,7 @@ describe('bootstrapping', function() {
     });
   });
 
-  // Validate that none of the config files with valid filenames but invalud contents were loaded.
+  // Validate that none of the config files with valid filenames but invalid contents were loaded.
   [
     'unnamed_service.json',
     'no_from_port_service.json', 'no_to_port_service.json',

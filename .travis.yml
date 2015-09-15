@@ -9,10 +9,11 @@ before_script:
   - cd test/clients/ruby
   - bundle install
   - cd ../../../
-  - export PATH=$HOME/.local/bin:$PATH # via https://github.com/rande/travis-kitchensink/blob/48e5915be37a4141dc59a8fd5c06b807c4abbab8/.travis.yml
+  # via https://github.com/rande/travis-kitchensink/blob/48e5915be37a4141dc59a8fd5c06b807c4abbab8/.travis.yml
+  - export PATH=$HOME/.local/bin:$PATH
   - pip install requests-oauth  --user `whoami`
 script:
-  - npm run test
+  - npm test
 after_success:
   - npm run coveralls
 deploy:

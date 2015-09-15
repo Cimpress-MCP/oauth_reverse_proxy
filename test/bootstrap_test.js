@@ -98,9 +98,9 @@ describe('bootstrapping', function() {
     });
   });
 
-  // Validate that none of the busted config files were loaded.
+  // Validate that none of the config files with valid filenames but invalud contents were loaded.
   [
-    '1999_called_service.xml', 'unnamed_service.json',
+    'unnamed_service.json',
     'no_from_port_service.json', 'no_to_port_service.json',
     'equal_ports_service.json', 'to_port_on_client_proxy_service.json',
     'nonnumeric_from_port_service.json', 'nonnumeric_to_port_service.json',

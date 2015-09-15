@@ -58,7 +58,7 @@ describe('basic config validation', function() {
     });
   });
 
-  it ('should not load any config file that has a filename not ending in \'json\' or \'xml\'', function(done) {
+  it ('should not load any config file that has a filename not ending in \'json\'', function(done) {
     var config_dir = './test/config.d/';
     var config = JSON.parse(fs.readFileSync(path.join(config_dir, 'invalid_file_extension.md'), {'encoding': 'utf8'}));
     var pm = ProxyManager;

@@ -8,7 +8,7 @@ var multer  = require('multer');
 var compress = require('compression');
 
 app.use(body_parser.json());
-multer().array('binary_data');
+app.use(multer().array('binary_data'));
 
 // Save ourselves the pain and emotional trauma of having to worry about verb case while looping.
 app.GET = app.get;

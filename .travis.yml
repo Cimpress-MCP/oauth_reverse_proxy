@@ -1,4 +1,4 @@
-language: node_jscd
+language: node_js
 node_js:
   - 0.12.7
 sudo: false
@@ -6,9 +6,6 @@ install:
   - npm install -g bunyan grunt grunt-cli
   - npm install
 before_script:
-  - #sudo curl -LO http://xrl.us/cpanm
-  - #sudo chmod +x cpanm
-  - #sudo ./cpanm Net::OAuth || true
   - cd test/clients/ruby
   - bundle install
   - cd ../../../

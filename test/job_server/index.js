@@ -8,6 +8,7 @@ var multer  = require('multer');
 var compress = require('compression');
 
 app.use(body_parser.json());
+multer().array('binary_data');
 
 // Save ourselves the pain and emotional trauma of having to worry about verb case while looping.
 app.GET = app.get;
@@ -117,7 +118,6 @@ function JobServer() {
       res.setHeader('Content-Type', 'application/json');
       console.log('%s with key %s', verb, req.headers[CONSUMER_KEY_HEADER]);
       this_obj.emit(verb + " /job", req, res);
-      multer({dest: path.join(verb, 'uploads')}).single('binary_data');
       res.send({'status':'ok'});
     });
 

@@ -105,7 +105,7 @@ function JobServer() {
     req.on('end', function () {
       req.body = data;
       this_obj.emit('POST /getProducts', req, res);
-      res.sendfile('./test/resources/list_of_products.xml');
+      res.sendFile('./test/resources/list_of_products.xml');
     });
 
 

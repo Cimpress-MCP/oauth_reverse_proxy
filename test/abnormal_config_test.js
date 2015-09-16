@@ -39,7 +39,7 @@ describe('basic config validation', function() {
   });
 
   it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a nonexistent directory', function() {
-    var dir = './does-not-exist';
+    var dir = path.resolve('./does-not-exist');
     (function() { oauth_reverse_proxy.init(dir, function() {}) }).
     should.throw("ENOENT, no such file or directory '" + dir + "'");
   });

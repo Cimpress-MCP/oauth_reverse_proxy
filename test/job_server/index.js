@@ -6,8 +6,8 @@ var body_parser = require('body-parser');
 var multer  = require('multer');
 var compress = require('compression');
 
+app.use(multer().fields(['binary_data']));
 app.use(body_parser.json());
-app.use(multer().array('binary_data'));
 
 // Save ourselves the pain and emotional trauma of having to worry about verb case while looping.
 app.GET = app.get;
@@ -105,7 +105,7 @@ function JobServer() {
     req.on('end', function () {
       req.body = data;
       this_obj.emit('POST /getProducts', req, res);
-      res.sendFile('./test/resources/list_of_products.xml');
+      res.sendFile(path.resolve('./test/resources/list_of_products.xml'));
     });
 
 

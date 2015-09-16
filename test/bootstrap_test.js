@@ -4,6 +4,7 @@ var fs = require('fs');
 var rimraf = require('rimraf');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
+var path = require('path');
 
 var oauth_reverse_proxy = require('../lib');
 var keygen = require('../utils/keygen.js');
@@ -112,6 +113,7 @@ describe('bootstrapping', function() {
     'no_ssl_cert_service.json', 'no_ssl_key_service.json',
     'invalid_ssl_cert_service.json', 'invalid_ssl_key_service.json'
   ].forEach(function(invalid_config_file) {
+    invalid_config_file = path.resolve('./test/config.d', invalid_config_file);
     it ('should reject invalid proxy config file ' + invalid_config_file, function() {
       var msg = exports.proxies[invalid_config_file];
       (typeof msg).should.equal('string');

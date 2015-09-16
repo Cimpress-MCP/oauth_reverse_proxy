@@ -59,7 +59,7 @@
     "multer": "^1.0.3",
     "oauth": "^0.9.13",
     "request": "^2.61.0",
-    "rimraf": "^2.4.3",
+    "rimraf": "~2.2.8",
     "should": "^7.1.0",
     "xunit-file": "^0.0.7"
   }

@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "bunyan": "^1.5.1",
-    "connect": "2.30.2",
+    "connect": "3.4.0",
     "connect-restreamer": "1.0.3",
     "http-proxy": "1.11.2",
     "mkdirp": "0.5.1",

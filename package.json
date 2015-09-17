@@ -1,7 +1,7 @@
 {
   "name": "oauth_reverse_proxy",
   "description": "An OAuth 1.0a authenticating proxy and reverse proxy to add authentication to API",
-  "version": "1.5.10",
+  "version": "1.5.10-1",
   "author": "Ryan Breen <rbreen@cimpress.com> (https://github.com/ryanbreen)",
   "contributors": [
     "Calvin Leung Huang <cleung@cimpress.com> (https://github.com/cleung2010)",

@@ -35,11 +35,11 @@
   "dependencies": {
     "bunyan": "^1.5.1",
     "connect": "3.4.0",
-    "connect-query": "^0.2.0",
     "connect-restreamer": "1.0.3",
     "http-proxy": "1.11.2",
     "mkdirp": "0.5.1",
     "node-uuid": "1.4.3",
+    "qs": "^5.1.0",
     "underscore": "1.8.3"
   },
   "devDependencies": {

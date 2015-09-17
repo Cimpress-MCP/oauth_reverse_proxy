@@ -87,7 +87,7 @@ describe('bootstrapping', function() {
     oauth_reverse_proxy.init('./test/config.d', function(err, proxies) {
       if (err) done('oauth_reverse_proxy startup failed: ' + err);
       exports.proxies = require('../lib/proxy_manager.js').proxies;
-      exports.proxy = exports.proxies["jobs_service.json"];
+      exports.proxy = exports.proxies['jobs_service.json'];
 
       if (typeof exports.proxy === 'string') {
         should.fail(exports.proxy);

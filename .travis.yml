@@ -3,7 +3,11 @@ node_js:
   - 0.12.7
 sudo: false
 install:
+  - npm cache clean
   - npm install -g bunyan grunt grunt-cli
+  - npm install
+  - npm update
+  - npm install
   - npm install
 before_script:
   - cd test/clients/ruby

@@ -2,5 +2,6 @@
 	"service_name": "client_proxy_service",
 	"mode": "proxy",
 	"from_port": 8282,
+	"validate_target_cert": false,
 	"oauth_secret_dir": "./test/keys/8008/8080/"
 }

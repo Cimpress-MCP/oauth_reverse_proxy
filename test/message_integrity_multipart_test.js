@@ -60,7 +60,6 @@ require('./bootstrap_test.js');
 
             // Validate that the request was sent multipart and chunked.
             authenticated_request.headers['content-type'].should.startWith('multipart/form-data; boundary=');
-            authenticated_request.headers['transfer-encoding'].should.equal('chunked');
 
             // Now validate that the response headers and body are correct.  Note that we explicitly ignore
             // last-modified and etag in the header comparison because it can differ by a second based on when the

@@ -7,8 +7,8 @@ var body_parser = require('body-parser');
 var multer  = require('multer');
 var compress = require('compression');
 
-app.use(multer().fields(['binary_data']));
-app.use(body_parser.urlencoded());
+app.use(multer().fields([{'name':'binary_data'}]));
+app.use(body_parser.urlencoded({extended: false}));
 app.use(body_parser.json());
 
 // Save ourselves the pain and emotional trauma of having to worry about verb case while looping.
@@ -126,8 +126,8 @@ function JobServer() {
     app[verb]('/uploads', function(req, res) {
       console.log('%s /uploads with key %s', verb.toUpperCase(), req.headers[CONSUMER_KEY_HEADER]);
 
-      var file_path = req.files['binary_data'].path;
-      var expected_length = req.files['binary_data'].size;
+      var file_path = './test/resources/' + req.files['binary_data'][0].originalname;
+      var expected_length = req.files['binary_data'][0].size;
 
       var is_file_complete = function(cb) {
         fs.stat(file_path, function(err, stat) {
@@ -140,7 +140,7 @@ function JobServer() {
         is_file_complete(function(complete) {
           if (complete) {
             this_obj.emit(verb.toUpperCase() + " /uploads", req, res);
-            res.sendfile(req.files['binary_data'].path);
+            res.sendfile(file_path);
           } else {
             // If the file is not completely loaded, pause 10ms and try again
             setTimeout(poll_file, 10);

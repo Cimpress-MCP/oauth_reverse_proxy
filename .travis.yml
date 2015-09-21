@@ -1,16 +1,24 @@
 language: node_js
+node_js:
+  - 0.12.7
+sudo: false
+install:
+  - npm cache clean
+  - npm install -g bunyan grunt grunt-cli
+  - npm install
+  - npm update
+  - npm install
+  - npm install
 before_script:
-  - #sudo curl -LO http://xrl.us/cpanm
-  - #sudo chmod +x cpanm
-  - #sudo ./cpanm Net::OAuth || true
   - cd test/clients/ruby
   - bundle install
   - cd ../../../
-  - sudo pip install requests-oauth
-  - npm install -g bunyan
-  - npm install -g grunt grunt-cli
+  # via https://github.com/rande/travis-kitchensink/blob/48e5915be37a4141dc59a8fd5c06b807c4abbab8/.travis.yml
+  - export PATH=$HOME/.local/bin:$PATH
+  - pip install requests-oauth  --user `whoami`
 script:
-  - grunt benchmark || true
+  - npm test
+after_success:
   - npm run coveralls
 deploy:
   provider: npm

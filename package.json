@@ -1,57 +1,67 @@
 {
   "name": "oauth_reverse_proxy",
-  "description": "An OAuth 1.0a authenticating proxy and reverse proxy",
-  "version": "1.5.9",
+  "description": "An OAuth 1.0a authenticating proxy and reverse proxy to add authentication to API",
+  "version": "1.5.10-2",
+  "author": "Ryan Breen <rbreen@cimpress.com> (https://github.com/ryanbreen)",
   "contributors": [
-    {
-      "name": "Ryan Breen",
-      "email": "rbreen@cimpress.com"
-    }
+    "Calvin Leung Huang <cleung@cimpress.com> (https://github.com/cleung2010)",
+    "Norm MacLennann <nmaclennann@cimpress.com> (https://github.com/maclennann)",
+    "Theodore X. Pak <tpak@cimpress.com> (https://github.com/theopak)",
+    "Justin Karimi <jkarimi@cimpress.com> (https://github.com/jekhokie)"
   ],
-  "repository" : {
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/Cimpress-MCP/oauth_reverse_proxy",
+  "repository": {
     "type": "git",
     "url": "git://github.com/Cimpress-MCP/oauth_reverse_proxy.git"
   },
+  "keywords": [
+    "authentication",
+    "auth",
+    "oauth",
+    "token",
+    "access",
+    "service",
+    "api"
+  ],
+  "engines": {
+    "node": ">= 0.12.7"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec -t 10000 ./test | bunyan; exit ${PIPESTATUS}",
+    "cov": "`npm bin`/istanbul cover --root . -x node_modules -x test --dir ./reports `npm bin`/_mocha -- --reporter spec -t 10000 test | bunyan",
+    "coveralls": "npm run cov && node_modules/coveralls/bin/coveralls.js < reports/lcov.info"
+  },
   "dependencies": {
-    "bunyan": "^1.2.3",
-    "connect": "2.14.4",
-    "connect-restreamer": "1.0.0",
-    "http-proxy": "1.1.2",
+    "body-parser": "^1.14.0",
+    "bunyan": "^1.5.1",
+    "connect": "3.4.0",
+    "http-proxy": "^1.11.2",
     "mkdirp": "0.5.0",
-    "node-uuid": "1.4.1",
-    "underscore": "1.6.0"
+    "node-uuid": "1.4.3",
+    "qs": "^5.1.0",
+    "underscore": "1.8.3"
   },
   "devDependencies": {
     "benchmark": "^1.0.0",
-    "body-parser": "1.0.2",
-    "compression": "1.0.6",
+    "body-parser": "^1.13.3",
+    "compression": "^1.5.2",
     "coveralls": "^2.11.2",
-    "express": "4.0.0",
+    "express": "^4.13.3",
     "grunt": "^0.4.5",
     "grunt-benchmark": "^0.3.0",
     "grunt-cli": "^0.1.13",
     "grunt-coveralls": "^1.0.0",
-    "grunt-env": "^0.4.2",
-    "grunt-nodemon": "^0.3.0",
-    "istanbul": "0.2.11",
-    "method-override": "1.0.2",
-    "mocha": "^1.21.4",
-    "multer": "0.1.0",
-    "oauth": "0.9.11",
-    "request": "2.36.0",
-    "rimraf": "2.2.8",
-    "should": "^4.0.4",
-    "xunit-file": "0.0.5"
-  },
-  "scripts": {
-    "test": "./node_modules/.bin/_mocha --reporter spec -t 10000 test | bunyan",
-    "cov": "`npm bin`/istanbul cover --root . -x node_modules -x test --dir ./reports `npm bin`/_mocha -- --reporter spec -t 10000 test | bunyan",
-    "coveralls": "npm run cov && node_modules/coveralls/bin/coveralls.js < reports/lcov.info"
-  },
-  "licenses": [
-    {
-      "type": "Apache-2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0"
-    }
-  ]
+    "grunt-env": "^0.4.4",
+    "grunt-nodemon": "^0.4.0",
+    "istanbul": "^0.3.20",
+    "method-override": "^2.3.5",
+    "mocha": "^2.3.2",
+    "multer": "^1.0.3",
+    "oauth": "^0.9.13",
+    "request": "^2.61.0",
+    "rimraf": "~2.2.8",
+    "should": "^7.1.0",
+    "xunit-file": "^0.0.7"
+  }
 }

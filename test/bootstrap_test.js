@@ -4,6 +4,7 @@ var fs = require('fs');
 var rimraf = require('rimraf');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
+var path = require('path');
 
 var oauth_reverse_proxy = require('../lib');
 var keygen = require('../utils/keygen.js');
@@ -86,7 +87,7 @@ describe('bootstrapping', function() {
     oauth_reverse_proxy.init('./test/config.d', function(err, proxies) {
       if (err) done('oauth_reverse_proxy startup failed: ' + err);
       exports.proxies = require('../lib/proxy_manager.js').proxies;
-      exports.proxy = exports.proxies["jobs_service.json"];
+      exports.proxy = exports.proxies['jobs_service.json'];
 
       if (typeof exports.proxy === 'string') {
         should.fail(exports.proxy);
@@ -98,9 +99,9 @@ describe('bootstrapping', function() {
     });
   });
 
-  // Validate that none of the busted config files were loaded.
+  // Validate that none of the config files with valid filenames but invalid contents were loaded.
   [
-    '1999_called_service.xml', 'unnamed_service.json',
+    'unnamed_service.json',
     'no_from_port_service.json', 'no_to_port_service.json',
     'equal_ports_service.json', 'to_port_on_client_proxy_service.json',
     'nonnumeric_from_port_service.json', 'nonnumeric_to_port_service.json',

@@ -39,8 +39,9 @@ describe('basic config validation', function() {
   });
 
   it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a nonexistent directory', function() {
-    (function() { oauth_reverse_proxy.init('./test/keys', function() {}) }).
-    should.throw("ENOENT, no such file or directory './test/keys'");
+    var dir = path.resolve('./does-not-exist');
+    (function() { oauth_reverse_proxy.init(dir, function() {}) }).
+    should.throw("ENOENT, no such file or directory '" + dir + "'");
   });
 
   it ('should reject an attempt to init oauth_reverse_proxy with a config_dir referencing a non-directory inode', function() {
@@ -58,7 +59,7 @@ describe('basic config validation', function() {
     });
   });
 
-  it ('should not load any config file that has a filename not ending in \'json\' or \'xml\'', function(done) {
+  it ('should not load any config file that has a filename not ending in \'json\'', function(done) {
     var config_dir = './test/config.d/';
     var config = JSON.parse(fs.readFileSync(path.join(config_dir, 'invalid_file_extension.md'), {'encoding': 'utf8'}));
     var pm = ProxyManager;
@@ -111,8 +112,8 @@ describe('detailed config validation', function() {
     { 'filename': 'giant_to_port_service.json', 'expected_error': 'to_port must be a valid port number'},
     { 'filename': 'no_ssl_cert_service.json', 'expected_error': 'no ssl cert file provided'},
     { 'filename': 'no_ssl_key_service.json', 'expected_error': 'no ssl key file provided'},
-    { 'filename': 'invalid_ssl_cert_service.json', 'expected_error': 'https cert file ./test/resources/cert_oops.pem does not exist'},
-    { 'filename': 'invalid_ssl_key_service.json', 'expected_error': 'https key file ./test/resources/key_oops.pem does not exist'},
+    { 'filename': 'invalid_ssl_cert_service.json', 'expected_error': 'https cert file ' + path.resolve(__dirname, '../', './test/resources/cert_oops.pem') + ' does not exist'},
+    { 'filename': 'invalid_ssl_key_service.json', 'expected_error': 'https key file ' + path.resolve(__dirname, '../', './test/resources/key_oops.pem') + ' does not exist'},
     { 'filename': 'to_port_on_client_proxy_service.json', 'expected_error': 'proxy configuration has a to_port and shouldn\'t'}
   ].forEach(function(validation) {
     it ('should reject a proxy config with error: ' + validation.expected_error, function() {

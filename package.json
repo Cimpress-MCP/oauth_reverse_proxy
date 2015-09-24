@@ -1,7 +1,7 @@
 {
   "name": "oauth_reverse_proxy",
   "description": "An OAuth 1.0a authenticating proxy and reverse proxy to add authentication to API",
-  "version": "1.5.10-2",
+  "version": "1.5.10-3",
   "author": "Ryan Breen <rbreen@cimpress.com> (https://github.com/ryanbreen)",
   "contributors": [
     "Calvin Leung Huang <cleung@cimpress.com> (https://github.com/cleung2010)",
@@ -28,7 +28,7 @@
     "node": ">= 0.12.7"
   },
   "scripts": {
-    "test": "mocha --reporter spec -t 10000 ./test | bunyan; exit ${PIPESTATUS}",
+    "test": "mocha --reporter spec -t 10000 ./test | bunyan; exit ${PIPESTATUS[0]}",
     "cov": "`npm bin`/istanbul cover --root . -x node_modules -x test --dir ./reports `npm bin`/_mocha -- --reporter spec -t 10000 test | bunyan",
     "coveralls": "npm run cov && node_modules/coveralls/bin/coveralls.js < reports/lcov.info"
   },

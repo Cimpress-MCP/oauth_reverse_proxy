@@ -51,7 +51,7 @@ require('./bootstrap_test.js');
         sendFn(verb, null, {form:{submit:'ok'}}, 200, done);
       });
 
-      // This test is not relevant for the outbound proxy
+      // This test is not relevant for the outbound proxy.
       if (mode === 'oauth_reverse_proxy') {
         // Validate that a POST or PUT with unsigned body parameters fails due to signature mismatch.
         it ("should reject an improperly signed " + verb + " where params are not part of the signature", function(done) {
@@ -73,6 +73,25 @@ require('./bootstrap_test.js');
           // reset console.err
           console.error = _console_error;
           done(err);
+        });
+      });
+
+      // Verify that the same request always produces the same outcome for a given urlencoded body, regardless of the
+      // charset. Note that plain `body_parser.urlencoded()` rejects non-`utf-8` charsets by default.
+      it ("should support urlencoded requests with non-'utf-8' charsets declared in the header", function(done) {
+        var intended_content_type_header = 'application/x-www-form-urlencoded;charset=utf-8';
+        var options = {
+          headers: { 'Content-Type': intended_content_type_header },
+          form: { 'submit': 'ok' }
+        };
+        sendFn(verb, 'http://localhost:8080/job', options, 200, function(utf8_err, utf8_res, utf8_body) {
+          if (utf8_err) return done(utf8_err);
+          intended_content_type_header = 'application/x-www-form-urlencoded;charset=ISO-8859-8';
+          sendFn(verb, 'http://localhost:8080/job', options, 200, function(err, res, body) {
+            if (err) return done(err);
+            body.should.deepEqual(utf8_body);
+            done();
+          });
         });
       });
     });

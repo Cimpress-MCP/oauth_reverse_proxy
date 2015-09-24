@@ -100,6 +100,17 @@ require('./bootstrap_test.js');
           });
         });
       });
+
+      // TODO (@theopak): Expand this test so that it verifies that the response is identical for requests
+      // that are identical other than having different charsets.
+      it ("should support " + verb + " requests with non-'utf-8' charsets declared in the header", function(done) {
+        var intended_content_type_header = 'text/html; charset=ISO-8859-8';
+        var custom_headers = { headers: {'Content-Type': intended_content_type_header } };
+        request_sender.sendRequest(verb, 'http://localhost:8080/livecheck', custom_headers, 200, function(err, res, body) {
+          if (err) return done(err);
+          done();
+        });
+      });
     });
   });
 });

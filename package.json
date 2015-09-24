@@ -28,7 +28,7 @@
     "node": ">= 0.12.7"
   },
   "scripts": {
-    "test": "mocha --reporter spec -t 10000 ./test | bunyan; exit ${PIPESTATUS[0]}",
+    "test": "bash -c 'mocha --reporter spec -t 10000 ./test | bunyan; exit ${PIPESTATUS[0]}'",
     "cov": "`npm bin`/istanbul cover --root . -x node_modules -x test --dir ./reports `npm bin`/_mocha -- --reporter spec -t 10000 test | bunyan",
     "coveralls": "npm run cov && node_modules/coveralls/bin/coveralls.js < reports/lcov.info"
   },

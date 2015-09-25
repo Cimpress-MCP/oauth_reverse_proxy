@@ -16,7 +16,7 @@ describe('OAuth validations', function() {
 
     // Validate that an invalid signature method results in a 400 error.
     it ("should reject " + verb + " requests with invalid signature methods", function(done) {
-      request_sender.oauth_headers[2][1] = 'HMAC-SHA256';
+      request_sender.oauth_headers[2][1] = 'HMAC-BLOWFISH';
       request_sender.sendSimpleAuthenticatedRequest(verb, 400, done);
     });
 

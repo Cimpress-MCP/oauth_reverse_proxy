@@ -24,7 +24,7 @@ require('./bootstrap_test.js');
     ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
 
       // Validate that a response containing gzipped content is handled properly.
-      it ("should handle a gzipped response to a " + verb, function(done) {
+      it ("should handle a " + mode + " gzipped response to a " + verb, function(done) {
         sendFn(verb, 'http://localhost:8008/compressed_content', {headers:{'accept-encoding':'gzip'}}, 200,
         function(err, res, body) {
           res.headers['content-encoding'].should.equal('gzip');
@@ -34,7 +34,7 @@ require('./bootstrap_test.js');
       });
 
       // Validate that a response containing deflated content is handled properly.
-      it ("should handle a gzipped response to a " + verb, function(done) {
+      it ("should handle a " + mode + " gzipped response to a " + verb, function(done) {
         sendFn(verb, 'http://localhost:8008/compressed_content', {headers:{'accept-encoding':'deflate'}}, 200,
         function(err, res, body) {
           res.headers['content-encoding'].should.equal('deflate');

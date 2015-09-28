@@ -20,7 +20,7 @@ var create_client_test = function(verb, cmd, cwd, key) {
     exec(cmd, {cwd: cwd}, function(err, stdout, stderr) {
       if (err) return cb(err);
       stderr.should.equal('');
-      stdout.trim().should.equal('{"status":"ok"}');
+      stdout.trim().should.endWith('{"status":"ok"}');
       cb();
     });
   };
@@ -32,23 +32,24 @@ describe('An OAuth-compliant reverse proxy', function() {
 
   // TODO: Refactor these tests so they auto-detect if they can be run on the host system.  This would simplify
   // the platform-specific logic in here and allow for successful tests with less lengthy setup on CI.
-/**
+
   it ('should support requests from Ruby clients', function(done) {
     var rubyTest = create_client_test('GET', 'ruby client.rb', 'test/clients/ruby', 'ruby-test-key')
     rubyTest(done);
   });
-**/
+
   it ('should support requests from Java clients', function(done) {
     var javaTest = create_client_test('POST',
       'java -cp target/JWTClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.cimpress.mcp.jwt.JWTClient',
       'test/clients/java/JWTClient', 'java-test-key')
-    javaTest(done);
-  });
-/**
-    var javaTest = create_client_test('POST',
-      'java -cp target/OAuthClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.cimpress.mcp.oauth.OAuthClient',
-      'test/clients/java/OAuthClient', 'java-test-key')
-    javaTest(done);
+    javaTest(function(err) {
+      if (err) return done(err);
+
+      var javaTest = create_client_test('POST',
+        'java -cp target/OAuthClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.cimpress.mcp.oauth.OAuthClient',
+        'test/clients/java/OAuthClient', 'java-test-key')
+      javaTest(done);
+    });
   });
 
   it ('should support requests from Node.js clients', function(done) {
@@ -62,7 +63,7 @@ describe('An OAuth-compliant reverse proxy', function() {
     var perlTest = create_client_test('GET', 'perl client.pl', 'test/clients/perl', 'perl-test-key')
     perlTest(done);
   });
-**
+**/
 
   // Mac-specific client tests
   if(os.platform() === "darwin") {
@@ -131,6 +132,6 @@ describe('An OAuth-compliant reverse proxy', function() {
       var pythonTest = create_client_test('GET', 'python client.py', 'test/clients/python', 'python-test-key')
       pythonTest(done);
     });
-  }**/
+  }
 
 });

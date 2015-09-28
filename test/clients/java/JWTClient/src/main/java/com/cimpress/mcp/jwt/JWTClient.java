@@ -45,6 +45,9 @@ public class JWTClient {
 		JwtClaims claims = new JwtClaims();
 	    claims.setIssuer("java-test-key");
 	    claims.setGeneratedJwtId();
+	    claims.setExpirationTimeMinutesInTheFuture(1);
+	    claims.setNotBeforeMinutesInThePast(1);
+	    claims.setIssuedAtToNow();
 	    
 	    // A JWT is a JWS and/or a JWE with JSON claims as the payload.
 	    // In this example it is a JWS so we create a JsonWebSignature object.
@@ -57,6 +60,7 @@ public class JWTClient {
 	    String jwkJson = "{\"kty\":\"oct\",\"k\":\""+ secret +"\"}";
 	    JsonWebKey key = JsonWebKey.Factory.newJwk(jwkJson);
 	    jws.setKey(key.getKey());
+	    jws.setKeyIdHeaderValue(key.getKeyId());
 	    jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.HMAC_SHA256);
 
 	    String jwt = jws.getCompactSerialization();

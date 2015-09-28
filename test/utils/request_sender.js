@@ -7,7 +7,7 @@ var fs = require('fs');
 var encoding = require('../../lib/encoding.js');
 
 var querystring = require('querystring');
-var request = require('request');
+var request = require('./request_custom');
 // This saves us from having to special case calls to delete since it's the only verb where the
 // name doesn't match the method name.  For the others, we're just being lazy and saying we don't
 // want to remember whether our verbs are upper or lower case when we try to grab the appropriate

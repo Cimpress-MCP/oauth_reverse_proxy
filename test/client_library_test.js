@@ -20,7 +20,7 @@ var create_client_test = function(verb, cmd, cwd, key) {
     exec(cmd, {cwd: cwd}, function(err, stdout, stderr) {
       if (err) return cb(err);
       stderr.should.equal('');
-      stdout.trim().should.equal('{"status":"ok"}');
+      stdout.trim().should.endWith('{"status":"ok"}');
       cb();
     });
   };
@@ -40,9 +40,16 @@ describe('An OAuth-compliant reverse proxy', function() {
 
   it ('should support requests from Java clients', function(done) {
     var javaTest = create_client_test('POST',
-      'java -cp target/OAuthClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.cimpress.mcp.oauth.OAuthClient',
-      'test/clients/java/OAuthClient', 'java-test-key')
-    javaTest(done);
+      'java -cp target/JWTClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.cimpress.mcp.jwt.JWTClient',
+      'test/clients/java/JWTClient', 'java-test-key')
+    javaTest(function(err) {
+      if (err) return done(err);
+
+      var javaTest = create_client_test('POST',
+        'java -cp target/OAuthClient-1.0-SNAPSHOT-jar-with-dependencies.jar com.cimpress.mcp.oauth.OAuthClient',
+        'test/clients/java/OAuthClient', 'java-test-key')
+      javaTest(done);
+    });
   });
 
   it ('should support requests from Node.js clients', function(done) {

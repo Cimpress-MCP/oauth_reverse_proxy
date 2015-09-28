@@ -18,6 +18,12 @@ app.PUT = app.put;
 app.DELETE = app.delete;
 
 const CONSUMER_KEY_HEADER = require('../../lib/proxy/oauth/constants.js').CONSUMER_KEY_HEADER;
+const ISSUER_HEADER = require('../../lib/proxy/jwt/constants.js').ISSUER_HEADER;
+
+function getUserHeader(req) {
+  if (req.headers[CONSUMER_KEY_HEADER]) return req.headers[CONSUMER_KEY_HEADER];
+  if (req.headers[ISSUER_HEADER]) return req.headers[ISSUER_HEADER];
+}
 
 // The job server represents they types of servers we might expect to see behind oauth_reverse_proxy.
 function JobServer() {
@@ -26,7 +32,7 @@ function JobServer() {
   ['GET', 'DELETE'].forEach(function(verb) {
     app[verb]("/job/:job_id", function(req, res) {
       res.setHeader('Content-Type', 'application/json');
-      console.log('%s with key %s', verb, req.headers[CONSUMER_KEY_HEADER]);
+      console.log('%s with key %s', verb, getUserHeader(req));
       this_obj.emit(verb + " /job", req, res);
       res.send({'status':'ok'});
     });
@@ -50,7 +56,7 @@ function JobServer() {
   ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
     app[verb]('/%7bwonky%20path%7d/is&wonky', function(req, res, next) {
       res.setHeader('Content-Type', 'application/json');
-      console.log('%s /{wonky path}/is&wonky with key %s', verb.toUpperCase(), req.headers[CONSUMER_KEY_HEADER]);
+      console.log('%s /{wonky path}/is&wonky with key %s', verb.toUpperCase(), getUserHeader(req));
       this_obj.emit(verb + ' /{wonky path}/is&wonky', req, res);
       res.send({'status':'ok'});
     });
@@ -61,7 +67,7 @@ function JobServer() {
     app[verb]('/compressed_content', function(req, res, next) {
 
       res.setHeader('Content-Type', 'text/plain');
-      console.log('%s /compressed_content with key %s', verb.toUpperCase(), req.headers[CONSUMER_KEY_HEADER]);
+      console.log('%s /compressed_content with key %s', verb.toUpperCase(), getUserHeader(req));
 
       compress()(req, res, function() {
         res.write(fs.readFileSync('./test/resources/lorem_ipsum.txt'), 'utf8');
@@ -75,7 +81,7 @@ function JobServer() {
     app[verb]('/transactions', function(req, res) {
 
       res.setHeader('Content-Type', 'application/json');
-      console.log('%s /transactions with key %s', verb.toUpperCase(), req.headers[CONSUMER_KEY_HEADER]);
+      console.log('%s /transactions with key %s', verb.toUpperCase(), getUserHeader(req));
 
       // Generate a sizeable chunk of json that will be chunked and returned
       res.write('{\n\t"jobs_list":[');
@@ -96,7 +102,7 @@ function JobServer() {
   });
 
   app.POST('/getProducts', function(req, res) {
-    console.log('POST /getProducts with key %s', req.headers[CONSUMER_KEY_HEADER]);
+    console.log('POST /getProducts with key %s', getUserHeader(req));
 
     var data = '';
 
@@ -117,14 +123,14 @@ function JobServer() {
 
     app[verb]("/job", function(req, res) {
       res.setHeader('Content-Type', 'application/json');
-      console.log('%s with key %s', verb, req.headers[CONSUMER_KEY_HEADER]);
+      console.log('%s with key %s', verb, getUserHeader(req));
       this_obj.emit(verb + " /job", req, res);
       res.send({'status':'ok'});
     });
 
     // /uploads simulates an endpoint that receives multipart form data for posts and puts
     app[verb]('/uploads', function(req, res) {
-      console.log('%s /uploads with key %s', verb.toUpperCase(), req.headers[CONSUMER_KEY_HEADER]);
+      console.log('%s /uploads with key %s', verb.toUpperCase(), getUserHeader(req));
 
       var file_path = './test/resources/' + req.files['binary_data'][0].originalname;
       var expected_length = req.files['binary_data'][0].size;

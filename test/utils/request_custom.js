@@ -2,7 +2,7 @@ var Request = require('request');
 
 /**
  * Comment out the parts of request.js that automatically set a form-urlencoded
- * request to be `charset=utf-8`;
+ * request to be `charset=utf-8` in this overriden defintion.
  * Refer to https://github.com/request/request/commit/86571c794b75bb637b39eb7574e825e461647151
  */
 Request.prototype.form = function (form) {

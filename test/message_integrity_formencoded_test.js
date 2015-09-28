@@ -72,22 +72,27 @@ require('./bootstrap_test.js');
         });
       });
 
-      // Verify that the same request always produces the same outcome for a given urlencoded body, regardless of the
-      // charset. Note that plain `body_parser.urlencoded()` rejects non-`utf-8` charsets by default.
-      it ("should support urlencoded " + verb + " requests with non-'utf-8' charsets declared in the header", function(done) {
-        var intended_content_type_header = 'application/x-www-form-urlencoded;charset=utf-8';
-        var options = {
-          headers: { 'Content-Type': intended_content_type_header },
-          form: { 'submit': 'ok' }
-        };
-        sendFn(verb, 'http://localhost:8080/job', options, 200, function(utf8_err, utf8_res, utf8_body) {
-          if (utf8_err) return done(utf8_err);
-          intended_content_type_header = 'application/x-www-form-urlencoded;charset=iso-8859-8'; // TODO (@theopak): Figure out why `charset=iso-8859-8` is not received as a header while `application/x-www-form-urlencoded;charset=utf-8` is without a problem.
-          sendFn(verb, 'http://localhost:8080/job', options, 200, function(err, res, body) {
-            if (err) return done(err);
-            res.request.headers['Content-Type'].should.equal(intended_content_type_header);
-            body.should.deepEqual(utf8_body);
-            return done();
+      // Validate that the same request always produces the same outcome for a given urlencoded body, regardless of the
+      // charset. Note that plain `body_parser.urlencoded()` rejects non-'utf-8' charsets by default.
+      ['iso-8859-8', 'us-ascii', 'ansi'].forEach(function(charset) {
+        it ("should support urlencoded " + verb + " requests with " + charset + " charsets declared in the header", function(done) {
+          var utf8_options = {
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            // form: { 'submit': 'ok' }
+          };
+          var options = {
+            headers: { 'Content-Type': 'text/plain;charset=' + charset.toString() },
+            // form: { 'submit': 'ok' }
+          };
+          sendFn(verb, 'http://localhost:8080/job', utf8_options, 200, function(utf8_err, utf8_res, utf8_body) {
+            if (utf8_err) return done(utf8_err);
+            utf8_res.request.headers['Content-Type'].should.equal(utf8_options.headers['Content-Type']);
+            sendFn(verb, 'http://localhost:8080/job', options, 200, function(err, res, body) {
+              if (err) return done(err);
+              res.request.headers['Content-Type'].should.equal(options.headers['Content-Type']);
+              body.should.deepEqual(utf8_body);
+              return done();
+            });
           });
         });
       });

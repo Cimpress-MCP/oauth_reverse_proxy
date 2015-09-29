@@ -40,7 +40,7 @@ public class OAuthClient {
 		params.add(new BasicNameValuePair("signposty", "a"));
 		params.add(new BasicNameValuePair("signposty", "b"));
 		params.add(new BasicNameValuePair("signposty", "rad"));
-		//request.setEntity(new UrlEncodedFormEntity(params));
+		request.setEntity(new UrlEncodedFormEntity(params));
 
         // sign the request
         consumer.sign(request);

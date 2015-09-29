@@ -5,6 +5,7 @@ var Request = require('request');
  * request to be `charset=utf-8` in this overriden defintion.
  * Refer to https://github.com/request/request/commit/86571c794b75bb637b39eb7574e825e461647151
  */
+Request.prototype.form = undefined;
 Request.prototype.form = function (form) {
   var self = this
   if (form) {
@@ -24,6 +25,7 @@ Request.prototype.form = function (form) {
     self.emit('error', err)
     self.abort()
   })
+  console.log('NOTICE: Using custom request.js library with overriden Request.prototype.form()')
   return self._form
 }
 

@@ -74,16 +74,16 @@ require('./bootstrap_test.js');
 
       // Validate that the same request always produces the same outcome for a given urlencoded body, regardless of the
       // charset. Note that plain `body_parser.urlencoded()` rejects non-'utf-8' charsets by default.
-      ['iso-8859-8', 'us-ascii', 'ansi'].forEach(function(charset) {
+      ['utf-8', 'iso-8859-8', 'us-ascii', 'ansi'].forEach(function(charset) {
 
-        it ("should support urlencoded " + verb + " requests with " + charset + " charsets declared in the header", function(done) {
+        it ("should support urlencoded " + verb + " requests with 'charset:" + charset + "' declared in the header", function(done) {
           var utf8_options = {
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            // form: { 'submit': 'ok' }
+            post: 'test_content'
           };
           var options = {
-            headers: { 'Content-Type': 'text/plain; charset=' + charset.toString() },
-            // form: { 'submit': 'ok' }
+            headers: { 'Content-Type': 'text/plain;charset=' + charset.toString() },
+            post: 'test_content'
           };
           sendFn(verb, 'http://localhost:8080/job', utf8_options, 200, function(utf8_err, utf8_res, utf8_body) {
             if (utf8_err) return done(utf8_err);

@@ -21,7 +21,7 @@ describe('oauth_proxy outbound message integrity: verbs', function() {
     ['GET', 'DELETE'].forEach(function(verb) {
 
       it ('should gracefully handle ' + proto + ' ' +  verb + ' requests to offline hosts', function(done) {
-        request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8282/?oauth_proxy_consumer_key=mocha-test-key&oauth_proxy_url=' +
+        request_sender.sendAuthenticatedRequest(verb, 'http://localhost:8282/?oauth_proxy_consumer_key=mocha-test-key&oauth_proxy_url=' +
           encodeURIComponent(sprintf('%s://localhost:50505/job/12345', proto)), null, 500, done);
       });
 

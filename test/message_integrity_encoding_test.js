@@ -39,11 +39,16 @@ require('./bootstrap_test.js');
       });
     });
 
-    // We want to test that escape characters in the path are acceptable for all verbs, so loop over each.
+    // Make sure to test all verbs
     ['GET', 'POST', 'PUT', 'DELETE'].forEach(function(verb) {
       // Validate that a verb requesting a URI with an escape character in the path works.
       it ("should accept a properly signed " + verb + " with a funky path", function(done) {
         sendFn(verb, 'http://localhost:8008/%7bwonky%20path%7d/is&wonky', null, 200, done);
+      });
+
+      // Validate that a verb requesting a URI with fun characters in the path works.
+      it ("should accept a properly signed " + verb + " with fun characters", function(done) {
+        sendFn(verb, 'http://localhost:8008/job?doyouwanttobuilda=☃&itdoesnthavetobea=⛄&ok=bye', null, 200, done);
       });
     });
   });

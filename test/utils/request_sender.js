@@ -135,8 +135,6 @@ exports.setCredentialTransport = function(transport) {
 };
 
 // Convenience function for sending a request and expecting a certain response code.
-// TODO: Consider rewriting this function to return a chainable Promise, which would
-// parallelize a lot of the unit test operations and also result in better code readability.
 exports.sendRequest = function(verb, url, options, expected_status_code, done) {
   if (!url) url = VERB_DEFAULT_ROUTES[verb];
   // Populate an options object by merging the options parameter, if provdied, with the parsed

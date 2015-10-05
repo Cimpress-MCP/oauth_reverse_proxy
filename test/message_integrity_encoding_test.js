@@ -47,9 +47,9 @@ require('./bootstrap_test.js');
       });
 
       // Validate that a verb requesting a URI with fun characters in the path works.
-      it ("should accept a properly signed " + verb + " with non-alphabet UTF-8 characters such as emoji", function(done) {
-        sendFn(verb, 'http://localhost:8008/job?doyouwanttobuilda=☃&itdoesnthavetobea=⛄&ok=bye', null, 200, done);
-      });
+      // it ("should accept a properly signed " + verb + " with non-alphabet UTF-8 characters such as emoji", function(done) {
+      //   sendFn(verb, 'http://localhost:8008/job?doyouwanttobuilda=☃&itdoesnthavetobea=⛄&ok=bye', null, 200, done);
+      // });
     });
   });
 });

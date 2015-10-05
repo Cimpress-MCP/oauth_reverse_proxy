@@ -1,15 +1,15 @@
 var _ = require('underscore');
 var crypto = require('crypto');
-var encoding = require('../../lib/encoding.js');
 var fs = require('fs');
-var logger = require('../../lib/logger.js').getLogger();
 var querystring = require('querystring');
 var request = require('request');
 var should = require('should');
 var url_utils = require('url');
 var util = require('util');
-var validation_tools = require('./validation_tools.js');
 var zlib = require('zlib');
+var encoding = require('../../lib/encoding.js');
+var logger = require('../../lib/logger.js').getLogger();
+var validation_tools = require('./validation_tools.js');
 
 var module_tag = {
   module: require('../../lib/logger.js').getModulePath(__filename)

@@ -2,6 +2,8 @@ var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
 var job_server = require('./job_server/');
+var request_sender = require('./utils/request_sender.js');
+var validation_tools = require('./utils/validation_tools.js');
 
 // All the messy business of creating and sending requests (both authenticated and unauthenticated)
 // lives in request_sender.

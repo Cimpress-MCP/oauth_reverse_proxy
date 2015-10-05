@@ -12,7 +12,7 @@ before_script:
   - bundle install --gemfile=test/clients/ruby/Gemfile
   # Install Perl dependencies (used by Perl client in unit tests)
   - which perl cpan cpanm || true
-  - export PERL_MM_USE_DEFAULT=1 PERL_LOCAL_LIB_ROOT=$HOME/perl5 PERL5LIB=$HOME/perl5/lib/perl5
+  - export PERL_MM_USE_DEFAULT=1 PERL_LOCAL_LIB_ROOT=$HOME/perl5 PERL5LIB=$HOME/perl5/lib/perl5 PERL_MB_OPT='--install_base "'$HOME'/perl5"'
   - mkdir -p ~/perl5/bin/ && curl -L https://cpanmin.us/ -o ~/perl5/bin/cpanm && chmod +x ~/perl5/bin/cpanm
   - ~/perl5/bin/cpanm --installdeps --notest Net::OAuth LWP::UserAgent HTTP::Request::Common
   # Install Python dependencies (used by Python client in unit tests)

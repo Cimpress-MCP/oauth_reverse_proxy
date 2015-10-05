@@ -19,7 +19,6 @@ var create_client_test = function(verb, cmd, cwd, key) {
 
     exec(cmd, {cwd: cwd}, function(err, stdout, stderr) {
       if (err) return cb(err);
-      stderr.should.equal('');
       stdout.trim().should.equal('{"status":"ok"}');
       cb();
     });

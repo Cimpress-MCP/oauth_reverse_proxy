@@ -7,8 +7,13 @@ var body_parser = require('body-parser');
 var multer  = require('multer');
 var compress = require('compression');
 
+var logger = require('../../lib/logger.js').getLogger();
+
 app.use(multer().fields([{'name':'binary_data'}]));
-app.use(body_parser.urlencoded({extended: false}));
+app.use(require('../../lib/proxy/mutators/urlencoded_bodyparser.js')({
+  logger: logger
+}))
+//app.use(body_parser.urlencoded({extended: false}));
 app.use(body_parser.json());
 
 // Save ourselves the pain and emotional trauma of having to worry about verb case while looping.

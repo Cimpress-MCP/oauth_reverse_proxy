@@ -11,14 +11,13 @@ before_script:
   # Install Ruby depenencies (used by Ruby client in unit tests)
   - bundle install --gemfile=test/clients/ruby/Gemfile
   # Install Perl dependencies (used by Perl client in unit tests)
-  - which perl cpan cpanm || true
-  - export PERL_MM_USE_DEFAULT=1 PERL_LOCAL_LIB_ROOT=$HOME/perl5 PERL5LIB=$HOME/perl5/lib/perl5 PERL_MB_OPT='--install_base "'$HOME'/perl5"'
-  - mkdir -p ~/perl5/bin/ && curl -L https://cpanmin.us/ -o ~/perl5/bin/cpanm && chmod +x ~/perl5/bin/cpanm
+  - export PERL_MM_USE_DEFAULT=1 PERL_LOCAL_LIB_ROOT=$HOME/perl5 PERL5LIB=$HOME/perl5/lib/perl5 PERL_MB_OPT='--install_base "'$HOME'/perl5"' && env | grep PERL && which perl cpan cpanm || true
+  - mkdir -p $HOME/perl5/bin/ && curl -L https://cpanmin.us/ -o $HOME/perl5/bin/cpanm && chmod +x $HOME/perl5/bin/cpanm
   - ~/perl5/bin/cpanm --installdeps --notest Net::OAuth LWP::UserAgent HTTP::Request::Common
   # Install Python dependencies (used by Python client in unit tests)
   # fix via https://github.com/rande/travis-kitchensink/blob/48e5915be37a4141dc59a8fd5c06b807c4abbab8/.travis.yml
   - export PATH=$HOME/.local/bin:$PATH
-  - pip install requests-oauth  --user `whoami`
+  - pip install requests-oauth --user `whoami`
 script:
   - npm test
 after_success:

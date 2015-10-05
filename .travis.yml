@@ -11,8 +11,9 @@ before_script:
   # Install Ruby depenencies (used by Ruby client in unit tests)
   - bundle install --gemfile=test/clients/ruby/Gemfile
   # Install Perl dependencies (used by Perl client in unit tests)
+  - which perl cpan cpanm || true
   - export PERL_MM_USE_DEFAULT=1 PERL_LOCAL_LIB_ROOT=$HOME/perl5 PERL5LIB=$HOME/perl5/lib/perl5
-  - curl -L https://cpanmin.us/ -o ~/perl5/bin/cpanm && chmod +x ~/perl5/bin/cpanm
+  - mkdir -p ~/perl5/bin/ && curl -L https://cpanmin.us/ -o ~/perl5/bin/cpanm && chmod +x ~/perl5/bin/cpanm
   - ~/perl5/bin/cpanm --installdeps --notest Net::OAuth LWP::UserAgent HTTP::Request::Common
   # Install Python dependencies (used by Python client in unit tests)
   # fix via https://github.com/rande/travis-kitchensink/blob/48e5915be37a4141dc59a8fd5c06b807c4abbab8/.travis.yml

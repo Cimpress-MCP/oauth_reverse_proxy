@@ -45,11 +45,11 @@ require('./bootstrap_test.js');
       it ("should accept a properly signed " + verb + " with a funky path", function(done) {
         sendFn(verb, 'http://localhost:8008/%7bwonky%20path%7d/is&wonky', null, 200, done);
       });
+    });
 
-      // Validate that a verb requesting a URI with fun characters in the path works.
-      it ("should accept a properly signed " + verb + " with non-alphabet UTF-8 characters such as emoji", function(done) {
-        sendFn(verb, 'http://localhost:8008/job/12345?doyouwanttobuilda=☃&itdoesnthavetobea=⛄&ok=bye', null, 200, done);
-      });
+    // Validate that a verb requesting a URI with fun characters in the path works.
+    it ("should accept a properly signed request with non-alphabet UTF-8 characters such as emoji", function(done) {
+      sendFn("GET", "http://localhost:8080/job/12345?doyouwanttobuilda=" + encodeURIComponent("☃") + "&itdoesnthavetobea=" + encodeURIComponent("⛄") + "&ok=bye", null, 200, done);
     });
   });
 });

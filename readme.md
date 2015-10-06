@@ -129,9 +129,6 @@ The following fields are optional for a proxy or reverse proxy:
     - The `thresholds` array contains 0 or more mappings from a consumer key name to the acceptable threshold for that key.  In the example above, the consumer_key "privileged_key" is allowed to make 1000 requests per second while "unprivileged_key" can only make 1 request per minute.
 - **https** (optional) - The default behavior of `oauth_[|reverse_]proxy` is to listen on an HTTP socket.  If you wish to use HTTPS instead, you must specify an `https` object in the configuration for the proxy, providing a path to both a key and certificate pem file.  Note that both a key and cert must be provided or the proxy will not be created.
 
-
-##### Usage
-
 [Unirest](http://unirest.io) is a recommended lightweight HTTP request client library for Node, Ruby, .NET, and other languages.
 
 

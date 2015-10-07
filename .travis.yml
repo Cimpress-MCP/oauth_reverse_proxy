@@ -24,9 +24,9 @@ after_success:
   - npm run coveralls
 deploy:
   provider: npm
-  email: ryan@ryanbreen.com
+  email: mail@theopak.com
   on:
     tags: true
     all_branches: true
   api_key:
-    secure: HhcCSWt/gIavho8apRa3+8UWgAesoJ1o2dvbhROviIZ+XNYBm5qCo1dfTH9d5hhaOVVVXe7rKLcqwru57fahXefU7gzPu78FuBQA5ipQnwQCZg8tLPVrq9FRGYUXOd/e/Al7NB9yVLaP6ji4KHC0lNUsEGMeo9mrH0hpKy9mc+k=
+    secure: FiUaN8GCOnUTBAQPi8uW2bs8xV254zmLMpgWrDllePHJJH911ADHMdfrTYqXJiailVDoedXZJnWNAJsf17cDpJn5W+SN+LklDVMTUJ36P+UiZjVgTVxrxGrNxbkbI8rBrzMudzpE4gYn1hIMYB0fAPGpgZ+W4rT31B+LKvVQq9vgcPvbMwvEITWJelVDgIBEf4IybT7GHRaP32MRuvOZUhX5Z2uCqVte0qma5iOOTPnSOTbmgXzfDclf+3wHHQ6UFhgCEbrPM6UdbsfgOP1WfDVxVk0b0i34anRwURHdst/U/ecKhmBR0r2hMtyfuBUJwpgW+fTjbXK358J6/IcLTsOV3yJhvBzT+Io2yZPm86izEQsVblRbPIMNX/af0Fld/AVFlw4flrJ9eMCZkgFZR78PIe4hvu0li79siFrJDbm9ISWjUhTfkYbpkvRz1UVyDaWYBskkUd686jXVCtil4htfZ/CuuowG4yxD31RLGvPfKVsjpHz843HfxFnsp732dDEyix9LV2BDuVf6R/ZBHLPUVFGEKPEwf1YTN6OffaKgpoVUQkUvhb8+OQG8BoxoYdf0UOok06igNfvckufUxolY7TLFg2cTsfDooG7L18125EPDq5WuuEFh3dP/yn6YIg19NqI7BH/sjDt7fQ/hp+L05qzgnKnD6LWLAa/Gvi4=

@@ -66,7 +66,7 @@ describe('dynamic config loader', function() {
             request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 200, function(err) {
               if (err) return done(err);
               request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8010/job/12345', null, 500, function(err) {
-                err.message.should.equal('connect ECONNREFUSED');
+                err.message.should.startWith('connect ECONNREFUSED');
 
                 // Validate that dynamic_whitelist_config_service has been updated to reflect the whitelist in dynamic_whitelist_config_service.next.json.
                 // /superlivecheck should no longer be whitelisted, but /superduperlivecheck will be.
@@ -92,7 +92,7 @@ describe('dynamic config loader', function() {
         var check_config = function() {
           if (bootstrap_test.proxies['dynamic_config_service.json'] === undefined) {
             request_sender.sendAuthenticatedRequest('GET', 'http://localhost:8011/job/12345', null, 500, function(err) {
-              err.message.should.equal('connect ECONNREFUSED');
+              err.message.should.startWith('connect ECONNREFUSED');
               done();
             });
           } else setTimeout(check_config, 50);

@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 use LWP::UserAgent;
 use HTTP::Request::Common;
 use Net::OAuth;

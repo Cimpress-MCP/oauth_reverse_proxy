@@ -1,11 +1,9 @@
 var _ = require('underscore');
 var fs = require('fs');
 var path = require('path');
-
+var job_server = require('./job_server/');
 var request_sender = require('./utils/request_sender.js');
 var validation_tools = require('./utils/validation_tools.js');
-
-var job_server = require('./job_server/');
 
 // All the messy business of creating and sending requests (both authenticated and unauthenticated)
 // lives in request_sender.
@@ -43,19 +41,19 @@ require('./bootstrap_test.js');
         job_server.once(verb + " /job", function(req, res) {
           req.headers.should.have.property('x-oauth-reverse-proxy-consumer-key', 'mocha-test-key');
           req.method.should.equal(verb);
-          _.isEqual(req.body, {'submit':'ok'}).should.equal(true);
+          _.isEqual(req.body, { 'submit': 'ok' }).should.equal(true);
         });
 
         // Add the params to the signature.  Without this line, the call will fail with a 401.
         request_sender.params.push('submit', 'ok');
-        sendFn(verb, null, {form:{submit:'ok'}}, 200, done);
+        sendFn(verb, null, { form: { submit: 'ok' } }, 200, done);
       });
 
-      // This test is not relevant for the outbound proxy
+      // This test is not relevant for the outbound proxy.
       if (mode === 'oauth_reverse_proxy') {
         // Validate that a POST or PUT with unsigned body parameters fails due to signature mismatch.
         it ("should reject an improperly signed " + verb + " where params are not part of the signature", function(done) {
-          sendFn(verb, null, {form:{submit:'ok'}}, 401, done);
+          sendFn(verb, null, { form: { submit: 'ok' } }, 401, done);
         });
       }
 
@@ -69,11 +67,38 @@ require('./bootstrap_test.js');
         console.error = function() {}
 
         // Send an authenticated request with a giant form body.
-        sendFn(verb, null, {form:crazy_huge_form}, 413, function(err) {
+        sendFn(verb, null, { form: crazy_huge_form }, 413, function(err) {
           // reset console.err
           console.error = _console_error;
           done(err);
         });
+      });
+
+      // Validate that the same request always produces the same outcome for a given urlencoded body, regardless of the
+      // charset. Note that plain `body_parser.urlencoded()` rejects non-'utf-8' charsets by default.
+      ['utf-8', 'iso-8859-8', 'us-ascii', 'ansi'].forEach(function(charset) {
+
+        it ("should support urlencoded " + verb + " requests with 'charset:" + charset + "' declared in the header", function(done) {
+          var utf8_options = {
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            post: 'test_content'
+          };
+          var options = {
+            headers: { 'Content-Type': 'text/plain;charset=' + charset.toString() },
+            post: 'test_content'
+          };
+          sendFn(verb, 'http://localhost:8080/job', utf8_options, 200, function(utf8_err, utf8_res, utf8_body) {
+            if (utf8_err) return done(utf8_err);
+            utf8_res.request.headers['Content-Type'].should.equal(utf8_options.headers['Content-Type']);
+            sendFn(verb, 'http://localhost:8080/job', options, 200, function(err, res, body) {
+              if (err) return done(err);
+              res.request.headers['Content-Type'].should.equal(options.headers['Content-Type']);
+              body.should.deepEqual(utf8_body);
+              return done();
+            });
+          });
+        });
+
       });
     });
   });

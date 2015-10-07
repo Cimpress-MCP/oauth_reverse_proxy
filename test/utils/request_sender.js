@@ -1,13 +1,20 @@
-var should = require('should');
-
 var _ = require('underscore');
 var crypto = require('crypto');
 var fs = require('fs');
-
-var encoding = require('../../lib/encoding.js');
-
 var querystring = require('querystring');
 var request = require('request');
+var should = require('should');
+var url_utils = require('url');
+var util = require('util');
+var zlib = require('zlib');
+var encoding = require('../../lib/encoding.js');
+var logger = require('../../lib/logger.js').getLogger();
+var validation_tools = require('./validation_tools.js');
+
+var module_tag = {
+  module: require('../../lib/logger.js').getModulePath(__filename)
+};
+
 // This saves us from having to special case calls to delete since it's the only verb where the
 // name doesn't match the method name.  For the others, we're just being lazy and saying we don't
 // want to remember whether our verbs are upper or lower case when we try to grab the appropriate
@@ -16,17 +23,6 @@ request.delete = request.DELETE = request.del;
 request.GET = request.get;
 request.POST = request.post;
 request.PUT = request.put;
-var url_utils = require('url');
-var util = require('util');
-var zlib = require('zlib');
-
-var module_tag = {
-  module: require('../../lib/logger.js').getModulePath(__filename)
-};
-
-var logger = require('../../lib/logger.js').getLogger();
-
-var validation_tools = require('./validation_tools.js');
 
 exports.keys = {};
 

@@ -22,7 +22,7 @@ my $oauth_request = Net::OAuth->request('consumer')->new(
   consumer_secret => $consumer_secret,
   request_url => url(),
   request_method => 'GET',
-  signature_method => 'HMAC-SHA1',
+  signature_method => 'HMAC-SHA256',
   timestamp => time,
   nonce => nonce(),
 );
